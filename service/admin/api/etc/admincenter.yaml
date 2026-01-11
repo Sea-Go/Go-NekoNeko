@@ -1,0 +1,9 @@
+Name: admincenter
+Host: 0.0.0.0
+Port: 8888
+DataSource : "host=127.0.0.1 user=postgres password=123456 dbname=user_db port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+AdminAuth:
+  AccessSecret : "yU-hCm)2*?NQmWG"
+  AccessExpire : 180
+System:
+ DefaultPassword : "123456"

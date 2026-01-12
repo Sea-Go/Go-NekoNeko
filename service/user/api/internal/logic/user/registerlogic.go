@@ -49,6 +49,7 @@ func (l *RegisterLogic) Register(req *types.CreateUserReq) (resp *types.CreateUs
 		Username:  req.Username,
 		Password:  truePassword,
 		Email:     req.Email,
+		Status:    0,
 		ExtraInfo: req.Extrainfo,
 	}
 	err = l.svcCtx.DB.Create(&user).Error

@@ -85,6 +85,19 @@ type UpdateSelfResp struct {
 	Admin   AdminInfo `json:"admin"`
 }
 
+type UpdateUserReq struct {
+	Id        uint64            `json:"id"`
+	Username  string            `json:"username,optional"`
+	Password  string            `json:"password,optional"`
+	Email     string            `json:"email,optional"`
+	Extrainfo map[string]string `json:"extra_info,optional"`
+}
+
+type UpdateUserResp struct {
+	Success bool     `json:"success"`
+	User    UserInfo `json:"user"`
+}
+
 type UserInfo struct {
 	Id        uint64            `json:"id"`
 	Username  string            `json:"username"`

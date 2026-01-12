@@ -32,6 +32,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 	server.AddRoutes(
 		[]rest.Route{
 			{
+				Method:  http.MethodPost,
+				Path:    "/admin/banuser",
+				Handler: admin.BanuserHandler(serverCtx),
+			},
+			{
 				Method:  http.MethodDelete,
 				Path:    "/admin/delete",
 				Handler: admin.DeleteHandler(serverCtx),
@@ -55,6 +60,11 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Method:  http.MethodPost,
 				Path:    "/admin/resetuserpassword",
 				Handler: admin.ResetuserpasswordHandler(serverCtx),
+			},
+			{
+				Method:  http.MethodPost,
+				Path:    "/admin/unbanuser",
+				Handler: admin.UnbanuserHandler(serverCtx),
 			},
 			{
 				Method:  http.MethodPost,

@@ -10,6 +10,14 @@ type AdminInfo struct {
 	Extrainfo map[string]string `json:"extra_info,omitempty"`
 }
 
+type BanUserReq struct {
+	Id uint64 `json:"id"`
+}
+
+type BanUserResp struct {
+	Success bool `json:"success"`
+}
+
 type CreateAdminReq struct {
 	Username  string            `json:"username"`
 	Password  string            `json:"password"`
@@ -73,6 +81,14 @@ type ResetUserPasswordResp struct {
 	Success bool `json:"success"`
 }
 
+type UnBanUserReq struct {
+	Id uint64 `json:"id"`
+}
+
+type UnBanUserResp struct {
+	Success bool `json:"success"`
+}
+
 type UpdateSelfReq struct {
 	Username  string            `json:"username,optional"`
 	Password  string            `json:"password,optional"`
@@ -101,6 +117,7 @@ type UpdateUserResp struct {
 type UserInfo struct {
 	Id        uint64            `json:"id"`
 	Username  string            `json:"username"`
+	Status    int64             `json:"status"`
 	Email     string            `json:"email,omitempty"`
 	Extrainfo map[string]string `json:"extra_info,omitempty"`
 }

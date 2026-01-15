@@ -6,12 +6,10 @@ package user
 import (
 	"context"
 	"encoding/json"
-	"errors"
 
-	"sea-try-go/service/common/cryptx"
-	"sea-try-go/service/user/api/internal/model"
 	"sea-try-go/service/user/api/internal/svc"
 	"sea-try-go/service/user/api/internal/types"
+	"sea-try-go/service/user/rpc/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -36,46 +34,26 @@ func (l *UpdateuserLogic) Updateuser(req *types.UpdateUserReq) (resp *types.Upda
 	if er != nil {
 		return nil, er
 	}
-	updates := make(map[string]interface{})
-	if len(req.Username) > 0 {
-		updates["username"] = req.Username
+
+	rpcReq := &pb.UpdateUserReq{
+		Id:        uint64(id),
+		Username:  req.Username,
+		Password:  req.Password,
+		Email:     req.Email,
+		ExtraInfo: req.Extrainfo,
 	}
 
-	if len(req.Password) > 0 {
-		newPassword, e := cryptx.PasswordEncrypt(req.Password)
-		if e != nil {
-			return nil, e
-		}
-		updates["password"] = newPassword
-	}
-
-	if len(req.Email) > 0 {
-		updates["email"] = req.Email
-	}
-
-	if req.Extrainfo != nil {
-		updates["extra_info"] = req.Extrainfo
-	}
-
-	if len(updates) > 0 {
-		err = l.svcCtx.DB.Model(&model.User{}).Where("id = ?", id).Updates(updates).Error
-		if err != nil {
-			return nil, errors.New("更新失败:" + err.Error())
-		}
-	}
-
-	var newUser model.User
-	err = l.svcCtx.DB.Model(&model.User{}).Where("id = ?", id).First(&newUser).Error
-	if err != nil {
-		return nil, errors.New("用户不存在")
+	rpcResp, er := l.svcCtx.UserRpc.UpdateUser(l.ctx, rpcReq)
+	if er != nil {
+		return nil, er
 	}
 
 	return &types.UpdateUserResp{
 		User: types.UserInfo{
-			Id:        newUser.Id,
-			Username:  newUser.Username,
-			Email:     newUser.Email,
-			Extrainfo: newUser.ExtraInfo,
+			Id:        rpcResp.User.Id,
+			Username:  rpcResp.User.Username,
+			Email:     rpcResp.User.Email,
+			Extrainfo: rpcResp.User.ExtraInfo,
 		},
 	}, nil
 

@@ -6,10 +6,11 @@ package user
 import (
 	"context"
 	"encoding/json"
+	"errors"
 
-	"sea-try-go/service/user/api/internal/model"
 	"sea-try-go/service/user/api/internal/svc"
 	"sea-try-go/service/user/api/internal/types"
+	"sea-try-go/service/user/rpc/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -30,28 +31,29 @@ func NewGetuserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetuserLo
 
 func (l *GetuserLogic) Getuser(req *types.GetUserReq) (resp *types.GetUserResp, err error) {
 
-	//id := req.id
-	//我自己写的是上面的,但是Gemini说上面的写法存在安全风险,改成下面的了
-	//我的理解是,应该给user再细分普通user和admin,普通user用下面的,admin用上面的
-
 	userId := l.ctx.Value("userId").(json.Number)
 	id, _ := userId.Int64()
 
-	user := model.User{}
-	err = l.svcCtx.DB.Where("id = ?", uint64(id)).First(&user).Error
-	if err != nil {
-		return &types.GetUserResp{
-			Found: false,
-		}, err
+	rpcReq := &pb.GetUserReq{
+		Id: uint64(id),
 	}
-	userInfo := types.UserInfo{
-		Id:        user.Id,
-		Username:  user.Username,
-		Email:     user.Email,
-		Extrainfo: user.ExtraInfo,
+
+	rpcResp, er := l.svcCtx.UserRpc.GetUser(l.ctx, rpcReq)
+
+	if er != nil {
+		return nil, er
 	}
+	if !rpcResp.Found {
+		return nil, errors.New("查询个人信息错误")
+	}
+
 	return &types.GetUserResp{
-		User:  userInfo,
+		User: types.UserInfo{
+			Id:        rpcResp.User.Id,
+			Username:  rpcResp.User.Username,
+			Email:     rpcResp.User.Email,
+			Extrainfo: rpcResp.User.ExtraInfo,
+		},
 		Found: true,
 	}, nil
 }

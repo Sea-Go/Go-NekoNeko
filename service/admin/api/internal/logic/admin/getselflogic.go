@@ -8,9 +8,9 @@ import (
 	"encoding/json"
 	"errors"
 
-	"sea-try-go/service/admin/api/internal/model"
 	"sea-try-go/service/admin/api/internal/svc"
 	"sea-try-go/service/admin/api/internal/types"
+	"sea-try-go/service/admin/rpc/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -34,15 +34,23 @@ func (l *GetselfLogic) Getself(req *types.GetSelfReq) (resp *types.GetSelfResp, 
 	if !ok {
 		return nil, errors.New("Token 解析异常")
 	}
-	id, _ := userId.Int64()
-	admin := model.Admin{}
-	err = l.svcCtx.DB.Where("id = ?", uint64(id)).First(&admin).Error
+	id, err := userId.Int64()
+	if err != nil {
+		return nil, err
+	}
+	rpcReq := &pb.GetSelfReq{
+		Id: uint64(id),
+	}
+	rpcResp, err := l.svcCtx.AdminRpc.GetSelf(l.ctx, rpcReq)
+	if err != nil {
+		return nil, err
+	}
 	return &types.GetSelfResp{
 		Admin: types.AdminInfo{
-			Id:        admin.Id,
-			Username:  admin.Username,
-			Email:     admin.Email,
-			Extrainfo: admin.ExtraInfo,
+			Id:        rpcResp.Admin.Id,
+			Username:  rpcResp.Admin.Username,
+			Email:     rpcResp.Admin.Email,
+			Extrainfo: rpcResp.Admin.ExtraInfo,
 		},
 	}, nil
 }

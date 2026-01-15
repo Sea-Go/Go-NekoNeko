@@ -2,10 +2,8 @@ Name: usercenter
 Host: 0.0.0.0
 Port: 8888
 
-#数据库参数
-DataSource : "host=127.0.0.1 user=postgres password=123456 dbname=user_db port=5432 sslmode=disable TimeZone=Asia/Shanghai"
-
-#定义Auth , 一个 json web token
-Auth:
-  AccessSecret : "uU7@#hJk9*L2s$5vXz!qWaE4rT&yGnBm"
-  AccessExpire : 86400
+UserRpc:
+ Etcd:
+  Hosts:
+   - 127.0.0.1:2379
+  Key: user.rpc

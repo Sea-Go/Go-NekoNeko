@@ -1,16 +1,17 @@
 Name: user.rpc
 ListenOn: 0.0.0.0:28080
-Etcd:
-  Hosts:
-    - 127.0.0.1:32379
-  Key: user.rpc
 
 Postgres:
   Host: 127.0.0.1
   Port: "35432"
-  User: admin
-  Password: "Sea-TryGo"
-  DBName: user
+  User: postgres
+  Password: "123456"
+  DBName: user_db
+
+Etcd:
+  Hosts:
+   - 127.0.0.1:2379
+  Key: user.rpc
 
 Log:
   Mode: file

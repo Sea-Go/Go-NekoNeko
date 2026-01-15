@@ -7,9 +7,9 @@ import (
 	"context"
 	"encoding/json"
 
-	"sea-try-go/service/user/api/internal/model"
 	"sea-try-go/service/user/api/internal/svc"
 	"sea-try-go/service/user/api/internal/types"
+	"sea-try-go/service/user/rpc/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -30,18 +30,23 @@ func NewDeleteuserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Delete
 
 func (l *DeleteuserLogic) Deleteuser(req *types.DeleteUserReq) (resp *types.DeleteUserResp, err error) {
 
-	//这里也是写的普通user对应的
-
-	//"userId"和token的claims中的字段对应
 	userId := l.ctx.Value("userId").(json.Number)
 	id, _ := userId.Int64()
 
-	err = l.svcCtx.DB.Where("id = ?", uint64(id)).Delete(&model.User{}).Error
-	if err != nil {
+	rpcReq := &pb.DeleteUserReq{
+		Id: uint64(id),
+	}
+
+	rpcResp, er := l.svcCtx.UserRpc.DeleteUser(l.ctx, rpcReq)
+	if er != nil {
+		return nil, er
+	}
+	if !rpcResp.Success {
 		return &types.DeleteUserResp{
 			Success: false,
-		}, err
+		}, nil
 	}
+
 	return &types.DeleteUserResp{
 		Success: true,
 	}, nil

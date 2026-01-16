@@ -3,61 +3,117 @@ syntax = "proto3";
 package article;
 option go_package = ".";
 
-message ArticleInfo {
-  uint64 id = 1;
-  string title = 2;  
-  string content = 3;
-  string author = 4;
-  repeated string tags = 5;
-  map<string,string> extra_info = 6;
+// 文章业务状态（仅描述社区场景下的状态）
+enum ArticleStatus {
+  ARTICLE_STATUS_UNSPECIFIED = 0; // 未指定
+  DRAFT = 1;                      // 草稿
+  PUBLISHED = 2;                  // 已发布
+  REVIEWING = 3;                  // 审核中（社区必备）
+  REJECTED = 4;                   // 审核被拒
+  DELETED = 5;                    // 已删除（逻辑删除）
 }
 
-message GetArticleReq {
-  uint64 id = 1;
+// 文章核心结构体（轻量 Markdown 格式，元数据+正文都存在 PG）
+message Article {
+  string id = 1;                      // 文章唯一ID（雪花ID）
+  string title = 2;                   // 文章标题
+  string brief = 3;                   // 文章摘要（自动截取/手动填写，用于列表展示）
+  string markdown_content = 4;        // 轻量 Markdown 正文（约束格式：标题、列表、图片链接、引用）
+  string cover_image_url = 5;         // 封面图URL（用OSS/MinIO存储，仅存URL）
+  string manual_type_tag = 6;         // 手动一级标签（如：游戏评测/攻略/杂谈）
+  repeated string secondary_tags = 7; // 二级标签（如：《黑神话：悟空》/PS5/Steam）
+  string author_id = 8;               // 作者ID（关联用户服务）
+  int64 create_time = 9;              // 创建时间（毫秒时间戳）
+  int64 update_time = 10;             // 更新时间（毫秒时间戳）
+  ArticleStatus status = 11;          // 文章状态
+  // 社区互动数据（直接存在PG，高频更新可缓存）
+  int32 view_count = 12;              // 阅读量
+  int32 like_count = 13;              // 点赞数
+  int32 comment_count = 14;           // 评论数
+  int32 share_count = 15;             // 分享数
+  map<string, string> ext_info = 16;  // 扩展字段（如：关联游戏ID/活动ID）
 }
 
-message GetArticleResp {
-  ArticleInfo article = 1;
-  bool found = 2;
+// 创建文章请求
+message CreateArticleRequest {
+  string title = 1;                   // 标题
+  optional string brief = 2;          // 摘要（可选，自动截取正文前150字）
+  string markdown_content = 3;        // 轻量 Markdown 正文
+  optional string cover_image_url = 4;// 封面图URL（可选）
+  string manual_type_tag = 5;         // 一级标签
+  repeated string secondary_tags = 6; // 二级标签
+  string author_id = 7;               // 作者ID
 }
 
-message CreateArticleReq {
-  string title = 1;
-  string content = 2;
-  string author = 3;
-  repeated string tags = 4;
-  map<string,string> extra_info = 5;
+// 创建文章响应
+message CreateArticleResponse {
+  string article_id = 1;              // 文章ID
 }
 
-message CreateArticleResp {
-  uint64 id = 1;
+// 获取文章详情请求
+message GetArticleRequest {
+  string article_id = 1;              // 文章ID
+  bool incr_view = 2;                 // 是否增加阅读量（详情页传true，其他场景传false）
 }
 
-message UpdateArticleReq {
-  uint64 id = 1;
-  string title = 2;
-  string content = 3;
-  string author = 4;
-  repeated string tags = 5;
-  map<string,string> extra_info = 6;
+// 获取文章详情响应
+message GetArticleResponse {
+  Article article = 1;                // 文章完整数据
 }
 
-message UpdateArticleResp {
-  ArticleInfo article = 1;
+// 更新文章请求
+message UpdateArticleRequest {
+  string article_id = 1;              // 文章ID（必传）
+  optional string title = 2;
+  optional string brief = 3;
+  optional string markdown_content = 4;
+  optional string cover_image_url = 5;
+  optional string manual_type_tag = 6;
+  repeated string secondary_tags = 7;
+  optional ArticleStatus status = 8;
 }
 
-
-message DeleteArticleReq {
-  uint64 id = 1;
-}
-
-message DeleteArticleResp {
+// 更新文章响应
+message UpdateArticleResponse {
   bool success = 1;
 }
 
+// 删除文章请求
+message DeleteArticleRequest {
+  string article_id = 1;              // 文章ID
+  string operator_id = 2;             // 操作人ID（作者/管理员）
+}
+
+// 删除文章响应
+message DeleteArticleResponse {
+  bool success = 1;
+}
+
+// 文章列表查询请求（社区核心场景：首页/标签页/个人主页）
+message ListArticlesRequest {
+  optional string manual_type_tag = 1;    // 按一级标签筛选
+  optional string secondary_tag = 2;      // 按二级标签筛选
+  optional string related_game_id = 3;    // 按关联游戏筛选
+  optional string author_id = 4;          // 按作者筛选
+  int32 page = 5;                         // 页码（从1开始）
+  int32 page_size = 6;                    // 每页数量
+  string sort_by = 7;                     // 排序字段（create_time/like_count/comment_count）
+  bool desc = 8;                          // 是否降序
+}
+
+// 文章列表查询响应
+message ListArticlesResponse {
+  repeated Article articles = 1;      // 文章列表（仅返回列表展示所需字段，可在服务层裁剪）
+  int64 total = 2;                    // 总条数
+  int32 page = 3;                     // 当前页码
+  int32 page_size = 4;                // 每页数量
+}
+
+// 文章核心服务定义
 service ArticleService {
-  rpc GetArticle(GetArticleReq) returns (GetArticleResp);
-  rpc CreateArticle(CreateArticleReq) returns (CreateArticleResp);
-  rpc UpdateArticle(UpdateArticleReq) returns (UpdateArticleResp);
-  rpc DeleteArticle(DeleteArticleReq) returns (DeleteArticleResp);
+  rpc CreateArticle(CreateArticleRequest) returns (CreateArticleResponse);
+  rpc GetArticle(GetArticleRequest) returns (GetArticleResponse);
+  rpc UpdateArticle(UpdateArticleRequest) returns (UpdateArticleResponse);
+  rpc DeleteArticle(DeleteArticleRequest) returns (DeleteArticleResponse);
+  rpc ListArticles(ListArticlesRequest) returns (ListArticlesResponse);
 }

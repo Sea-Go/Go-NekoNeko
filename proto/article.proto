@@ -35,7 +35,7 @@ message Article {
 }
 
 // 创建文章请求
-message CreateArticleRequest {
+message CreateArticleReq {
   string title = 1;                   // 标题
   optional string brief = 2;          // 摘要（可选，自动截取正文前150字）
   string markdown_content = 3;        // 轻量 Markdown 正文
@@ -46,23 +46,23 @@ message CreateArticleRequest {
 }
 
 // 创建文章响应
-message CreateArticleResponse {
+message CreateArticleResp {
   string article_id = 1;              // 文章ID
 }
 
 // 获取文章详情请求
-message GetArticleRequest {
+message GetArticleReq {
   string article_id = 1;              // 文章ID
   bool incr_view = 2;                 // 是否增加阅读量（详情页传true，其他场景传false）
 }
 
 // 获取文章详情响应
-message GetArticleResponse {
+message GetArticleResp {
   Article article = 1;                // 文章完整数据
 }
 
 // 更新文章请求
-message UpdateArticleRequest {
+message UpdateArticleReq {
   string article_id = 1;              // 文章ID（必传）
   optional string title = 2;
   optional string brief = 3;
@@ -74,23 +74,23 @@ message UpdateArticleRequest {
 }
 
 // 更新文章响应
-message UpdateArticleResponse {
+message UpdateArticleResp {
   bool success = 1;
 }
 
 // 删除文章请求
-message DeleteArticleRequest {
+message DeleteArticleReq {
   string article_id = 1;              // 文章ID
   string operator_id = 2;             // 操作人ID（作者/管理员）
 }
 
 // 删除文章响应
-message DeleteArticleResponse {
+message DeleteArticleResp {
   bool success = 1;
 }
 
 // 文章列表查询请求（社区核心场景：首页/标签页/个人主页）
-message ListArticlesRequest {
+message ListArticlesReq {
   optional string manual_type_tag = 1;    // 按一级标签筛选
   optional string secondary_tag = 2;      // 按二级标签筛选
   optional string related_game_id = 3;    // 按关联游戏筛选
@@ -102,7 +102,7 @@ message ListArticlesRequest {
 }
 
 // 文章列表查询响应
-message ListArticlesResponse {
+message ListArticlesResp {
   repeated Article articles = 1;      // 文章列表（仅返回列表展示所需字段，可在服务层裁剪）
   int64 total = 2;                    // 总条数
   int32 page = 3;                     // 当前页码
@@ -111,9 +111,21 @@ message ListArticlesResponse {
 
 // 文章核心服务定义
 service ArticleService {
-  rpc CreateArticle(CreateArticleRequest) returns (CreateArticleResponse);
-  rpc GetArticle(GetArticleRequest) returns (GetArticleResponse);
-  rpc UpdateArticle(UpdateArticleRequest) returns (UpdateArticleResponse);
-  rpc DeleteArticle(DeleteArticleRequest) returns (DeleteArticleResponse);
-  rpc ListArticles(ListArticlesRequest) returns (ListArticlesResponse);
+  rpc CreateArticle(CreateArticleReq) returns (CreateArticleResp);
+  rpc GetArticle(GetArticleReq) returns (GetArticleResp);
+  rpc UpdateArticle(UpdateArticleReq) returns (UpdateArticleResp);
+  rpc DeleteArticle(DeleteArticleReq) returns (DeleteArticleResp);
+  rpc ListArticles(ListArticlesReq) returns (ListArticlesResp);
+  rpc LikeArticle(LikeArticleReq) returns (LikeArticleResp);
+}
+
+//////////////////// hotspot / like /////////////////////
+message LikeArticleReq {
+  string article_id = 1;              // 文章ID
+  string user_id = 2;                 // 用户ID (?)
+  int32 type = 3;                     // 1=点赞, 2=取消
+}
+
+message LikeArticleResp {
+  int32 like_count = 1;               // 点赞数量
 }

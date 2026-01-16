@@ -14,21 +14,27 @@ import (
 )
 
 type (
-	ArticleInfo       = __.ArticleInfo
+	Article           = __.Article
 	CreateArticleReq  = __.CreateArticleReq
 	CreateArticleResp = __.CreateArticleResp
 	DeleteArticleReq  = __.DeleteArticleReq
 	DeleteArticleResp = __.DeleteArticleResp
 	GetArticleReq     = __.GetArticleReq
 	GetArticleResp    = __.GetArticleResp
+	LikeArticleReq    = __.LikeArticleReq
+	LikeArticleResp   = __.LikeArticleResp
+	ListArticlesReq   = __.ListArticlesReq
+	ListArticlesResp  = __.ListArticlesResp
 	UpdateArticleReq  = __.UpdateArticleReq
 	UpdateArticleResp = __.UpdateArticleResp
 
 	ArticleService interface {
-		GetArticle(ctx context.Context, in *GetArticleReq, opts ...grpc.CallOption) (*GetArticleResp, error)
 		CreateArticle(ctx context.Context, in *CreateArticleReq, opts ...grpc.CallOption) (*CreateArticleResp, error)
+		GetArticle(ctx context.Context, in *GetArticleReq, opts ...grpc.CallOption) (*GetArticleResp, error)
 		UpdateArticle(ctx context.Context, in *UpdateArticleReq, opts ...grpc.CallOption) (*UpdateArticleResp, error)
 		DeleteArticle(ctx context.Context, in *DeleteArticleReq, opts ...grpc.CallOption) (*DeleteArticleResp, error)
+		ListArticles(ctx context.Context, in *ListArticlesReq, opts ...grpc.CallOption) (*ListArticlesResp, error)
+		LikeArticle(ctx context.Context, in *LikeArticleReq, opts ...grpc.CallOption) (*LikeArticleResp, error)
 	}
 
 	defaultArticleService struct {
@@ -42,14 +48,14 @@ func NewArticleService(cli zrpc.Client) ArticleService {
 	}
 }
 
-func (m *defaultArticleService) GetArticle(ctx context.Context, in *GetArticleReq, opts ...grpc.CallOption) (*GetArticleResp, error) {
-	client := __.NewArticleServiceClient(m.cli.Conn())
-	return client.GetArticle(ctx, in, opts...)
-}
-
 func (m *defaultArticleService) CreateArticle(ctx context.Context, in *CreateArticleReq, opts ...grpc.CallOption) (*CreateArticleResp, error) {
 	client := __.NewArticleServiceClient(m.cli.Conn())
 	return client.CreateArticle(ctx, in, opts...)
+}
+
+func (m *defaultArticleService) GetArticle(ctx context.Context, in *GetArticleReq, opts ...grpc.CallOption) (*GetArticleResp, error) {
+	client := __.NewArticleServiceClient(m.cli.Conn())
+	return client.GetArticle(ctx, in, opts...)
 }
 
 func (m *defaultArticleService) UpdateArticle(ctx context.Context, in *UpdateArticleReq, opts ...grpc.CallOption) (*UpdateArticleResp, error) {
@@ -60,4 +66,14 @@ func (m *defaultArticleService) UpdateArticle(ctx context.Context, in *UpdateArt
 func (m *defaultArticleService) DeleteArticle(ctx context.Context, in *DeleteArticleReq, opts ...grpc.CallOption) (*DeleteArticleResp, error) {
 	client := __.NewArticleServiceClient(m.cli.Conn())
 	return client.DeleteArticle(ctx, in, opts...)
+}
+
+func (m *defaultArticleService) ListArticles(ctx context.Context, in *ListArticlesReq, opts ...grpc.CallOption) (*ListArticlesResp, error) {
+	client := __.NewArticleServiceClient(m.cli.Conn())
+	return client.ListArticles(ctx, in, opts...)
+}
+
+func (m *defaultArticleService) LikeArticle(ctx context.Context, in *LikeArticleReq, opts ...grpc.CallOption) (*LikeArticleResp, error) {
+	client := __.NewArticleServiceClient(m.cli.Conn())
+	return client.LikeArticle(ctx, in, opts...)
 }

@@ -23,14 +23,14 @@ func NewArticleServiceServer(svcCtx *svc.ServiceContext) *ArticleServiceServer {
 	}
 }
 
-func (s *ArticleServiceServer) GetArticle(ctx context.Context, in *__.GetArticleReq) (*__.GetArticleResp, error) {
-	l := logic.NewGetArticleLogic(ctx, s.svcCtx)
-	return l.GetArticle(in)
-}
-
 func (s *ArticleServiceServer) CreateArticle(ctx context.Context, in *__.CreateArticleReq) (*__.CreateArticleResp, error) {
 	l := logic.NewCreateArticleLogic(ctx, s.svcCtx)
 	return l.CreateArticle(in)
+}
+
+func (s *ArticleServiceServer) GetArticle(ctx context.Context, in *__.GetArticleReq) (*__.GetArticleResp, error) {
+	l := logic.NewGetArticleLogic(ctx, s.svcCtx)
+	return l.GetArticle(in)
 }
 
 func (s *ArticleServiceServer) UpdateArticle(ctx context.Context, in *__.UpdateArticleReq) (*__.UpdateArticleResp, error) {
@@ -41,4 +41,14 @@ func (s *ArticleServiceServer) UpdateArticle(ctx context.Context, in *__.UpdateA
 func (s *ArticleServiceServer) DeleteArticle(ctx context.Context, in *__.DeleteArticleReq) (*__.DeleteArticleResp, error) {
 	l := logic.NewDeleteArticleLogic(ctx, s.svcCtx)
 	return l.DeleteArticle(in)
+}
+
+func (s *ArticleServiceServer) ListArticles(ctx context.Context, in *__.ListArticlesReq) (*__.ListArticlesResp, error) {
+	l := logic.NewListArticlesLogic(ctx, s.svcCtx)
+	return l.ListArticles(in)
+}
+
+func (s *ArticleServiceServer) LikeArticle(ctx context.Context, in *__.LikeArticleReq) (*__.LikeArticleResp, error) {
+	l := logic.NewLikeArticleLogic(ctx, s.svcCtx)
+	return l.LikeArticle(in)
 }

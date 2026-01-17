@@ -25,5 +25,7 @@ func NewLikeArticleLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LikeA
 func (l *LikeArticleLogic) LikeArticle(in *__.LikeArticleReq) (*__.LikeArticleResp, error) {
 	// todo: add your logic here and delete this line
 
-	return &__.LikeArticleResp{}, nil
+	return &__.LikeArticleResp{
+		LikeCount: 0, // 暂时填0，你需要做类型转换
+	}, nil
 }

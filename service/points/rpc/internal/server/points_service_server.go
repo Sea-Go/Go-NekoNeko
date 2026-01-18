@@ -37,3 +37,8 @@ func (s *PointsServiceServer) GetUserAddPointHistory(ctx context.Context, in *__
 	l := logic.NewGetUserAddPointHistoryLogic(ctx, s.svcCtx)
 	return l.GetUserAddPointHistory(in)
 }
+
+func (s *PointsServiceServer) GetTaskProgress(ctx context.Context, in *__.GetTaskProgressReq) (*__.GetTaskProgressResp, error) {
+	l := logic.NewGetTaskProgressLogic(ctx, s.svcCtx)
+	return l.GetTaskProgress(in)
+}

@@ -22,6 +22,7 @@ const (
 	PointsService_SignIn_FullMethodName                 = "/points.PointsService/SignIn"
 	PointsService_AddArticlePoint_FullMethodName        = "/points.PointsService/AddArticlePoint"
 	PointsService_GetUserAddPointHistory_FullMethodName = "/points.PointsService/GetUserAddPointHistory"
+	PointsService_GetTaskProgress_FullMethodName        = "/points.PointsService/GetTaskProgress"
 )
 
 // PointsServiceClient is the client API for PointsService service.
@@ -31,6 +32,7 @@ type PointsServiceClient interface {
 	SignIn(ctx context.Context, in *SignInReq, opts ...grpc.CallOption) (*SignInResp, error)
 	AddArticlePoint(ctx context.Context, in *AddArticlePointReq, opts ...grpc.CallOption) (*AddArticlePointResp, error)
 	GetUserAddPointHistory(ctx context.Context, in *GetUserAddPointHistoryReq, opts ...grpc.CallOption) (*GetUserAddPointHistoryResp, error)
+	GetTaskProgress(ctx context.Context, in *GetTaskProgressReq, opts ...grpc.CallOption) (*GetTaskProgressResp, error)
 }
 
 type pointsServiceClient struct {
@@ -71,6 +73,16 @@ func (c *pointsServiceClient) GetUserAddPointHistory(ctx context.Context, in *Ge
 	return out, nil
 }
 
+func (c *pointsServiceClient) GetTaskProgress(ctx context.Context, in *GetTaskProgressReq, opts ...grpc.CallOption) (*GetTaskProgressResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(GetTaskProgressResp)
+	err := c.cc.Invoke(ctx, PointsService_GetTaskProgress_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PointsServiceServer is the server API for PointsService service.
 // All implementations must embed UnimplementedPointsServiceServer
 // for forward compatibility.
@@ -78,6 +90,7 @@ type PointsServiceServer interface {
 	SignIn(context.Context, *SignInReq) (*SignInResp, error)
 	AddArticlePoint(context.Context, *AddArticlePointReq) (*AddArticlePointResp, error)
 	GetUserAddPointHistory(context.Context, *GetUserAddPointHistoryReq) (*GetUserAddPointHistoryResp, error)
+	GetTaskProgress(context.Context, *GetTaskProgressReq) (*GetTaskProgressResp, error)
 	mustEmbedUnimplementedPointsServiceServer()
 }
 
@@ -96,6 +109,9 @@ func (UnimplementedPointsServiceServer) AddArticlePoint(context.Context, *AddArt
 }
 func (UnimplementedPointsServiceServer) GetUserAddPointHistory(context.Context, *GetUserAddPointHistoryReq) (*GetUserAddPointHistoryResp, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserAddPointHistory not implemented")
+}
+func (UnimplementedPointsServiceServer) GetTaskProgress(context.Context, *GetTaskProgressReq) (*GetTaskProgressResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetTaskProgress not implemented")
 }
 func (UnimplementedPointsServiceServer) mustEmbedUnimplementedPointsServiceServer() {}
 func (UnimplementedPointsServiceServer) testEmbeddedByValue()                       {}
@@ -172,6 +188,24 @@ func _PointsService_GetUserAddPointHistory_Handler(srv interface{}, ctx context.
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PointsService_GetTaskProgress_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(GetTaskProgressReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PointsServiceServer).GetTaskProgress(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PointsService_GetTaskProgress_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PointsServiceServer).GetTaskProgress(ctx, req.(*GetTaskProgressReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PointsService_ServiceDesc is the grpc.ServiceDesc for PointsService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -190,6 +224,10 @@ var PointsService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserAddPointHistory",
 			Handler:    _PointsService_GetUserAddPointHistory_Handler,
+		},
+		{
+			MethodName: "GetTaskProgress",
+			Handler:    _PointsService_GetTaskProgress_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

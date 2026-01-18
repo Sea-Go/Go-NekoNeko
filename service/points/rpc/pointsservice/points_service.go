@@ -16,16 +16,20 @@ import (
 type (
 	AddArticlePointReq         = __.AddArticlePointReq
 	AddArticlePointResp        = __.AddArticlePointResp
+	GetTaskProgressReq         = __.GetTaskProgressReq
+	GetTaskProgressResp        = __.GetTaskProgressResp
 	GetUserAddPointHistoryReq  = __.GetUserAddPointHistoryReq
 	GetUserAddPointHistoryResp = __.GetUserAddPointHistoryResp
 	PointsRecord               = __.PointsRecord
 	SignInReq                  = __.SignInReq
 	SignInResp                 = __.SignInResp
+	Task                       = __.Task
 
 	PointsService interface {
 		SignIn(ctx context.Context, in *SignInReq, opts ...grpc.CallOption) (*SignInResp, error)
 		AddArticlePoint(ctx context.Context, in *AddArticlePointReq, opts ...grpc.CallOption) (*AddArticlePointResp, error)
 		GetUserAddPointHistory(ctx context.Context, in *GetUserAddPointHistoryReq, opts ...grpc.CallOption) (*GetUserAddPointHistoryResp, error)
+		GetTaskProgress(ctx context.Context, in *GetTaskProgressReq, opts ...grpc.CallOption) (*GetTaskProgressResp, error)
 	}
 
 	defaultPointsService struct {
@@ -52,4 +56,9 @@ func (m *defaultPointsService) AddArticlePoint(ctx context.Context, in *AddArtic
 func (m *defaultPointsService) GetUserAddPointHistory(ctx context.Context, in *GetUserAddPointHistoryReq, opts ...grpc.CallOption) (*GetUserAddPointHistoryResp, error) {
 	client := __.NewPointsServiceClient(m.cli.Conn())
 	return client.GetUserAddPointHistory(ctx, in, opts...)
+}
+
+func (m *defaultPointsService) GetTaskProgress(ctx context.Context, in *GetTaskProgressReq, opts ...grpc.CallOption) (*GetTaskProgressResp, error) {
+	client := __.NewPointsServiceClient(m.cli.Conn())
+	return client.GetTaskProgress(ctx, in, opts...)
 }

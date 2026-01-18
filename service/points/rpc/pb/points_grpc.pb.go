@@ -19,18 +19,16 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PointsService_SignIn_FullMethodName                 = "/points.PointsService/SignIn"
-	PointsService_AddArticlePoint_FullMethodName        = "/points.PointsService/AddArticlePoint"
-	PointsService_GetUserAddPointHistory_FullMethodName = "/points.PointsService/GetUserAddPointHistory"
+	PointsService_AddPoints_FullMethodName = "/points.PointsService/AddPoints"
+	PointsService_DecPoints_FullMethodName = "/points.PointsService/DecPoints"
 )
 
 // PointsServiceClient is the client API for PointsService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PointsServiceClient interface {
-	SignIn(ctx context.Context, in *SignInReq, opts ...grpc.CallOption) (*SignInResp, error)
-	AddArticlePoint(ctx context.Context, in *AddArticlePointReq, opts ...grpc.CallOption) (*AddArticlePointResp, error)
-	GetUserAddPointHistory(ctx context.Context, in *GetUserAddPointHistoryReq, opts ...grpc.CallOption) (*GetUserAddPointHistoryResp, error)
+	AddPoints(ctx context.Context, in *AddPointsReq, opts ...grpc.CallOption) (*AddPointsResp, error)
+	DecPoints(ctx context.Context, in *DecPointsReq, opts ...grpc.CallOption) (*DecPointsResp, error)
 }
 
 type pointsServiceClient struct {
@@ -41,30 +39,20 @@ func NewPointsServiceClient(cc grpc.ClientConnInterface) PointsServiceClient {
 	return &pointsServiceClient{cc}
 }
 
-func (c *pointsServiceClient) SignIn(ctx context.Context, in *SignInReq, opts ...grpc.CallOption) (*SignInResp, error) {
+func (c *pointsServiceClient) AddPoints(ctx context.Context, in *AddPointsReq, opts ...grpc.CallOption) (*AddPointsResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(SignInResp)
-	err := c.cc.Invoke(ctx, PointsService_SignIn_FullMethodName, in, out, cOpts...)
+	out := new(AddPointsResp)
+	err := c.cc.Invoke(ctx, PointsService_AddPoints_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *pointsServiceClient) AddArticlePoint(ctx context.Context, in *AddArticlePointReq, opts ...grpc.CallOption) (*AddArticlePointResp, error) {
+func (c *pointsServiceClient) DecPoints(ctx context.Context, in *DecPointsReq, opts ...grpc.CallOption) (*DecPointsResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(AddArticlePointResp)
-	err := c.cc.Invoke(ctx, PointsService_AddArticlePoint_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *pointsServiceClient) GetUserAddPointHistory(ctx context.Context, in *GetUserAddPointHistoryReq, opts ...grpc.CallOption) (*GetUserAddPointHistoryResp, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(GetUserAddPointHistoryResp)
-	err := c.cc.Invoke(ctx, PointsService_GetUserAddPointHistory_FullMethodName, in, out, cOpts...)
+	out := new(DecPointsResp)
+	err := c.cc.Invoke(ctx, PointsService_DecPoints_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
@@ -75,9 +63,8 @@ func (c *pointsServiceClient) GetUserAddPointHistory(ctx context.Context, in *Ge
 // All implementations must embed UnimplementedPointsServiceServer
 // for forward compatibility.
 type PointsServiceServer interface {
-	SignIn(context.Context, *SignInReq) (*SignInResp, error)
-	AddArticlePoint(context.Context, *AddArticlePointReq) (*AddArticlePointResp, error)
-	GetUserAddPointHistory(context.Context, *GetUserAddPointHistoryReq) (*GetUserAddPointHistoryResp, error)
+	AddPoints(context.Context, *AddPointsReq) (*AddPointsResp, error)
+	DecPoints(context.Context, *DecPointsReq) (*DecPointsResp, error)
 	mustEmbedUnimplementedPointsServiceServer()
 }
 
@@ -88,14 +75,11 @@ type PointsServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedPointsServiceServer struct{}
 
-func (UnimplementedPointsServiceServer) SignIn(context.Context, *SignInReq) (*SignInResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method SignIn not implemented")
+func (UnimplementedPointsServiceServer) AddPoints(context.Context, *AddPointsReq) (*AddPointsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method AddPoints not implemented")
 }
-func (UnimplementedPointsServiceServer) AddArticlePoint(context.Context, *AddArticlePointReq) (*AddArticlePointResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method AddArticlePoint not implemented")
-}
-func (UnimplementedPointsServiceServer) GetUserAddPointHistory(context.Context, *GetUserAddPointHistoryReq) (*GetUserAddPointHistoryResp, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method GetUserAddPointHistory not implemented")
+func (UnimplementedPointsServiceServer) DecPoints(context.Context, *DecPointsReq) (*DecPointsResp, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DecPoints not implemented")
 }
 func (UnimplementedPointsServiceServer) mustEmbedUnimplementedPointsServiceServer() {}
 func (UnimplementedPointsServiceServer) testEmbeddedByValue()                       {}
@@ -118,56 +102,38 @@ func RegisterPointsServiceServer(s grpc.ServiceRegistrar, srv PointsServiceServe
 	s.RegisterService(&PointsService_ServiceDesc, srv)
 }
 
-func _PointsService_SignIn_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(SignInReq)
+func _PointsService_AddPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddPointsReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PointsServiceServer).SignIn(ctx, in)
+		return srv.(PointsServiceServer).AddPoints(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PointsService_SignIn_FullMethodName,
+		FullMethod: PointsService_AddPoints_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PointsServiceServer).SignIn(ctx, req.(*SignInReq))
+		return srv.(PointsServiceServer).AddPoints(ctx, req.(*AddPointsReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _PointsService_AddArticlePoint_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddArticlePointReq)
+func _PointsService_DecPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DecPointsReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(PointsServiceServer).AddArticlePoint(ctx, in)
+		return srv.(PointsServiceServer).DecPoints(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: PointsService_AddArticlePoint_FullMethodName,
+		FullMethod: PointsService_DecPoints_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PointsServiceServer).AddArticlePoint(ctx, req.(*AddArticlePointReq))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _PointsService_GetUserAddPointHistory_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(GetUserAddPointHistoryReq)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(PointsServiceServer).GetUserAddPointHistory(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: PointsService_GetUserAddPointHistory_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(PointsServiceServer).GetUserAddPointHistory(ctx, req.(*GetUserAddPointHistoryReq))
+		return srv.(PointsServiceServer).DecPoints(ctx, req.(*DecPointsReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -180,16 +146,12 @@ var PointsService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*PointsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "SignIn",
-			Handler:    _PointsService_SignIn_Handler,
+			MethodName: "AddPoints",
+			Handler:    _PointsService_AddPoints_Handler,
 		},
 		{
-			MethodName: "AddArticlePoint",
-			Handler:    _PointsService_AddArticlePoint_Handler,
-		},
-		{
-			MethodName: "GetUserAddPointHistory",
-			Handler:    _PointsService_GetUserAddPointHistory_Handler,
+			MethodName: "DecPoints",
+			Handler:    _PointsService_DecPoints_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

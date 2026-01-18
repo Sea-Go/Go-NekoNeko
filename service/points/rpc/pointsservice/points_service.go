@@ -14,18 +14,14 @@ import (
 )
 
 type (
-	AddArticlePointReq         = __.AddArticlePointReq
-	AddArticlePointResp        = __.AddArticlePointResp
-	GetUserAddPointHistoryReq  = __.GetUserAddPointHistoryReq
-	GetUserAddPointHistoryResp = __.GetUserAddPointHistoryResp
-	PointsRecord               = __.PointsRecord
-	SignInReq                  = __.SignInReq
-	SignInResp                 = __.SignInResp
+	AddPointsReq  = __.AddPointsReq
+	AddPointsResp = __.AddPointsResp
+	DecPointsReq  = __.DecPointsReq
+	DecPointsResp = __.DecPointsResp
 
 	PointsService interface {
-		SignIn(ctx context.Context, in *SignInReq, opts ...grpc.CallOption) (*SignInResp, error)
-		AddArticlePoint(ctx context.Context, in *AddArticlePointReq, opts ...grpc.CallOption) (*AddArticlePointResp, error)
-		GetUserAddPointHistory(ctx context.Context, in *GetUserAddPointHistoryReq, opts ...grpc.CallOption) (*GetUserAddPointHistoryResp, error)
+		AddPoints(ctx context.Context, in *AddPointsReq, opts ...grpc.CallOption) (*AddPointsResp, error)
+		DecPoints(ctx context.Context, in *DecPointsReq, opts ...grpc.CallOption) (*DecPointsResp, error)
 	}
 
 	defaultPointsService struct {
@@ -39,17 +35,12 @@ func NewPointsService(cli zrpc.Client) PointsService {
 	}
 }
 
-func (m *defaultPointsService) SignIn(ctx context.Context, in *SignInReq, opts ...grpc.CallOption) (*SignInResp, error) {
+func (m *defaultPointsService) AddPoints(ctx context.Context, in *AddPointsReq, opts ...grpc.CallOption) (*AddPointsResp, error) {
 	client := __.NewPointsServiceClient(m.cli.Conn())
-	return client.SignIn(ctx, in, opts...)
+	return client.AddPoints(ctx, in, opts...)
 }
 
-func (m *defaultPointsService) AddArticlePoint(ctx context.Context, in *AddArticlePointReq, opts ...grpc.CallOption) (*AddArticlePointResp, error) {
+func (m *defaultPointsService) DecPoints(ctx context.Context, in *DecPointsReq, opts ...grpc.CallOption) (*DecPointsResp, error) {
 	client := __.NewPointsServiceClient(m.cli.Conn())
-	return client.AddArticlePoint(ctx, in, opts...)
-}
-
-func (m *defaultPointsService) GetUserAddPointHistory(ctx context.Context, in *GetUserAddPointHistoryReq, opts ...grpc.CallOption) (*GetUserAddPointHistoryResp, error) {
-	client := __.NewPointsServiceClient(m.cli.Conn())
-	return client.GetUserAddPointHistory(ctx, in, opts...)
+	return client.DecPoints(ctx, in, opts...)
 }

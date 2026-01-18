@@ -9,22 +9,22 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-type SignInLogic struct {
+type DecPointsLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
 
-func NewSignInLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SignInLogic {
-	return &SignInLogic{
+func NewDecPointsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DecPointsLogic {
+	return &DecPointsLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
 		Logger: logx.WithContext(ctx),
 	}
 }
 
-func (l *SignInLogic) SignIn(in *__.SignInReq) (*__.SignInResp, error) {
+func (l *DecPointsLogic) DecPoints(in *__.DecPointsReq) (*__.DecPointsResp, error) {
 	// todo: add your logic here and delete this line
 
-	return &__.SignInResp{}, nil
+	return &__.DecPointsResp{}, nil
 }

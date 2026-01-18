@@ -21,89 +21,96 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-type PointsRecord struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	ArticleId     string                 `protobuf:"bytes,1,opt,name=article_id,json=articleId,proto3" json:"article_id,omitempty"`
-	PointsCount   int64                  `protobuf:"varint,2,opt,name=points_count,json=pointsCount,proto3" json:"points_count,omitempty"`
-	Date          string                 `protobuf:"bytes,3,opt,name=date,proto3" json:"date,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *PointsRecord) Reset() {
-	*x = PointsRecord{}
-	mi := &file_proto_points_proto_msgTypes[0]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *PointsRecord) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*PointsRecord) ProtoMessage() {}
-
-func (x *PointsRecord) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_points_proto_msgTypes[0]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use PointsRecord.ProtoReflect.Descriptor instead.
-func (*PointsRecord) Descriptor() ([]byte, []int) {
-	return file_proto_points_proto_rawDescGZIP(), []int{0}
-}
-
-func (x *PointsRecord) GetArticleId() string {
-	if x != nil {
-		return x.ArticleId
-	}
-	return ""
-}
-
-func (x *PointsRecord) GetPointsCount() int64 {
-	if x != nil {
-		return x.PointsCount
-	}
-	return 0
-}
-
-func (x *PointsRecord) GetDate() string {
-	if x != nil {
-		return x.Date
-	}
-	return ""
-}
-
-type SignInReq struct {
+type AddPointsReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
 	UserPoints    int64                  `protobuf:"varint,2,opt,name=user_points,json=userPoints,proto3" json:"user_points,omitempty"`
 	RequestId     int64                  `protobuf:"varint,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	AddPoints     int64                  `protobuf:"varint,4,opt,name=add_points,json=addPoints,proto3" json:"add_points,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SignInReq) Reset() {
-	*x = SignInReq{}
+func (x *AddPointsReq) Reset() {
+	*x = AddPointsReq{}
+	mi := &file_proto_points_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *AddPointsReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*AddPointsReq) ProtoMessage() {}
+
+func (x *AddPointsReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_points_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use AddPointsReq.ProtoReflect.Descriptor instead.
+func (*AddPointsReq) Descriptor() ([]byte, []int) {
+	return file_proto_points_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *AddPointsReq) GetUserId() int64 {
+	if x != nil {
+		return x.UserId
+	}
+	return 0
+}
+
+func (x *AddPointsReq) GetUserPoints() int64 {
+	if x != nil {
+		return x.UserPoints
+	}
+	return 0
+}
+
+func (x *AddPointsReq) GetRequestId() int64 {
+	if x != nil {
+		return x.RequestId
+	}
+	return 0
+}
+
+func (x *AddPointsReq) GetAddPoints() int64 {
+	if x != nil {
+		return x.AddPoints
+	}
+	return 0
+}
+
+type AddPointsResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
+	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *AddPointsResp) Reset() {
+	*x = AddPointsResp{}
 	mi := &file_proto_points_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SignInReq) String() string {
+func (x *AddPointsResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SignInReq) ProtoMessage() {}
+func (*AddPointsResp) ProtoMessage() {}
 
-func (x *SignInReq) ProtoReflect() protoreflect.Message {
+func (x *AddPointsResp) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_points_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -115,54 +122,49 @@ func (x *SignInReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SignInReq.ProtoReflect.Descriptor instead.
-func (*SignInReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use AddPointsResp.ProtoReflect.Descriptor instead.
+func (*AddPointsResp) Descriptor() ([]byte, []int) {
 	return file_proto_points_proto_rawDescGZIP(), []int{1}
 }
 
-func (x *SignInReq) GetUserId() int64 {
+func (x *AddPointsResp) GetSuccess() bool {
 	if x != nil {
-		return x.UserId
+		return x.Success
 	}
-	return 0
+	return false
 }
 
-func (x *SignInReq) GetUserPoints() int64 {
+func (x *AddPointsResp) GetMessage() string {
 	if x != nil {
-		return x.UserPoints
+		return x.Message
 	}
-	return 0
+	return ""
 }
 
-func (x *SignInReq) GetRequestId() int64 {
-	if x != nil {
-		return x.RequestId
-	}
-	return 0
-}
-
-type SignInResp struct {
+type DecPointsReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
+	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	UserPoints    int64                  `protobuf:"varint,2,opt,name=user_points,json=userPoints,proto3" json:"user_points,omitempty"`
+	RequestId     int64                  `protobuf:"varint,3,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
+	DecPoints     int64                  `protobuf:"varint,4,opt,name=dec_points,json=decPoints,proto3" json:"dec_points,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *SignInResp) Reset() {
-	*x = SignInResp{}
+func (x *DecPointsReq) Reset() {
+	*x = DecPointsReq{}
 	mi := &file_proto_points_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *SignInResp) String() string {
+func (x *DecPointsReq) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*SignInResp) ProtoMessage() {}
+func (*DecPointsReq) ProtoMessage() {}
 
-func (x *SignInResp) ProtoReflect() protoreflect.Message {
+func (x *DecPointsReq) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_points_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -174,102 +176,40 @@ func (x *SignInResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use SignInResp.ProtoReflect.Descriptor instead.
-func (*SignInResp) Descriptor() ([]byte, []int) {
+// Deprecated: Use DecPointsReq.ProtoReflect.Descriptor instead.
+func (*DecPointsReq) Descriptor() ([]byte, []int) {
 	return file_proto_points_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *SignInResp) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *SignInResp) GetMessage() string {
-	if x != nil {
-		return x.Message
-	}
-	return ""
-}
-
-type AddArticlePointReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	ArticleId     int64                  `protobuf:"varint,2,opt,name=article_id,json=articleId,proto3" json:"article_id,omitempty"`
-	PointsCount   int64                  `protobuf:"varint,3,opt,name=points_count,json=pointsCount,proto3" json:"points_count,omitempty"`
-	UserPoints    int64                  `protobuf:"varint,4,opt,name=user_points,json=userPoints,proto3" json:"user_points,omitempty"`
-	RequestId     int64                  `protobuf:"varint,5,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *AddArticlePointReq) Reset() {
-	*x = AddArticlePointReq{}
-	mi := &file_proto_points_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *AddArticlePointReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*AddArticlePointReq) ProtoMessage() {}
-
-func (x *AddArticlePointReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_points_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use AddArticlePointReq.ProtoReflect.Descriptor instead.
-func (*AddArticlePointReq) Descriptor() ([]byte, []int) {
-	return file_proto_points_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *AddArticlePointReq) GetUserId() int64 {
+func (x *DecPointsReq) GetUserId() int64 {
 	if x != nil {
 		return x.UserId
 	}
 	return 0
 }
 
-func (x *AddArticlePointReq) GetArticleId() int64 {
-	if x != nil {
-		return x.ArticleId
-	}
-	return 0
-}
-
-func (x *AddArticlePointReq) GetPointsCount() int64 {
-	if x != nil {
-		return x.PointsCount
-	}
-	return 0
-}
-
-func (x *AddArticlePointReq) GetUserPoints() int64 {
+func (x *DecPointsReq) GetUserPoints() int64 {
 	if x != nil {
 		return x.UserPoints
 	}
 	return 0
 }
 
-func (x *AddArticlePointReq) GetRequestId() int64 {
+func (x *DecPointsReq) GetRequestId() int64 {
 	if x != nil {
 		return x.RequestId
 	}
 	return 0
 }
 
-type AddArticlePointResp struct {
+func (x *DecPointsReq) GetDecPoints() int64 {
+	if x != nil {
+		return x.DecPoints
+	}
+	return 0
+}
+
+type DecPointsResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
 	Message       string                 `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"`
@@ -277,21 +217,21 @@ type AddArticlePointResp struct {
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *AddArticlePointResp) Reset() {
-	*x = AddArticlePointResp{}
-	mi := &file_proto_points_proto_msgTypes[4]
+func (x *DecPointsResp) Reset() {
+	*x = DecPointsResp{}
+	mi := &file_proto_points_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *AddArticlePointResp) String() string {
+func (x *DecPointsResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*AddArticlePointResp) ProtoMessage() {}
+func (*DecPointsResp) ProtoMessage() {}
 
-func (x *AddArticlePointResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_points_proto_msgTypes[4]
+func (x *DecPointsResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_points_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -302,153 +242,55 @@ func (x *AddArticlePointResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use AddArticlePointResp.ProtoReflect.Descriptor instead.
-func (*AddArticlePointResp) Descriptor() ([]byte, []int) {
-	return file_proto_points_proto_rawDescGZIP(), []int{4}
+// Deprecated: Use DecPointsResp.ProtoReflect.Descriptor instead.
+func (*DecPointsResp) Descriptor() ([]byte, []int) {
+	return file_proto_points_proto_rawDescGZIP(), []int{3}
 }
 
-func (x *AddArticlePointResp) GetSuccess() bool {
+func (x *DecPointsResp) GetSuccess() bool {
 	if x != nil {
 		return x.Success
 	}
 	return false
 }
 
-func (x *AddArticlePointResp) GetMessage() string {
+func (x *DecPointsResp) GetMessage() string {
 	if x != nil {
 		return x.Message
 	}
 	return ""
-}
-
-type GetUserAddPointHistoryReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	UserId        int64                  `protobuf:"varint,1,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetUserAddPointHistoryReq) Reset() {
-	*x = GetUserAddPointHistoryReq{}
-	mi := &file_proto_points_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetUserAddPointHistoryReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetUserAddPointHistoryReq) ProtoMessage() {}
-
-func (x *GetUserAddPointHistoryReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_points_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetUserAddPointHistoryReq.ProtoReflect.Descriptor instead.
-func (*GetUserAddPointHistoryReq) Descriptor() ([]byte, []int) {
-	return file_proto_points_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *GetUserAddPointHistoryReq) GetUserId() int64 {
-	if x != nil {
-		return x.UserId
-	}
-	return 0
-}
-
-type GetUserAddPointHistoryResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	PointsRecord  []*PointsRecord        `protobuf:"bytes,1,rep,name=points_record,json=pointsRecord,proto3" json:"points_record,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *GetUserAddPointHistoryResp) Reset() {
-	*x = GetUserAddPointHistoryResp{}
-	mi := &file_proto_points_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *GetUserAddPointHistoryResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*GetUserAddPointHistoryResp) ProtoMessage() {}
-
-func (x *GetUserAddPointHistoryResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_points_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use GetUserAddPointHistoryResp.ProtoReflect.Descriptor instead.
-func (*GetUserAddPointHistoryResp) Descriptor() ([]byte, []int) {
-	return file_proto_points_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *GetUserAddPointHistoryResp) GetPointsRecord() []*PointsRecord {
-	if x != nil {
-		return x.PointsRecord
-	}
-	return nil
 }
 
 var File_proto_points_proto protoreflect.FileDescriptor
 
 const file_proto_points_proto_rawDesc = "" +
 	"\n" +
-	"\x12proto/points.proto\x12\x06points\"d\n" +
-	"\fPointsRecord\x12\x1d\n" +
-	"\n" +
-	"article_id\x18\x01 \x01(\tR\tarticleId\x12!\n" +
-	"\fpoints_count\x18\x02 \x01(\x03R\vpointsCount\x12\x12\n" +
-	"\x04date\x18\x03 \x01(\tR\x04date\"d\n" +
-	"\tSignInReq\x12\x17\n" +
+	"\x12proto/points.proto\x12\x06points\"\x86\x01\n" +
+	"\fAddPointsReq\x12\x17\n" +
 	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x1f\n" +
 	"\vuser_points\x18\x02 \x01(\x03R\n" +
 	"userPoints\x12\x1d\n" +
 	"\n" +
-	"request_id\x18\x03 \x01(\x03R\trequestId\"@\n" +
+	"request_id\x18\x03 \x01(\x03R\trequestId\x12\x1d\n" +
 	"\n" +
-	"SignInResp\x12\x18\n" +
+	"add_points\x18\x04 \x01(\x03R\taddPoints\"C\n" +
+	"\rAddPointsResp\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"\xaf\x01\n" +
-	"\x12AddArticlePointReq\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x1d\n" +
-	"\n" +
-	"article_id\x18\x02 \x01(\x03R\tarticleId\x12!\n" +
-	"\fpoints_count\x18\x03 \x01(\x03R\vpointsCount\x12\x1f\n" +
-	"\vuser_points\x18\x04 \x01(\x03R\n" +
+	"\amessage\x18\x02 \x01(\tR\amessage\"\x86\x01\n" +
+	"\fDecPointsReq\x12\x17\n" +
+	"\auser_id\x18\x01 \x01(\x03R\x06userId\x12\x1f\n" +
+	"\vuser_points\x18\x02 \x01(\x03R\n" +
 	"userPoints\x12\x1d\n" +
 	"\n" +
-	"request_id\x18\x05 \x01(\x03R\trequestId\"I\n" +
-	"\x13AddArticlePointResp\x12\x18\n" +
+	"request_id\x18\x03 \x01(\x03R\trequestId\x12\x1d\n" +
+	"\n" +
+	"dec_points\x18\x04 \x01(\x03R\tdecPoints\"C\n" +
+	"\rDecPointsResp\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x18\n" +
-	"\amessage\x18\x02 \x01(\tR\amessage\"4\n" +
-	"\x19GetUserAddPointHistoryReq\x12\x17\n" +
-	"\auser_id\x18\x01 \x01(\x03R\x06userId\"W\n" +
-	"\x1aGetUserAddPointHistoryResp\x129\n" +
-	"\rpoints_record\x18\x01 \x03(\v2\x14.points.PointsRecordR\fpointsRecord2\xed\x01\n" +
-	"\rPointsService\x12/\n" +
-	"\x06SignIn\x12\x11.points.SignInReq\x1a\x12.points.SignInResp\x12J\n" +
-	"\x0fAddArticlePoint\x12\x1a.points.AddArticlePointReq\x1a\x1b.points.AddArticlePointResp\x12_\n" +
-	"\x16GetUserAddPointHistory\x12!.points.GetUserAddPointHistoryReq\x1a\".points.GetUserAddPointHistoryRespB\x03Z\x01.b\x06proto3"
+	"\amessage\x18\x02 \x01(\tR\amessage2\x83\x01\n" +
+	"\rPointsService\x128\n" +
+	"\tAddPoints\x12\x14.points.AddPointsReq\x1a\x15.points.AddPointsResp\x128\n" +
+	"\tDecPoints\x12\x14.points.DecPointsReq\x1a\x15.points.DecPointsRespB\x03Z\x01.b\x06proto3"
 
 var (
 	file_proto_points_proto_rawDescOnce sync.Once
@@ -462,29 +304,23 @@ func file_proto_points_proto_rawDescGZIP() []byte {
 	return file_proto_points_proto_rawDescData
 }
 
-var file_proto_points_proto_msgTypes = make([]protoimpl.MessageInfo, 7)
+var file_proto_points_proto_msgTypes = make([]protoimpl.MessageInfo, 4)
 var file_proto_points_proto_goTypes = []any{
-	(*PointsRecord)(nil),               // 0: points.PointsRecord
-	(*SignInReq)(nil),                  // 1: points.SignInReq
-	(*SignInResp)(nil),                 // 2: points.SignInResp
-	(*AddArticlePointReq)(nil),         // 3: points.AddArticlePointReq
-	(*AddArticlePointResp)(nil),        // 4: points.AddArticlePointResp
-	(*GetUserAddPointHistoryReq)(nil),  // 5: points.GetUserAddPointHistoryReq
-	(*GetUserAddPointHistoryResp)(nil), // 6: points.GetUserAddPointHistoryResp
+	(*AddPointsReq)(nil),  // 0: points.AddPointsReq
+	(*AddPointsResp)(nil), // 1: points.AddPointsResp
+	(*DecPointsReq)(nil),  // 2: points.DecPointsReq
+	(*DecPointsResp)(nil), // 3: points.DecPointsResp
 }
 var file_proto_points_proto_depIdxs = []int32{
-	0, // 0: points.GetUserAddPointHistoryResp.points_record:type_name -> points.PointsRecord
-	1, // 1: points.PointsService.SignIn:input_type -> points.SignInReq
-	3, // 2: points.PointsService.AddArticlePoint:input_type -> points.AddArticlePointReq
-	5, // 3: points.PointsService.GetUserAddPointHistory:input_type -> points.GetUserAddPointHistoryReq
-	2, // 4: points.PointsService.SignIn:output_type -> points.SignInResp
-	4, // 5: points.PointsService.AddArticlePoint:output_type -> points.AddArticlePointResp
-	6, // 6: points.PointsService.GetUserAddPointHistory:output_type -> points.GetUserAddPointHistoryResp
-	4, // [4:7] is the sub-list for method output_type
-	1, // [1:4] is the sub-list for method input_type
-	1, // [1:1] is the sub-list for extension type_name
-	1, // [1:1] is the sub-list for extension extendee
-	0, // [0:1] is the sub-list for field type_name
+	0, // 0: points.PointsService.AddPoints:input_type -> points.AddPointsReq
+	2, // 1: points.PointsService.DecPoints:input_type -> points.DecPointsReq
+	1, // 2: points.PointsService.AddPoints:output_type -> points.AddPointsResp
+	3, // 3: points.PointsService.DecPoints:output_type -> points.DecPointsResp
+	2, // [2:4] is the sub-list for method output_type
+	0, // [0:2] is the sub-list for method input_type
+	0, // [0:0] is the sub-list for extension type_name
+	0, // [0:0] is the sub-list for extension extendee
+	0, // [0:0] is the sub-list for field type_name
 }
 
 func init() { file_proto_points_proto_init() }
@@ -498,7 +334,7 @@ func file_proto_points_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_points_proto_rawDesc), len(file_proto_points_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   7,
+			NumMessages:   4,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

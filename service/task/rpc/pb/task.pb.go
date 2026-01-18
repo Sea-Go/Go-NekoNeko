@@ -188,6 +188,7 @@ func (x *GetTaskResp) GetTask() []*Task {
 type CreateTaskReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Task          *Task                  `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
+	RequestId     int64                  `protobuf:"varint,2,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -227,6 +228,13 @@ func (x *CreateTaskReq) GetTask() *Task {
 		return x.Task
 	}
 	return nil
+}
+
+func (x *CreateTaskReq) GetRequestId() int64 {
+	if x != nil {
+		return x.RequestId
+	}
+	return 0
 }
 
 type CreateTaskResp struct {
@@ -284,6 +292,7 @@ func (x *CreateTaskResp) GetMsg() string {
 type UpdateTaskReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Task          *Task                  `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
+	RequestId     int64                  `protobuf:"varint,2,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -323,6 +332,13 @@ func (x *UpdateTaskReq) GetTask() *Task {
 		return x.Task
 	}
 	return nil
+}
+
+func (x *UpdateTaskReq) GetRequestId() int64 {
+	if x != nil {
+		return x.RequestId
+	}
+	return 0
 }
 
 type UpdateTaskResp struct {
@@ -380,6 +396,7 @@ func (x *UpdateTaskResp) GetMsg() string {
 type DeleteTaskReq struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	TaskId        int64                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
+	RequestId     int64                  `protobuf:"varint,2,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -417,6 +434,13 @@ func (*DeleteTaskReq) Descriptor() ([]byte, []int) {
 func (x *DeleteTaskReq) GetTaskId() int64 {
 	if x != nil {
 		return x.TaskId
+	}
+	return 0
+}
+
+func (x *DeleteTaskReq) GetRequestId() int64 {
+	if x != nil {
+		return x.RequestId
 	}
 	return 0
 }
@@ -489,21 +513,27 @@ const file_proto_task_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\x03R\x06userId\"-\n" +
 	"\vGetTaskResp\x12\x1e\n" +
 	"\x04task\x18\x01 \x03(\v2\n" +
-	".task.TaskR\x04task\"/\n" +
+	".task.TaskR\x04task\"N\n" +
 	"\rCreateTaskReq\x12\x1e\n" +
 	"\x04task\x18\x01 \x01(\v2\n" +
-	".task.TaskR\x04task\"<\n" +
+	".task.TaskR\x04task\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x02 \x01(\x03R\trequestId\"<\n" +
 	"\x0eCreateTaskResp\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x10\n" +
-	"\x03msg\x18\x02 \x01(\tR\x03msg\"/\n" +
+	"\x03msg\x18\x02 \x01(\tR\x03msg\"N\n" +
 	"\rUpdateTaskReq\x12\x1e\n" +
 	"\x04task\x18\x01 \x01(\v2\n" +
-	".task.TaskR\x04task\"<\n" +
+	".task.TaskR\x04task\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x02 \x01(\x03R\trequestId\"<\n" +
 	"\x0eUpdateTaskResp\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x10\n" +
-	"\x03msg\x18\x02 \x01(\tR\x03msg\"(\n" +
+	"\x03msg\x18\x02 \x01(\tR\x03msg\"G\n" +
 	"\rDeleteTaskReq\x12\x17\n" +
-	"\atask_id\x18\x01 \x01(\x03R\x06taskId\"<\n" +
+	"\atask_id\x18\x01 \x01(\x03R\x06taskId\x12\x1d\n" +
+	"\n" +
+	"request_id\x18\x02 \x01(\x03R\trequestId\"<\n" +
 	"\x0eDeleteTaskResp\x12\x18\n" +
 	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x10\n" +
 	"\x03msg\x18\x02 \x01(\tR\x03msg2\xe8\x01\n" +

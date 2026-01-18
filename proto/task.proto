@@ -21,6 +21,7 @@ message GetTaskResp{
 
 message CreateTaskReq{
   Task task = 1;
+  int64 request_id = 2;
 }
 
 message CreateTaskResp{
@@ -30,6 +31,7 @@ message CreateTaskResp{
 
 message UpdateTaskReq{
   Task task = 1;
+  int64 request_id = 2;
 }
 
 message UpdateTaskResp{
@@ -39,6 +41,7 @@ message UpdateTaskResp{
 
 message DeleteTaskReq{
   int64 task_id = 1;
+  int64 request_id = 2;
 }
 
 message DeleteTaskResp{

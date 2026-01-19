@@ -3,6 +3,7 @@ package logic
 import (
 	"context"
 	"errors"
+	"github.com/zeromicro/go-zero/core/metric"
 
 	"sea-try-go/service/common/cryptx"
 	"sea-try-go/service/user/rpc/internal/model"
@@ -17,6 +18,14 @@ type RegisterLogic struct {
 	svcCtx *svc.ServiceContext
 	logx.Logger
 }
+
+var metricUserCreated = metric.NewCounterVec(&metric.CounterVecOpts{
+	Namespace: "user_rpc",
+	Subsystem: "logic",
+	Name:      "user_created_total",
+	Help:      "Total number of users created",
+	Labels:    []string{"result"},
+})
 
 func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *RegisterLogic {
 	return &RegisterLogic{
@@ -48,6 +57,7 @@ func (l *RegisterLogic) Register(in *pb.CreateUserReq) (*pb.CreateUserResp, erro
 	if err != nil {
 		return nil, err
 	}
+	metricUserCreated.Inc("success")
 	return &pb.CreateUserResp{
 		Id: newUser.Id,
 	}, nil

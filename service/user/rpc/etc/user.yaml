@@ -4,14 +4,21 @@ ListenOn: 0.0.0.0:28080
 Postgres:
   Host: 127.0.0.1
   Port: "35432"
-  User: postgres
-  Password: "123456"
-  DBName: user_db
+  User: admin
+  Password: "Sea-TryGo"
+  DBName: first_db
 
 Etcd:
   Hosts:
-   - 127.0.0.1:2379
+   - 127.0.0.1:32379
   Key: user.rpc
+
+Prometheus:
+  Host: 0.0.0.0
+  Port: 9094
+  Path: /metrics
+
+
 
 Log:
   Mode: file

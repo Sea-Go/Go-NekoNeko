@@ -1,3 +1,13 @@
 Name: article-api
 Host: 0.0.0.0
 Port: 8888
+
+ArticleRpcConf:
+  Etcd:
+    Hosts:
+      - 127.0.0.1:32379
+    Key: article.rpc
+
+Auth:
+  AccessSecret: ae0536f9-6450-4606-8e13-5a19ed505da0
+  AccessExpire: 31536000

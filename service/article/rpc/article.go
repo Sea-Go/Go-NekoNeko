@@ -3,6 +3,7 @@ package main
 import (
 	"flag"
 	"fmt"
+	model "sea-try-go/service/article/rpc/internal/model/postgres"
 
 	"sea-try-go/service/article/rpc/internal/config"
 	"sea-try-go/service/article/rpc/internal/server"
@@ -23,7 +24,8 @@ func main() {
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
-	ctx := svc.NewServiceContext(c)
+	u := model.NewArticleRepo(c)
+	ctx := svc.NewServiceContext(c, u)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		__.RegisterArticleServiceServer(grpcServer, server.NewArticleServiceServer(ctx))

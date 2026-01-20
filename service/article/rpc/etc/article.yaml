@@ -2,5 +2,12 @@ Name: article.rpc
 ListenOn: 0.0.0.0:8080
 Etcd:
   Hosts:
-  - 127.0.0.1:2379
+  - 127.0.0.1:32379
   Key: article.rpc
+
+Postgres:
+  Host: 127.0.0.1
+  Port: "35432"
+  User: admin
+  Password: "Sea-TryGo"
+  DBName: first_db

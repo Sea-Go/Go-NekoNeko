@@ -1,6 +1,9 @@
 package config
 
-import "github.com/zeromicro/go-zero/zrpc"
+import (
+	"github.com/zeromicro/go-queue/kq"
+	"github.com/zeromicro/go-zero/zrpc"
+)
 
 type Postgres struct {
 	Host     string
@@ -11,5 +14,6 @@ type Postgres struct {
 }
 type Config struct {
 	zrpc.RpcServerConf
-	Postgres Postgres
+	Postgres     Postgres
+	KqPusherConf kq.KqConf
 }

@@ -1,5 +1,5 @@
 Name: article.rpc
-ListenOn: 0.0.0.0:8080
+ListenOn: 0.0.0.0:9001
 Etcd:
   Hosts:
   - 127.0.0.1:32379
@@ -11,3 +11,10 @@ Postgres:
   User: admin
   Password: "Sea-TryGo"
   DBName: first_db
+
+KqPusherConf:
+  Name: article-mq-pusher
+  Group: "article-creation-group"
+  Brokers:
+    - 127.0.0.1:9092
+  Topic: article-creation-topic

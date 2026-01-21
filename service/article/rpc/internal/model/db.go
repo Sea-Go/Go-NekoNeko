@@ -2,13 +2,13 @@ package model
 
 import (
 	"fmt"
-	"sea-try-go/service/article/rpc/internal/config"
-	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
 	"gorm.io/gorm/schema"
+	"sea-try-go/service/article/rpc/internal/config"
+	"time"
 )
 
 type ArticleRepo struct {

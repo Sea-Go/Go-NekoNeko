@@ -3,9 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
-	model "sea-try-go/service/article/rpc/internal/model/postgres"
-
 	"sea-try-go/service/article/rpc/internal/config"
+	"sea-try-go/service/article/rpc/internal/model"
 	"sea-try-go/service/article/rpc/internal/server"
 	"sea-try-go/service/article/rpc/internal/svc"
 	"sea-try-go/service/article/rpc/pb"

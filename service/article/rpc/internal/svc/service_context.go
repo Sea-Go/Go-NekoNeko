@@ -1,14 +1,16 @@
 package svc
 
 import (
+	"github.com/zeromicro/go-queue/kq"
+	"sea-try-go/common/utils"
 	"sea-try-go/service/article/rpc/internal/config"
-	model "sea-try-go/service/article/rpc/internal/model/postgres"
-	snowflake "sea-try-go/service/common/utils"
+	"sea-try-go/service/article/rpc/internal/model"
 )
 
 type ServiceContext struct {
 	Config      config.Config
 	ArticleRepo *model.ArticleRepo
+	KqPusher    *kq.Pusher
 }
 
 func NewServiceContext(c config.Config, articleRepo *model.ArticleRepo) *ServiceContext {
@@ -16,5 +18,6 @@ func NewServiceContext(c config.Config, articleRepo *model.ArticleRepo) *Service
 	return &ServiceContext{
 		Config:      c,
 		ArticleRepo: articleRepo,
+		KqPusher:    kq.NewPusher(c.KqPusherConf.Brokers, c.KqPusherConf.Topic),
 	}
 }

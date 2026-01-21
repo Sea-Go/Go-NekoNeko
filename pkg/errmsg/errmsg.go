@@ -9,39 +9,39 @@ import (
 	"fmt"
 )
 
-// Code 表示业务错误码（不是 HTTP 状态码）。
+// Code 业务错误码
 type Code int32
 
 const (
-	// ===== 通用 =====
+	// 通用
 	CodeOK           Code = 0
 	CodeBadRequest   Code = 1000 // 参数/请求不合法
-	CodeUnauthorized Code = 1001 // 未登录 / 鉴权失败
+	CodeUnauthorized Code = 1001 // 未登录/鉴权失败
 	CodeForbidden    Code = 1002 // 权限不足
-	CodeInternal     Code = 9001 // 内部错误（兜底）
+	CodeInternal     Code = 9001 // 内部错误(兜底)
 	CodeServerBusy   Code = 9000 // 服务繁忙/限流/依赖不可用
 
-	// ===== 用户/登录 ===== (1100~1299)
+	// 用户/登录 (1100~1299)
 	CodeUserAlreadyExists       Code = 1100
 	CodeUserNotFound            Code = 1101
 	CodeUsernameOrPasswordWrong Code = 1102
 	CodeUserAlreadyLoggedIn     Code = 1103
 
-	// ===== Token/JWT ===== (1200~1299)
+	// Token/JWT (1200~1299)
 	CodeTokenMissing       Code = 1200
 	CodeTokenInvalid       Code = 1201
 	CodeTokenExpired       Code = 1202
 	CodeTokenRefreshFailed Code = 1203
 
-	// ===== 社区 ===== (2000~2099)
+	// 社区 (2000~2099)
 	CodeCommunityAlreadyExists Code = 2000
 	CodeCommunityNotFound      Code = 2001
 
-	// ===== 帖子 ===== (3000~3099)
+	// 帖子 (3000~3099)
 	CodePostAlreadyExists Code = 3000
 	CodePostNotFound      Code = 3001
 
-	// ===== 投票 ===== (4000~4099)
+	// 投票 (4000~4099)
 	CodeVoteRepeated    Code = 4000
 	CodeVoteTimeExpired Code = 4001
 )
@@ -74,14 +74,14 @@ var msg = map[Code]string{
 	CodeVoteTimeExpired: "投票时间已过",
 }
 
-// BizError 表示业务错误，包含业务码/对外消息，以及可选的底层原因（用于排查）。
+// BizError 表示业务错误
 type BizError struct {
 	Code  Code
 	Msg   string
 	Cause error
 }
 
-// Message 根据业务码返回默认文案；如果业务码不存在，则返回通用“内部错误”文案。
+// Message 根据 Code 返回默认 Msg , Code 对应 Msg 不存在时返回内部错误
 func Message(code Code) string {
 	if s, ok := msg[code]; ok {
 		return s
@@ -89,8 +89,7 @@ func Message(code Code) string {
 	return "内部错误"
 }
 
-// Error 实现 error 接口。
-// 主要用于日志/调试输出；对外回包一般只使用 Code/Msg，不应直接透出 Cause。
+// Error 接口,返回格式化字符串便于输出日志
 func (e *BizError) Error() string {
 	if e == nil {
 		return "<nil>"
@@ -102,76 +101,66 @@ func (e *BizError) Error() string {
 	return fmt.Sprintf("code=%d msg=%s", e.Code, e.Msg)
 }
 
-// New 根据业务码创建 BizError，消息使用 Message(code) 的默认文案。
-func New(code Code) *BizError {
-	return &BizError{Code: code, Msg: Message(code)}
-}
+// Option 用于 New 的可选配置
+type Option func(*BizError)
 
-// NewMsg 根据业务码创建 BizError，并使用自定义消息文案。
-// 适合参数校验等场景；注意不要把敏感信息（密码、内部异常细节）透出给用户。
-func NewMsg(code Code, m string) *BizError {
-	return &BizError{Code: code, Msg: m}
-}
-
-// Wrap 用业务码包装底层错误 cause，并使用默认文案 Message(code)。
-// 如果 cause 为 nil，则退化为 New(code)。
-func Wrap(code Code, cause error) *BizError {
-	if cause == nil {
-		return New(code)
+// WithMsg 设置自定义 Msg
+func WithMsg(m string) Option {
+	return func(e *BizError) {
+		e.Msg = m
 	}
-	return &BizError{Code: code, Msg: Message(code), Cause: cause}
 }
 
-// Unwrap 返回底层原因错误，用于支持 errors.Is / errors.As 的错误链解析。
+// WithMsgf 设置格式化 Msg
+func WithMsgf(format string, args ...any) Option {
+	return func(e *BizError) {
+		e.Msg = fmt.Sprintf(format, args...)
+	}
+}
+
+// WithCause 设置底层原因错误 Cause
+func WithCause(cause error) Option {
+	return func(e *BizError) {
+		e.Cause = cause
+	}
+}
+
+// New 创建 BizError,可选用 WithMsg / WithMsgf, WithCause 自定义消息和原因,不填则使用 Code 对于的默认配置
+func New(code Code, opts ...Option) *BizError {
+	e := &BizError{Code: code, Msg: Message(code)}
+	for _, opt := range opts {
+		if opt != nil {
+			opt(e)
+		}
+	}
+	return e
+}
+
+// Unwrap 返回底层原因错误,用于 errors.Is / errors.As 的错误链解析
 func (e *BizError) Unwrap() error {
 	return e.Cause
 }
 
-// From 将任意 error 统一转换成（业务码，消息）。
-// - 如果 err 是 BizError（或被 BizError 包装），则提取其 Code/Msg（Msg 为空则用默认文案）
-// - 否则认为是系统内部错误，返回 CodeInternal 及默认内部错误文案
-func From(err error) (Code, string) {
+// FromError 将任意 error 解析为 业务码,消息 由用内部错误 CodeInternal 兜底
+func FromError(err error) (Code, string) {
 	if err == nil {
 		return CodeOK, Message(CodeOK)
 	}
 	var be *BizError
 	if errors.As(err, &be) {
-		// be.Msg 允许是自定义 msg
-		if be.Msg != "" {
-			return be.Code, be.Msg
-		}
-		return be.Code, Message(be.Code)
+		return be.Code, be.Msg
 	}
 	return CodeInternal, Message(CodeInternal)
 }
 
-// Newf 创建带格式化消息的 BizError（自定义文案）。
-// 用于需要携带少量上下文信息的场景（仍需避免泄露敏感信息）。
-func Newf(code Code, format string, args ...any) *BizError {
-	return &BizError{Code: code, Msg: fmt.Sprintf(format, args...)}
-}
-
-// Wrapf 用业务码包装底层错误 cause，并使用格式化消息作为对外文案。
-// 如果 cause 为 nil，则退化为 Newf(code, ...)。
-func Wrapf(code Code, cause error, format string, args ...any) *BizError {
-	if cause == nil {
-		return Newf(code, format, args...)
-	}
-	return &BizError{Code: code, Msg: fmt.Sprintf(format, args...), Cause: cause}
-}
-
-// IsBiz 判断 err 是否为 BizError（或错误链中包含 BizError）。
-// 常用于入口层决定日志级别：业务错误一般 warn/info；系统错误一般 error。
+// IsBiz 判断 err 是否为 BizError 或错误链中包含 BizError
 func IsBiz(err error) bool {
 	var be *BizError
 	return errors.As(err, &be)
 }
 
-// CodeOf 获取 err 对应的业务码：
-// - err 为 nil：返回 CodeOK
-// - err 为 BizError（或链中包含 BizError）：返回其 Code
-// - 否则：返回 CodeInternal
+// CodeOf 获取 err 对应的业务码,由内部错误 CodeInternal 兜底
 func CodeOf(err error) Code {
-	c, _ := From(err)
+	c, _ := FromError(err)
 	return c
 }

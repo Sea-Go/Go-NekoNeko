@@ -337,7 +337,6 @@ services:
     depends_on:
       - elasticsearch
     restart: unless-stopped
-
 volumes:
   prometheus_data:
   grafana_data:

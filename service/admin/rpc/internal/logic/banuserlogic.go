@@ -7,6 +7,7 @@ import (
 	"sea-try-go/service/admin/rpc/internal/model"
 	"sea-try-go/service/admin/rpc/internal/svc"
 	"sea-try-go/service/admin/rpc/pb"
+	"sea-try-go/service/common/errmsg"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,12 +28,12 @@ func NewBanUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *BanUserLo
 
 func (l *BanUserLogic) BanUser(in *pb.BanUserReq) (*pb.BanUserResp, error) {
 
-	result := l.svcCtx.DB.Model(&model.User{}).Where("id = ?", in.Id).Update("status", 1)
-	if result.Error != nil {
-		return nil, errors.New("封禁失败" + result.Error.Error())
-	}
-	if result.RowsAffected == 0 {
-		return nil, errors.New("用户不存在")
+	err := l.svcCtx.AdminModel.UpdateUserStatusByUid(l.ctx, in.Uid, 1)
+	if err != nil {
+		if err == model.ErrorNotFound {
+			return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorUserNotExist))
+		}
+		return nil, errors.New("封禁失败" + err.Error())
 	}
 	return &pb.BanUserResp{
 		Success: true,

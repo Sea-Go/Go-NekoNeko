@@ -8,6 +8,7 @@ import (
 	"sea-try-go/service/admin/rpc/internal/svc"
 	"sea-try-go/service/admin/rpc/pb"
 	"sea-try-go/service/common/cryptx"
+	"sea-try-go/service/common/errmsg"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,41 +29,36 @@ func NewUpdateSelfLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Update
 
 func (l *UpdateSelfLogic) UpdateSelf(in *pb.UpdateSelfReq) (*pb.UpdateSelfResp, error) {
 
-	updates := make(map[string]interface{})
+	toUpdate := &model.Admin{}
 	if len(in.Username) > 0 {
-		updates["username"] = in.Username
+		toUpdate.Username = in.Username
 	}
-
 	if len(in.Password) > 0 {
 		newPassword, e := cryptx.PasswordEncrypt(in.Password)
 		if e != nil {
-			return nil, e
+			return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorServerCommon))
 		}
-		updates["password"] = newPassword
+		toUpdate.Password = newPassword
 	}
-
 	if len(in.Email) > 0 {
-		updates["email"] = in.Email
+		toUpdate.Email = in.Email
 	}
 	if in.ExtraInfo != nil {
-		updates["extra_info"] = in.ExtraInfo
+		toUpdate.ExtraInfo = in.ExtraInfo
 	}
-
-	if len(updates) > 0 {
-		err := l.svcCtx.DB.Model(&model.Admin{}).Where("id = ?", in.Id).Updates(updates).Error
-		if err != nil {
-			return nil, errors.New("更新失败:" + err.Error())
-		}
+	err := l.svcCtx.AdminModel.UpdateOneAdminByUid(l.ctx, in.Uid, toUpdate)
+	if err != nil {
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorServerCommon))
 	}
-	var newAdmin model.Admin
-	err := l.svcCtx.DB.Model(&model.Admin{}).Where("id = ?", in.Id).First(&newAdmin).Error
+	var newAdmin *model.Admin
+	newAdmin, err = l.svcCtx.AdminModel.FindOneAdminByUid(l.ctx, in.Uid)
 	if err != nil {
 		return nil, err
 	}
 	return &pb.UpdateSelfResp{
 		Success: true,
 		Admin: &pb.AdminInfo{
-			Id:        newAdmin.Id,
+			Uid:       newAdmin.Uid,
 			Username:  newAdmin.Username,
 			Email:     newAdmin.Email,
 			ExtraInfo: newAdmin.ExtraInfo,

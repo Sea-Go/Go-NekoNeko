@@ -4,10 +4,10 @@ import (
 	"context"
 	"errors"
 
-	"sea-try-go/service/admin/rpc/internal/model"
 	"sea-try-go/service/admin/rpc/internal/svc"
 	"sea-try-go/service/admin/rpc/pb"
 	"sea-try-go/service/common/cryptx"
+	"sea-try-go/service/common/errmsg"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,16 +27,15 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 }
 
 func (l *LoginLogic) Login(in *pb.LoginReq) (*pb.LoginResp, error) {
-	admin := model.Admin{}
-	err := l.svcCtx.DB.Where("username = ?", in.Username).First(&admin).Error
+	admin, err := l.svcCtx.AdminModel.FindOneAdminByUsername(l.ctx, in.Username)
 	if err != nil {
-		return nil, errors.New("用户名或密码错误")
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorLoginWrong))
 	}
 	correct := cryptx.CheckPassword(admin.Password, in.Password)
 	if !correct {
-		return nil, errors.New("用户名或密码错误")
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorLoginWrong))
 	}
 	return &pb.LoginResp{
-		Id: admin.Id,
+		Uid: admin.Uid,
 	}, nil
 }

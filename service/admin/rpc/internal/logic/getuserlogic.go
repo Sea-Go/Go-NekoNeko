@@ -2,10 +2,12 @@ package logic
 
 import (
 	"context"
+	"errors"
 
 	"sea-try-go/service/admin/rpc/internal/model"
 	"sea-try-go/service/admin/rpc/internal/svc"
 	"sea-try-go/service/admin/rpc/pb"
+	"sea-try-go/service/common/errmsg"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -25,14 +27,15 @@ func NewGetUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUserLo
 }
 
 func (l *GetUserLogic) GetUser(in *pb.GetUserReq) (*pb.GetUserResp, error) {
-	user := model.User{}
-	err := l.svcCtx.DB.Where("id = ?", in.Id).First(&user).Error
+	user, err := l.svcCtx.AdminModel.FindOneUserByUid(l.ctx, in.Uid)
 	if err != nil {
-		return nil, err
+		if err == model.ErrorNotFound {
+			return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorUserNotExist))
+		}
 	}
 	return &pb.GetUserResp{
 		User: &pb.UserInfo{
-			Id:        user.Id,
+			Uid:       user.Uid,
 			Username:  user.Username,
 			Email:     user.Email,
 			Status:    uint64(user.Status),

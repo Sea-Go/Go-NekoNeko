@@ -2,10 +2,11 @@ package logic
 
 import (
 	"context"
+	"errors"
 
-	"sea-try-go/service/admin/rpc/internal/model"
 	"sea-try-go/service/admin/rpc/internal/svc"
 	"sea-try-go/service/admin/rpc/pb"
+	"sea-try-go/service/common/errmsg"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -25,14 +26,13 @@ func NewGetSelfLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetSelfLo
 }
 
 func (l *GetSelfLogic) GetSelf(in *pb.GetSelfReq) (*pb.GetSelfResp, error) {
-	admin := model.Admin{}
-	err := l.svcCtx.DB.Where("id = ?", uint64(in.Id)).First(&admin).Error
+	admin, err := l.svcCtx.AdminModel.FindOneAdminByUid(l.ctx, in.Uid)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorDbSelect))
 	}
 	return &pb.GetSelfResp{
 		Admin: &pb.AdminInfo{
-			Id:        admin.Id,
+			Uid:       admin.Uid,
 			Username:  admin.Username,
 			Email:     admin.Email,
 			ExtraInfo: admin.ExtraInfo,

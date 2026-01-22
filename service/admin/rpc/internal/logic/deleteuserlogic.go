@@ -7,6 +7,7 @@ import (
 	"sea-try-go/service/admin/rpc/internal/model"
 	"sea-try-go/service/admin/rpc/internal/svc"
 	"sea-try-go/service/admin/rpc/pb"
+	"sea-try-go/service/common/errmsg"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -26,13 +27,11 @@ func NewDeleteUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Delete
 }
 
 func (l *DeleteUserLogic) DeleteUser(in *pb.DeleteUserReq) (*pb.DeleteUserResp, error) {
-	result := l.svcCtx.DB.Where("id = ?", in.Id).Delete(&model.User{})
-	err := result.Error
+	err := l.svcCtx.AdminModel.DeleteOneUserByUid(l.ctx, in.Uid)
 	if err != nil {
-		return nil, err
-	}
-	if result.RowsAffected == 0 {
-		return nil, errors.New("该用户不存在,无法删除")
+		if err == model.ErrorNotFound {
+			return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorUserNotExist))
+		}
 	}
 	return &pb.DeleteUserResp{
 		Success: true,

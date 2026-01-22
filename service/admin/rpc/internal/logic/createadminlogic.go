@@ -8,6 +8,8 @@ import (
 	"sea-try-go/service/admin/rpc/internal/svc"
 	"sea-try-go/service/admin/rpc/pb"
 	"sea-try-go/service/common/cryptx"
+	"sea-try-go/service/common/errmsg"
+	"sea-try-go/service/common/snowflake"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,27 +30,31 @@ func NewCreateAdminLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Creat
 
 func (l *CreateAdminLogic) CreateAdmin(in *pb.CreateAdminReq) (*pb.CreateAdminResp, error) {
 
-	var count int64
-	l.svcCtx.DB.Model(&model.Admin{}).Where("username = ?", in.Username).Count(&count)
-	if count > 0 {
-		return nil, errors.New("用户名已存在")
+	_, err := l.svcCtx.AdminModel.FindOneAdminByUsername(l.ctx, in.Username)
+	if err == nil {
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorUserExist))
 	}
 
 	password, err := cryptx.PasswordEncrypt(in.Password)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorServerCommon))
 	}
-	admin := model.Admin{
+	uid, err := snowflake.GetID()
+	if err != nil {
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorServerCommon))
+	}
+	admin := &model.Admin{
+		Uid:       uid,
 		Username:  in.Username,
 		Password:  password,
 		Email:     in.Email,
 		ExtraInfo: in.ExtraInfo,
 	}
-	err = l.svcCtx.DB.Save(&admin).Error
+	err = l.svcCtx.AdminModel.InsertOneAdmin(l.ctx, admin)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorDbUpdate))
 	}
 	return &pb.CreateAdminResp{
-		Id: admin.Id,
+		Uid: admin.Uid,
 	}, nil
 }

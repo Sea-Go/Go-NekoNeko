@@ -7,6 +7,7 @@ import (
 	"sea-try-go/service/admin/rpc/internal/model"
 	"sea-try-go/service/admin/rpc/internal/svc"
 	"sea-try-go/service/admin/rpc/pb"
+	"sea-try-go/service/common/errmsg"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -26,12 +27,12 @@ func NewUnBanUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UnBanUs
 }
 
 func (l *UnBanUserLogic) UnBanUser(in *pb.UnBanUserReq) (*pb.UnBanUserResp, error) {
-	result := l.svcCtx.DB.Model(&model.User{}).Where("id = ?", in.Id).Update("status", 0)
-	if result.Error != nil {
-		return nil, errors.New("解封失败" + result.Error.Error())
-	}
-	if result.RowsAffected == 0 {
-		return nil, errors.New("用户不存在")
+	err := l.svcCtx.AdminModel.UpdateUserStatusByUid(l.ctx, in.Uid, 0)
+	if err != nil {
+		if err == model.ErrorNotFound {
+			return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorUserNotExist))
+		}
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorServerCommon))
 	}
 	return &pb.UnBanUserResp{
 		Success: true,

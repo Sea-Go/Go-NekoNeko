@@ -2,10 +2,11 @@ package logic
 
 import (
 	"context"
+	"errors"
 
-	"sea-try-go/service/admin/rpc/internal/model"
 	"sea-try-go/service/admin/rpc/internal/svc"
 	"sea-try-go/service/admin/rpc/pb"
+	"sea-try-go/service/common/errmsg"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -25,25 +26,17 @@ func NewGetUserListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUs
 }
 
 func (l *GetUserListLogic) GetUserList(in *pb.GetUserListReq) (*pb.GetUserListResp, error) {
-	var users []model.User
-	var total int64
-	db := l.svcCtx.DB.Model(&model.User{})
-	if len(in.Keyword) > 0 {
-		keyword := "%" + in.Keyword + "%"
-		db = db.Where("username LIKE ? OR email LIKE ?", keyword, keyword)
-	}
-	if err := db.Count(&total).Error; err != nil {
-		return nil, err
-	}
-	list := make([]*pb.UserInfo, 0)
-	offset := (in.Page - 1) * in.PageSize
-	err := db.Offset(int(offset)).Limit(int(in.PageSize)).Order("id desc").Find(&users).Error
+
+	users, total, err := l.svcCtx.AdminModel.FindUserListByKeyword(l.ctx, in.Page, in.PageSize, in.Keyword)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorDbSelect))
 	}
+
+	list := make([]*pb.UserInfo, 0)
+
 	for _, user := range users {
 		list = append(list, &pb.UserInfo{
-			Id:        user.Id,
+			Uid:       user.Uid,
 			Username:  user.Username,
 			Email:     user.Email,
 			Status:    uint64(user.Status),

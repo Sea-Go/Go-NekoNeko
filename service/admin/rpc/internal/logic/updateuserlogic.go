@@ -8,6 +8,7 @@ import (
 	"sea-try-go/service/admin/rpc/internal/svc"
 	"sea-try-go/service/admin/rpc/pb"
 	"sea-try-go/service/common/cryptx"
+	"sea-try-go/service/common/errmsg"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -27,42 +28,42 @@ func NewUpdateUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Update
 }
 
 func (l *UpdateUserLogic) UpdateUser(in *pb.UpdateUserReq) (*pb.UpdateUserResp, error) {
-	user := model.User{}
-	err := l.svcCtx.DB.Where("id = ?", in.Id).First(&user).Error
-	if err != nil {
-		return nil, errors.New("用户不存在")
+	_, err := l.svcCtx.AdminModel.FindOneUserByUid(l.ctx, in.Uid)
+	if err == model.ErrorNotFound {
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorUserNotExist))
 	}
-	updates := make(map[string]interface{})
+	if err != nil {
+		return nil, err
+	}
+	toUpdate := &model.User{}
 	if len(in.Username) > 0 {
-		updates["username"] = in.Username
+		toUpdate.Username = in.Username
 	}
 	if len(in.Password) > 0 {
 		newPassword, e := cryptx.PasswordEncrypt(in.Password)
 		if e != nil {
-			return nil, errors.New("密码加密失败")
+			return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorServerCommon))
 		}
-		updates["password"] = newPassword
+		toUpdate.Password = newPassword
 	}
 	if len(in.Email) > 0 {
-		updates["email"] = in.Email
+		toUpdate.Email = in.Email
 	}
 	if in.ExtraInfo != nil {
-		updates["extra_info"] = in.ExtraInfo
+		toUpdate.ExtraInfo = in.ExtraInfo
 	}
-	if len(updates) > 0 {
-		err = l.svcCtx.DB.Model(&model.User{}).Where("id = ?", in.Id).Updates(updates).Error
-		if err != nil {
-			return nil, errors.New("更新失败" + err.Error())
-		}
+	err = l.svcCtx.AdminModel.UpdateOneUserByUid(l.ctx, in.Uid, toUpdate)
+	if err != nil {
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorServerCommon))
 	}
-	var newUser model.User
-	err = l.svcCtx.DB.Model(&model.User{}).Where("id = ?", in.Id).First(&newUser).Error
+	var newUser *model.User
+	newUser, err = l.svcCtx.AdminModel.FindOneUserByUid(l.ctx, in.Uid)
 	if err != nil {
 		return nil, err
 	}
 	return &pb.UpdateUserResp{
 		User: &pb.UserInfo{
-			Id:        newUser.Id,
+			Uid:       newUser.Uid,
 			Username:  newUser.Username,
 			Email:     newUser.Email,
 			Status:    uint64(newUser.Status),

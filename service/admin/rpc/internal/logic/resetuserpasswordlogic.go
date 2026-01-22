@@ -8,6 +8,7 @@ import (
 	"sea-try-go/service/admin/rpc/internal/svc"
 	"sea-try-go/service/admin/rpc/pb"
 	"sea-try-go/service/common/cryptx"
+	"sea-try-go/service/common/errmsg"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -28,20 +29,22 @@ func NewResetUserPasswordLogic(ctx context.Context, svcCtx *svc.ServiceContext) 
 
 func (l *ResetUserPasswordLogic) ResetUserPassword(in *pb.ResetUserPasswordReq) (*pb.ResetUserPasswordResp, error) {
 
-	user := model.User{}
-	err := l.svcCtx.DB.Where("id = ?", in.Id).First(&user).Error
+	_, err := l.svcCtx.AdminModel.FindOneUserByUid(l.ctx, in.Uid)
 	if err != nil {
-		return nil, errors.New("用户不存在")
+		if err == model.ErrorNotFound {
+			return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorUserNotExist))
+		}
+		//可能需要写日志来记录错误
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorServerCommon))
 	}
 	var password string
 	password, err = cryptx.PasswordEncrypt(l.svcCtx.Config.System.DefaultPassword)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorServerCommon))
 	}
-	user.Password = password
-	err = l.svcCtx.DB.Model(&user).Update("password", password).Error
+	err = l.svcCtx.AdminModel.UpdateUserPasswordByUid(l.ctx, in.Uid, password)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorDbUpdate))
 	}
 	return &pb.ResetUserPasswordResp{
 		Success: true,

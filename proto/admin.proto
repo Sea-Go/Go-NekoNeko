@@ -5,22 +5,23 @@ package admin;
 option go_package = "./pb";
 
 message AdminInfo{
- uint64 id = 1;
+ int64 uid = 1;
  string username = 2;
  string email = 3;
  map<string,string> extra_info = 4;
 }
 
 message UserInfo {
- uint64 id = 1;
- string username = 2;
- string email = 3;
- uint64 status = 4;
- map<string,string> extra_info = 5;
+ int64 uid = 1;
+ uint32 score = 2;
+ string username = 3;
+ string email = 4;
+ uint64 status = 5;
+ map<string,string> extra_info = 6;
 }
 
 message GetUserReq{
- uint64 id = 1;
+ int64 uid = 1;
 }
 
 message GetUserResp{
@@ -29,7 +30,7 @@ message GetUserResp{
 }
 
 message GetSelfReq{
- uint64 id = 1;
+ int64 uid = 1;
 }
 
 message GetSelfResp {
@@ -44,7 +45,7 @@ message CreateAdminReq {
 }
 
 message CreateAdminResp {
-  uint64 id = 1;
+  int64 uid = 1;
 }
 
 message LoginReq{
@@ -53,11 +54,11 @@ message LoginReq{
 }
 
 message LoginResp{
-  uint64 id = 1;
+  int64 uid = 1;
 }
 
 message DeleteUserReq {
-  uint64 id = 1;
+  int64 uid = 1;
 }
 
 message DeleteUserResp {
@@ -65,7 +66,7 @@ message DeleteUserResp {
 }
 
 message ResetUserPasswordReq{
- uint64 id = 1;
+ int64 uid = 1;
 }
 
 message ResetUserPasswordResp {
@@ -73,7 +74,7 @@ message ResetUserPasswordResp {
 }
 
 message UpdateSelfReq {
-  uint64 id = 1;
+  int64 uid = 1;
   string username = 2;
   string password = 3;
   string email = 4;
@@ -86,7 +87,7 @@ message UpdateSelfResp {
 }
 
 message UpdateUserReq {
-  uint64 id = 1;
+  int64 uid = 1;
   string username = 2;
   string password = 3;
   string email = 4;
@@ -110,7 +111,7 @@ message GetUserListResp {
 }
 
 message BanUserReq {
-  uint64 id = 1;
+  int64 uid = 1;
 }
 
 message BanUserResp {
@@ -118,7 +119,7 @@ message BanUserResp {
 }
 
 message UnBanUserReq {
-  uint64 id = 1;
+  int64 uid = 1;
 }
 
 message UnBanUserResp {

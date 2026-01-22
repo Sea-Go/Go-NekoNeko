@@ -2,6 +2,7 @@ syntax = "v1"
 
 type UserInfo{
     Id uint64 `json:"id"`
+    Uid int64 `json:"uid"`
     Username string `json:"username"`
     Status int64 `json:"status"`
     Email string `json:"email,omitempty"`
@@ -10,13 +11,14 @@ type UserInfo{
 
 type AdminInfo{
     Id uint64 `json:"id"`
+    Uid int64 `json:"uid"`
     Username string `json:"username"`
     Email string `json:"email"`
     Extrainfo map[string]string `json:"extra_info,omitempty"`
 }
 
 type GetUserReq{
-    Id uint64 `form:"id"`
+    Uid int64 `form:"uid"`
 }
 
 type GetUserResp{
@@ -35,12 +37,12 @@ type GetSelfResp{
 type CreateAdminReq{
     Username string `json:"username"`
     Password string `json:"password"`
-    Email string `json:"email,optional"`
-    Extrainfo map[string]string `json:"extra_info,optional"`
+    Email string `json:"email,omitempty"`
+    Extrainfo map[string]string `json:"extra_info,omitempty"`
 }
 
 type CreateAdminResp{
-    Id uint64 `json:"id"`
+    Uid int64 `json:"uid"`
 }
 
 type LoginReq{
@@ -53,7 +55,7 @@ type LoginResp{
 }
 
 type DeleteUserReq{
-    Id uint64 `json:"id"`
+    Uid int64 `json:"uid"`
 }
 
 type DeleteUserResp{
@@ -61,7 +63,7 @@ type DeleteUserResp{
 }
 
 type ResetUserPasswordReq{
-    Id uint64 `json:"id"`
+    Uid int64 `json:"uid"`
 }
 
 type ResetUserPasswordResp{
@@ -69,10 +71,10 @@ type ResetUserPasswordResp{
 }
 
 type UpdateSelfReq{
-    Username string `json:"username,optional"`
-    Password string `json:"password,optional"`
-    Email string `json:"email,optional"`
-    Extrainfo map[string]string `json:"extra_info,optional"`
+    Username string `json:"username,omitempty"`
+    Password string `json:"password,omitempty"`
+    Email string `json:"email,omitempty"`
+    Extrainfo map[string]string `json:"extra_info,omitempty"`
 }
 
 type UpdateSelfResp{
@@ -81,11 +83,11 @@ type UpdateSelfResp{
 }
 
 type UpdateUserReq{
-    Id uint64 `json:"id"`
-    Username string `json:"username,optional"`
-    Password string `json:"password,optional"`
-    Email string `json:"email,optional"`
-    Extrainfo map[string]string `json:"extra_info,optional"`
+    Uid int64 `json:"uid"`
+    Username string `json:"username,omitempty"`
+    Password string `json:"password,omitempty"`
+    Email string `json:"email,omitempty"`
+    Extrainfo map[string]string `json:"extra_info,omitempty"`
 }
 
 type UpdateUserResp{
@@ -96,7 +98,7 @@ type UpdateUserResp{
 type GetUserListReq{
     Page int64 `form:"page,default=1"`
     PageSize int64 `form:"page_size,default=20"`
-    Keyword string `form:"keyword,optional"`
+    Keyword string `form:"keyword,omitempty"`
 }
 
 type GetUserListResp{
@@ -105,7 +107,7 @@ type GetUserListResp{
 }
 
 type BanUserReq{
-    Id uint64 `json:"id"`
+    Uid int64 `json:"uid"`
 }
 
 type BanUserResp{
@@ -113,7 +115,7 @@ type BanUserResp{
 }
 
 type UnBanUserReq{
-    Id uint64 `json:"id"`
+    Uid int64 `json:"uid"`
 }
 
 

@@ -11,7 +11,7 @@ type CreateUserReq struct {
 }
 
 type CreateUserResp struct {
-	Id uint64 `json:"id"`
+	Uid int64 `json:"uid,string"`
 }
 
 type DeleteUserReq struct {
@@ -57,7 +57,8 @@ type UpdateUserResp struct {
 }
 
 type UserInfo struct {
-	Id        uint64            `json:"id"`
+	Uid       int64             `json:"uid,string"`
+	Score     uint32            `json:"score"`
 	Username  string            `json:"username"`
 	Email     string            `json:"email,omitempty"`
 	Extrainfo map[string]string `json:"extra_info,omitempty"`

@@ -2,8 +2,9 @@ Name: admin.rpc
 ListenOn: 0.0.0.0:8081
 Etcd:
   Hosts:
-  - 127.0.0.1:2379
+  - 127.0.0.1:32379
   Key: admin.rpc
-DataSource : "host=127.0.0.1 user=postgres password=123456 dbname=user_db port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+DataSource: "postgres://admin:Sea-TryGo@127.0.0.1:35432/first_db?sslmode=disable&TimeZone=Asia/Shanghai"
+
 System:
  DefaultPassword : "123456"

@@ -2,9 +2,9 @@ package logic
 
 import (
 	"context"
-	"sea-try-go/service/user/rpc/internal/metrics"
-	"time"
+	"errors"
 
+	"sea-try-go/service/common/errmsg"
 	"sea-try-go/service/user/rpc/internal/model"
 	"sea-try-go/service/user/rpc/internal/svc"
 	pb "sea-try-go/service/user/rpc/pb"
@@ -27,22 +27,20 @@ func NewGetUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetUserLo
 }
 
 func (l *GetUserLogic) GetUser(in *pb.GetUserReq) (*pb.GetUserResp, error) {
-	start := time.Now()
-	user := model.User{}
-	err := l.svcCtx.DB.Where("id = ?", in.Id).First(&user).Error
-	if err != nil {
+
+	user, err := l.svcCtx.UserModel.FindOneByUid(l.ctx, in.Uid)
+	if err == model.ErrorNotFound {
 		return &pb.GetUserResp{
 			Found: false,
-		}, err
+		}, nil
 	}
-	defer func() {
-		costMs := time.Since(start).Milliseconds()
-		metrics.GetUserLatencyMs.Observe(costMs, "success")
-	}()
+	if err != nil {
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorDbSelect))
+	}
 
 	return &pb.GetUserResp{
 		User: &pb.UserInfo{
-			Id:        user.Id,
+			Uid:       user.Uid,
 			Username:  user.Username,
 			Email:     user.Email,
 			ExtraInfo: user.ExtraInfo,

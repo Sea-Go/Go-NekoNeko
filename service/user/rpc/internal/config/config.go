@@ -10,5 +10,6 @@ type Config struct {
 		User     string
 		Password string
 		DBName   string
+		Mode     string
 	}
 }

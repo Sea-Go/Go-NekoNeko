@@ -52,7 +52,7 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 				Handler: user.UpdateuserHandler(serverCtx),
 			},
 		},
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
+		rest.WithJwt(serverCtx.Config.UserAuth.AccessSecret),
 		rest.WithPrefix("/usercenter/v1"),
 	)
 }

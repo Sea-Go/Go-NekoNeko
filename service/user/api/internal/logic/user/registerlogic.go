@@ -8,7 +8,8 @@ import (
 
 	"sea-try-go/service/user/api/internal/svc"
 	"sea-try-go/service/user/api/internal/types"
-	"sea-try-go/service/user/rpc/pb"
+
+	pb "sea-try-go/service/user/rpc/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -47,6 +48,6 @@ func (l *RegisterLogic) Register(req *types.CreateUserReq) (resp *types.CreateUs
 	}
 
 	return &types.CreateUserResp{
-		Id: rpcResp.Id,
+		Uid: rpcResp.Uid,
 	}, nil
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 
 	"sea-try-go/service/common/cryptx"
+	"sea-try-go/service/common/errmsg"
 	"sea-try-go/service/user/rpc/internal/model"
 	"sea-try-go/service/user/rpc/internal/svc"
 	pb "sea-try-go/service/user/rpc/pb"
@@ -28,47 +29,42 @@ func NewUpdateUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Update
 
 func (l *UpdateUserLogic) UpdateUser(in *pb.UpdateUserReq) (*pb.UpdateUserResp, error) {
 
-	updates := make(map[string]interface{})
+	toUpdate := &model.User{}
 	if len(in.Username) > 0 {
-		var cnt int64
-		l.svcCtx.DB.Model(&model.User{}).Where("username = ? AND id != ?", in.Username, in.Id).Count(&cnt)
-		if cnt > 0 {
-			return nil, errors.New("用户名已存在")
-		}
-		updates["username"] = in.Username
+		toUpdate.Username = in.Username
 	}
-
 	if len(in.Password) > 0 {
 		newPassword, e := cryptx.PasswordEncrypt(in.Password)
 		if e != nil {
-			return nil, e
+			return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorServerCommon))
 		}
-		updates["password"] = newPassword
+		toUpdate.Password = newPassword
 	}
-
 	if len(in.Email) > 0 {
-		updates["email"] = in.Email
+		toUpdate.Email = in.Email
 	}
-
 	if in.ExtraInfo != nil {
-		updates["extra_info"] = in.ExtraInfo
+		toUpdate.ExtraInfo = in.ExtraInfo
 	}
 
-	if len(updates) > 0 {
-		err := l.svcCtx.DB.Model(&model.User{}).Where("id = ?", in.Id).Updates(updates).Error
-		if err != nil {
-			return nil, errors.New("更新失败:" + err.Error())
-		}
-	}
+	err := l.svcCtx.UserModel.UpdateUserById(l.ctx, in.Uid, toUpdate)
 
-	var newUser model.User
-	err := l.svcCtx.DB.Model(&model.User{}).Where("id = ?", in.Id).First(&newUser).Error
 	if err != nil {
-		return nil, errors.New("用户不存在")
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorServerCommon))
 	}
+
+	newUser, err := l.svcCtx.UserModel.FindOneByUid(l.ctx, in.Uid)
+
+	if err != nil {
+		if err == model.ErrorNotFound {
+			return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorUserNotExist))
+		}
+		return nil, err
+	}
+
 	return &pb.UpdateUserResp{
 		User: &pb.UserInfo{
-			Id:        newUser.Id,
+			Uid:       newUser.Uid,
 			Username:  newUser.Username,
 			Email:     newUser.Email,
 			ExtraInfo: newUser.ExtraInfo,

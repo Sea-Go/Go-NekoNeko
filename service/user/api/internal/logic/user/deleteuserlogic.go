@@ -31,15 +31,15 @@ func NewDeleteuserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Delete
 func (l *DeleteuserLogic) Deleteuser(req *types.DeleteUserReq) (resp *types.DeleteUserResp, err error) {
 
 	userId := l.ctx.Value("userId").(json.Number)
-	id, _ := userId.Int64()
+	uid, _ := userId.Int64()
 
 	rpcReq := &pb.DeleteUserReq{
-		Id: uint64(id),
+		Uid: int64(uid),
 	}
 
-	rpcResp, er := l.svcCtx.UserRpc.DeleteUser(l.ctx, rpcReq)
-	if er != nil {
-		return nil, er
+	rpcResp, err := l.svcCtx.UserRpc.DeleteUser(l.ctx, rpcReq)
+	if err != nil {
+		return nil, err
 	}
 	if !rpcResp.Success {
 		return &types.DeleteUserResp{

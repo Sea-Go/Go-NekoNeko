@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"sea-try-go/service/common/cryptx"
+	"sea-try-go/service/common/errmsg"
+	"sea-try-go/service/common/snowflake"
 	"sea-try-go/service/user/rpc/internal/metrics"
 	"sea-try-go/service/user/rpc/internal/model"
 	"sea-try-go/service/user/rpc/internal/svc"
@@ -27,16 +29,27 @@ func NewRegisterLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Register
 }
 
 func (l *RegisterLogic) Register(in *pb.CreateUserReq) (*pb.CreateUserResp, error) {
-	var user model.User
-	err := l.svcCtx.DB.Where("username = ?", in.Username).First(&user).Error
+
+	_, err := l.svcCtx.UserModel.FindOneByUserName(l.ctx, in.Username)
 	if err == nil {
-		return nil, errors.New("用户名已存在")
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorUserExist))
+	}
+	if err != model.ErrorNotFound {
+		return nil, err
 	}
 	truePassword, er := cryptx.PasswordEncrypt(in.Password)
 	if er != nil {
 		return nil, er
 	}
+
+	var uid int64
+	uid, err = snowflake.GetID()
+	if err != nil {
+		l.Logger.Errorf("生成UID失败:%v", err)
+		return nil, errors.New("ID生成失败")
+	}
 	newUser := model.User{
+		Uid:       uid,
 		Username:  in.Username,
 		Password:  truePassword,
 		Email:     in.Email,
@@ -44,12 +57,12 @@ func (l *RegisterLogic) Register(in *pb.CreateUserReq) (*pb.CreateUserResp, erro
 		Status:    0,
 		ExtraInfo: in.ExtraInfo,
 	}
-	err = l.svcCtx.DB.Create(&newUser).Error
+	err = l.svcCtx.UserModel.Insert(l.ctx, &newUser)
 	if err != nil {
-		return nil, err
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorDbUpdate))
 	}
 	metrics.RegisterSuccessTotal.Inc()
 	return &pb.CreateUserResp{
-		Id: newUser.Id,
+		Uid: newUser.Uid,
 	}, nil
 }

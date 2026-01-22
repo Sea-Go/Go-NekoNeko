@@ -2,8 +2,10 @@ package logic
 
 import (
 	"context"
+	"errors"
 
 	"sea-try-go/service/common/cryptx"
+	"sea-try-go/service/common/errmsg"
 	"sea-try-go/service/user/rpc/internal/model"
 	"sea-try-go/service/user/rpc/internal/svc"
 	pb "sea-try-go/service/user/rpc/pb"
@@ -27,12 +29,15 @@ func NewLoginLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LoginLogic 
 
 func (l *LoginLogic) Login(in *pb.LoginReq) (*pb.LoginResp, error) {
 
-	user := model.User{}
-	err := l.svcCtx.DB.Where("username = ?", in.Username).First(&user).Error
+	user, err := l.svcCtx.UserModel.FindOneByUserName(l.ctx, in.Username)
+
 	if err != nil {
-		return &pb.LoginResp{
-			Status: 1,
-		}, nil
+		if err == model.ErrorNotFound {
+			return &pb.LoginResp{
+				Status: 1,
+			}, nil
+		}
+		return nil, errors.New(errmsg.GetErrMsg(errmsg.ErrorDbSelect))
 	}
 
 	correct := cryptx.CheckPassword(user.Password, in.Password)
@@ -48,7 +53,7 @@ func (l *LoginLogic) Login(in *pb.LoginReq) (*pb.LoginResp, error) {
 	}
 
 	return &pb.LoginResp{
-		Id:     user.Id,
+		Uid:    user.Uid,
 		Status: 0,
 	}, nil
 }

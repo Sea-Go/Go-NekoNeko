@@ -10,7 +10,7 @@ import (
 
 type Config struct {
 	rest.RestConf
-	Auth struct {
+	UserAuth struct {
 		AccessSecret string
 		AccessExpire int64
 	}

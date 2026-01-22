@@ -3,7 +3,6 @@ package logic
 import (
 	"context"
 
-	"sea-try-go/service/user/rpc/internal/model"
 	"sea-try-go/service/user/rpc/internal/svc"
 	pb "sea-try-go/service/user/rpc/pb"
 
@@ -26,13 +25,12 @@ func NewDeleteUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Delete
 
 func (l *DeleteUserLogic) DeleteUser(in *pb.DeleteUserReq) (*pb.DeleteUserResp, error) {
 
-	err := l.svcCtx.DB.Where("id = ?", in.Id).Delete(&model.User{}).Error
+	err := l.svcCtx.UserModel.DeleteUserByUid(l.ctx, in.Uid)
 	if err != nil {
 		return &pb.DeleteUserResp{
 			Success: false,
 		}, err
 	}
-
 	return &pb.DeleteUserResp{
 		Success: true,
 	}, nil

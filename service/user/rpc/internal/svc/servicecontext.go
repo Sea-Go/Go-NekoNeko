@@ -1,28 +1,27 @@
 package svc
 
 import (
-	"fmt"
-	"log"
 	"sea-try-go/service/user/rpc/internal/config"
-
-	"gorm.io/driver/postgres"
-	"gorm.io/gorm"
+	"sea-try-go/service/user/rpc/internal/model"
 )
 
 type ServiceContext struct {
-	Config config.Config
-	DB     *gorm.DB
+	Config    config.Config
+	UserModel *model.UserModel
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
-	dsn := fmt.Sprintf("host=%s user=%s password = %s dbname = %s port = %s sslmode = disable",
-		c.Postgres.Host, c.Postgres.User, c.Postgres.Password, c.Postgres.DBName, c.Postgres.Port)
-	db, err := gorm.Open(postgres.Open(dsn), &gorm.Config{})
-	if err != nil {
-		log.Fatalln("数据库连接失败", err)
+	dbConf := model.DBConf{
+		Host:     c.Postgres.Host,
+		Port:     c.Postgres.Port,
+		User:     c.Postgres.User,
+		Password: c.Postgres.Password,
+		DBName:   c.Postgres.DBName,
+		Mode:     c.Postgres.Mode,
 	}
+	db := model.InitDB(dbConf)
 	return &ServiceContext{
-		Config: c,
-		DB:     db,
+		Config:    c,
+		UserModel: model.NewUserModel(db),
 	}
 }

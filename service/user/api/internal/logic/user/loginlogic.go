@@ -52,10 +52,10 @@ func (l *LoginLogic) Login(req *types.LoginReq) (resp *types.LoginResp, err erro
 	}
 
 	now := time.Now().Unix()
-	accessSecret := l.svcCtx.Config.Auth.AccessSecret
-	accessExpire := l.svcCtx.Config.Auth.AccessExpire
+	accessSecret := l.svcCtx.Config.UserAuth.AccessSecret
+	accessExpire := l.svcCtx.Config.UserAuth.AccessExpire
 
-	token, e := jwt.GetToken(accessSecret, now, accessExpire, int64(rpcResp.Id))
+	token, e := jwt.GetToken(accessSecret, now, accessExpire, int64(rpcResp.Uid))
 
 	if e != nil {
 		return nil, e

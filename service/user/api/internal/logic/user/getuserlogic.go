@@ -32,10 +32,10 @@ func NewGetuserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetuserLo
 func (l *GetuserLogic) Getuser(req *types.GetUserReq) (resp *types.GetUserResp, err error) {
 
 	userId := l.ctx.Value("userId").(json.Number)
-	id, _ := userId.Int64()
+	uid, _ := userId.Int64()
 
 	rpcReq := &pb.GetUserReq{
-		Id: uint64(id),
+		Uid: uid,
 	}
 
 	rpcResp, er := l.svcCtx.UserRpc.GetUser(l.ctx, rpcReq)
@@ -49,7 +49,7 @@ func (l *GetuserLogic) Getuser(req *types.GetUserReq) (resp *types.GetUserResp, 
 
 	return &types.GetUserResp{
 		User: types.UserInfo{
-			Id:        rpcResp.User.Id,
+			Uid:       rpcResp.User.Uid,
 			Username:  rpcResp.User.Username,
 			Email:     rpcResp.User.Email,
 			Extrainfo: rpcResp.User.ExtraInfo,

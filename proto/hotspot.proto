@@ -1,0 +1,21 @@
+syntax = "proto3";
+
+package hotspot;
+option go_package = ".";
+
+//////////////////// hotspot / like /////////////////////
+message LikeArticleReq {
+  string article_id = 1;              // 文章ID
+  string user_id = 2;                 // 用户ID (?)
+  int32 type = 3;                     // 1=点赞, 2=取消
+}
+
+message LikeArticleResp {
+  int32 like_count = 1;               // 点赞数量
+}
+
+
+// 文章核心服务定义
+service ArticleService {
+  rpc LikeArticle(LikeArticleReq) returns (LikeArticleResp);
+}

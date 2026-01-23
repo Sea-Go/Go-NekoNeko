@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package admin;
 
-option go_package = "./pb";
+option go_package = ".";
 
 message AdminInfo{
  int64 uid = 1;

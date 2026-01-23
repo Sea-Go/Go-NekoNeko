@@ -21,30 +21,81 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
-//////////////////// hotspot / like /////////////////////
-type LikeArticleReq struct {
+type TypeSet int32
+
+const (
+	TypeSet_sort_by_hot      TypeSet = 0
+	TypeSet_sort_by_time     TypeSet = 1
+	TypeSet_biz_article      TypeSet = 32
+	TypeSet_Downvote_Dislike TypeSet = 64
+	TypeSet_Upvote_Like      TypeSet = 65
+)
+
+// Enum value maps for TypeSet.
+var (
+	TypeSet_name = map[int32]string{
+		0:  "sort_by_hot",
+		1:  "sort_by_time",
+		32: "biz_article",
+		64: "Downvote_Dislike",
+		65: "Upvote_Like",
+	}
+	TypeSet_value = map[string]int32{
+		"sort_by_hot":      0,
+		"sort_by_time":     1,
+		"biz_article":      32,
+		"Downvote_Dislike": 64,
+		"Upvote_Like":      65,
+	}
+)
+
+func (x TypeSet) Enum() *TypeSet {
+	p := new(TypeSet)
+	*p = x
+	return p
+}
+
+func (x TypeSet) String() string {
+	return protoimpl.X.EnumStringOf(x.Descriptor(), protoreflect.EnumNumber(x))
+}
+
+func (TypeSet) Descriptor() protoreflect.EnumDescriptor {
+	return file_proto_hotspot_proto_enumTypes[0].Descriptor()
+}
+
+func (TypeSet) Type() protoreflect.EnumType {
+	return &file_proto_hotspot_proto_enumTypes[0]
+}
+
+func (x TypeSet) Number() protoreflect.EnumNumber {
+	return protoreflect.EnumNumber(x)
+}
+
+// Deprecated: Use TypeSet.Descriptor instead.
+func (TypeSet) EnumDescriptor() ([]byte, []int) {
+	return file_proto_hotspot_proto_rawDescGZIP(), []int{0}
+}
+
+type Empty struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	ArticleId     string                 `protobuf:"bytes,1,opt,name=article_id,json=articleId,proto3" json:"article_id,omitempty"` // 文章ID
-	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`          // 用户ID (?)
-	Type          int32                  `protobuf:"varint,3,opt,name=type,proto3" json:"type,omitempty"`                           // 1=点赞, 2=取消
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *LikeArticleReq) Reset() {
-	*x = LikeArticleReq{}
+func (x *Empty) Reset() {
+	*x = Empty{}
 	mi := &file_proto_hotspot_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *LikeArticleReq) String() string {
+func (x *Empty) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*LikeArticleReq) ProtoMessage() {}
+func (*Empty) ProtoMessage() {}
 
-func (x *LikeArticleReq) ProtoReflect() protoreflect.Message {
+func (x *Empty) ProtoReflect() protoreflect.Message {
 	mi := &file_proto_hotspot_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
@@ -56,54 +107,101 @@ func (x *LikeArticleReq) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LikeArticleReq.ProtoReflect.Descriptor instead.
-func (*LikeArticleReq) Descriptor() ([]byte, []int) {
+// Deprecated: Use Empty.ProtoReflect.Descriptor instead.
+func (*Empty) Descriptor() ([]byte, []int) {
 	return file_proto_hotspot_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *LikeArticleReq) GetArticleId() string {
+type LikeReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	BizId         string                 `protobuf:"bytes,1,opt,name=biz_id,json=bizId,proto3" json:"biz_id,omitempty"`        // 文章ID
+	BizType       int32                  `protobuf:"varint,2,opt,name=biz_type,json=bizType,proto3" json:"biz_type,omitempty"` // biz_article
+	UserId        string                 `protobuf:"bytes,3,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`     // 用户ID
+	Action        int32                  `protobuf:"varint,4,opt,name=action,proto3" json:"action,omitempty"`                  // Downvote_Dislike, Upvote_Like
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *LikeReq) Reset() {
+	*x = LikeReq{}
+	mi := &file_proto_hotspot_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *LikeReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*LikeReq) ProtoMessage() {}
+
+func (x *LikeReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_hotspot_proto_msgTypes[1]
 	if x != nil {
-		return x.ArticleId
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use LikeReq.ProtoReflect.Descriptor instead.
+func (*LikeReq) Descriptor() ([]byte, []int) {
+	return file_proto_hotspot_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *LikeReq) GetBizId() string {
+	if x != nil {
+		return x.BizId
 	}
 	return ""
 }
 
-func (x *LikeArticleReq) GetUserId() string {
+func (x *LikeReq) GetBizType() int32 {
+	if x != nil {
+		return x.BizType
+	}
+	return 0
+}
+
+func (x *LikeReq) GetUserId() string {
 	if x != nil {
 		return x.UserId
 	}
 	return ""
 }
 
-func (x *LikeArticleReq) GetType() int32 {
+func (x *LikeReq) GetAction() int32 {
 	if x != nil {
-		return x.Type
+		return x.Action
 	}
 	return 0
 }
 
-type LikeArticleResp struct {
+type LikeResp struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	LikeCount     int32                  `protobuf:"varint,1,opt,name=like_count,json=likeCount,proto3" json:"like_count,omitempty"` // 点赞数量
+	LikeCount     int64                  `protobuf:"varint,2,opt,name=like_count,json=likeCount,proto3" json:"like_count,omitempty"` // 当前点赞总数
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
-func (x *LikeArticleResp) Reset() {
-	*x = LikeArticleResp{}
-	mi := &file_proto_hotspot_proto_msgTypes[1]
+func (x *LikeResp) Reset() {
+	*x = LikeResp{}
+	mi := &file_proto_hotspot_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
 
-func (x *LikeArticleResp) String() string {
+func (x *LikeResp) String() string {
 	return protoimpl.X.MessageStringOf(x)
 }
 
-func (*LikeArticleResp) ProtoMessage() {}
+func (*LikeResp) ProtoMessage() {}
 
-func (x *LikeArticleResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_hotspot_proto_msgTypes[1]
+func (x *LikeResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_hotspot_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -114,14 +212,442 @@ func (x *LikeArticleResp) ProtoReflect() protoreflect.Message {
 	return mi.MessageOf(x)
 }
 
-// Deprecated: Use LikeArticleResp.ProtoReflect.Descriptor instead.
-func (*LikeArticleResp) Descriptor() ([]byte, []int) {
-	return file_proto_hotspot_proto_rawDescGZIP(), []int{1}
+// Deprecated: Use LikeResp.ProtoReflect.Descriptor instead.
+func (*LikeResp) Descriptor() ([]byte, []int) {
+	return file_proto_hotspot_proto_rawDescGZIP(), []int{2}
 }
 
-func (x *LikeArticleResp) GetLikeCount() int32 {
+func (x *LikeResp) GetLikeCount() int64 {
 	if x != nil {
 		return x.LikeCount
+	}
+	return 0
+}
+
+type IsLikedReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	BizId         string                 `protobuf:"bytes,1,opt,name=biz_id,json=bizId,proto3" json:"biz_id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IsLikedReq) Reset() {
+	*x = IsLikedReq{}
+	mi := &file_proto_hotspot_proto_msgTypes[3]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IsLikedReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IsLikedReq) ProtoMessage() {}
+
+func (x *IsLikedReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_hotspot_proto_msgTypes[3]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IsLikedReq.ProtoReflect.Descriptor instead.
+func (*IsLikedReq) Descriptor() ([]byte, []int) {
+	return file_proto_hotspot_proto_rawDescGZIP(), []int{3}
+}
+
+func (x *IsLikedReq) GetBizId() string {
+	if x != nil {
+		return x.BizId
+	}
+	return ""
+}
+
+func (x *IsLikedReq) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+type IsLikedResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	IsLiked       bool                   `protobuf:"varint,1,opt,name=is_liked,json=isLiked,proto3" json:"is_liked,omitempty"` // true=已点赞
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IsLikedResp) Reset() {
+	*x = IsLikedResp{}
+	mi := &file_proto_hotspot_proto_msgTypes[4]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IsLikedResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IsLikedResp) ProtoMessage() {}
+
+func (x *IsLikedResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_hotspot_proto_msgTypes[4]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IsLikedResp.ProtoReflect.Descriptor instead.
+func (*IsLikedResp) Descriptor() ([]byte, []int) {
+	return file_proto_hotspot_proto_rawDescGZIP(), []int{4}
+}
+
+func (x *IsLikedResp) GetIsLiked() bool {
+	if x != nil {
+		return x.IsLiked
+	}
+	return false
+}
+
+type CommentReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	BizId         string                 `protobuf:"bytes,1,opt,name=biz_id,json=bizId,proto3" json:"biz_id,omitempty"`          // 文章ID
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`       // 用户ID
+	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`                   // 内容
+	ParentId      string                 `protobuf:"bytes,4,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"` // 回复某条评论的ID (可选)
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommentReq) Reset() {
+	*x = CommentReq{}
+	mi := &file_proto_hotspot_proto_msgTypes[5]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommentReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommentReq) ProtoMessage() {}
+
+func (x *CommentReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_hotspot_proto_msgTypes[5]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommentReq.ProtoReflect.Descriptor instead.
+func (*CommentReq) Descriptor() ([]byte, []int) {
+	return file_proto_hotspot_proto_rawDescGZIP(), []int{5}
+}
+
+func (x *CommentReq) GetBizId() string {
+	if x != nil {
+		return x.BizId
+	}
+	return ""
+}
+
+func (x *CommentReq) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CommentReq) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *CommentReq) GetParentId() string {
+	if x != nil {
+		return x.ParentId
+	}
+	return ""
+}
+
+type CommentResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	CommentId     string                 `protobuf:"bytes,1,opt,name=comment_id,json=commentId,proto3" json:"comment_id,omitempty"` // 生成的雪花ID
+	CreateTime    int64                  `protobuf:"varint,2,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommentResp) Reset() {
+	*x = CommentResp{}
+	mi := &file_proto_hotspot_proto_msgTypes[6]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommentResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommentResp) ProtoMessage() {}
+
+func (x *CommentResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_hotspot_proto_msgTypes[6]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommentResp.ProtoReflect.Descriptor instead.
+func (*CommentResp) Descriptor() ([]byte, []int) {
+	return file_proto_hotspot_proto_rawDescGZIP(), []int{6}
+}
+
+func (x *CommentResp) GetCommentId() string {
+	if x != nil {
+		return x.CommentId
+	}
+	return ""
+}
+
+func (x *CommentResp) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+type ListCommentReq struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	BizId         string                 `protobuf:"bytes,1,opt,name=biz_id,json=bizId,proto3" json:"biz_id,omitempty"`           // biz_article
+	Page          int64                  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`                         // 分页
+	PageSize      int64                  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"` // 一次请求数量
+	SortType      int32                  `protobuf:"varint,4,opt,name=sort_type,json=sortType,proto3" json:"sort_type,omitempty"` // sort_by_time, sort_by_hot
+	ParentId      string                 `protobuf:"bytes,5,opt,name=parent_id,json=parentId,proto3" json:"parent_id,omitempty"`  // 某条评论的ID (可选，专门用来查询回复某人的评论)
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCommentReq) Reset() {
+	*x = ListCommentReq{}
+	mi := &file_proto_hotspot_proto_msgTypes[7]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCommentReq) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCommentReq) ProtoMessage() {}
+
+func (x *ListCommentReq) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_hotspot_proto_msgTypes[7]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCommentReq.ProtoReflect.Descriptor instead.
+func (*ListCommentReq) Descriptor() ([]byte, []int) {
+	return file_proto_hotspot_proto_rawDescGZIP(), []int{7}
+}
+
+func (x *ListCommentReq) GetBizId() string {
+	if x != nil {
+		return x.BizId
+	}
+	return ""
+}
+
+func (x *ListCommentReq) GetPage() int64 {
+	if x != nil {
+		return x.Page
+	}
+	return 0
+}
+
+func (x *ListCommentReq) GetPageSize() int64 {
+	if x != nil {
+		return x.PageSize
+	}
+	return 0
+}
+
+func (x *ListCommentReq) GetSortType() int32 {
+	if x != nil {
+		return x.SortType
+	}
+	return 0
+}
+
+func (x *ListCommentReq) GetParentId() string {
+	if x != nil {
+		return x.ParentId
+	}
+	return ""
+}
+
+type CommentInfo struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
+	UserId        string                 `protobuf:"bytes,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Content       string                 `protobuf:"bytes,3,opt,name=content,proto3" json:"content,omitempty"`
+	CreateTime    int64                  `protobuf:"varint,4,opt,name=create_time,json=createTime,proto3" json:"create_time,omitempty"`
+	LikeCount     int64                  `protobuf:"varint,5,opt,name=like_count,json=likeCount,proto3" json:"like_count,omitempty"`    // 评论本身也可以被点赞
+	ReplyCount    int32                  `protobuf:"varint,6,opt,name=reply_count,json=replyCount,proto3" json:"reply_count,omitempty"` // 回复数
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *CommentInfo) Reset() {
+	*x = CommentInfo{}
+	mi := &file_proto_hotspot_proto_msgTypes[8]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *CommentInfo) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*CommentInfo) ProtoMessage() {}
+
+func (x *CommentInfo) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_hotspot_proto_msgTypes[8]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use CommentInfo.ProtoReflect.Descriptor instead.
+func (*CommentInfo) Descriptor() ([]byte, []int) {
+	return file_proto_hotspot_proto_rawDescGZIP(), []int{8}
+}
+
+func (x *CommentInfo) GetId() string {
+	if x != nil {
+		return x.Id
+	}
+	return ""
+}
+
+func (x *CommentInfo) GetUserId() string {
+	if x != nil {
+		return x.UserId
+	}
+	return ""
+}
+
+func (x *CommentInfo) GetContent() string {
+	if x != nil {
+		return x.Content
+	}
+	return ""
+}
+
+func (x *CommentInfo) GetCreateTime() int64 {
+	if x != nil {
+		return x.CreateTime
+	}
+	return 0
+}
+
+func (x *CommentInfo) GetLikeCount() int64 {
+	if x != nil {
+		return x.LikeCount
+	}
+	return 0
+}
+
+func (x *CommentInfo) GetReplyCount() int32 {
+	if x != nil {
+		return x.ReplyCount
+	}
+	return 0
+}
+
+type ListCommentResp struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	List          []*CommentInfo         `protobuf:"bytes,1,rep,name=list,proto3" json:"list,omitempty"`
+	Total         int64                  `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListCommentResp) Reset() {
+	*x = ListCommentResp{}
+	mi := &file_proto_hotspot_proto_msgTypes[9]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListCommentResp) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListCommentResp) ProtoMessage() {}
+
+func (x *ListCommentResp) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_hotspot_proto_msgTypes[9]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListCommentResp.ProtoReflect.Descriptor instead.
+func (*ListCommentResp) Descriptor() ([]byte, []int) {
+	return file_proto_hotspot_proto_rawDescGZIP(), []int{9}
+}
+
+func (x *ListCommentResp) GetList() []*CommentInfo {
+	if x != nil {
+		return x.List
+	}
+	return nil
+}
+
+func (x *ListCommentResp) GetTotal() int64 {
+	if x != nil {
+		return x.Total
 	}
 	return 0
 }
@@ -130,17 +656,64 @@ var File_proto_hotspot_proto protoreflect.FileDescriptor
 
 const file_proto_hotspot_proto_rawDesc = "" +
 	"\n" +
-	"\x13proto/hotspot.proto\x12\ahotspot\"\\\n" +
-	"\x0eLikeArticleReq\x12\x1d\n" +
+	"\x13proto/hotspot.proto\x12\ahotspot\"\a\n" +
+	"\x05Empty\"l\n" +
+	"\aLikeReq\x12\x15\n" +
+	"\x06biz_id\x18\x01 \x01(\tR\x05bizId\x12\x19\n" +
+	"\bbiz_type\x18\x02 \x01(\x05R\abizType\x12\x17\n" +
+	"\auser_id\x18\x03 \x01(\tR\x06userId\x12\x16\n" +
+	"\x06action\x18\x04 \x01(\x05R\x06action\")\n" +
+	"\bLikeResp\x12\x1d\n" +
 	"\n" +
-	"article_id\x18\x01 \x01(\tR\tarticleId\x12\x17\n" +
-	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x12\n" +
-	"\x04type\x18\x03 \x01(\x05R\x04type\"0\n" +
-	"\x0fLikeArticleResp\x12\x1d\n" +
+	"like_count\x18\x02 \x01(\x03R\tlikeCount\"<\n" +
 	"\n" +
-	"like_count\x18\x01 \x01(\x05R\tlikeCount2R\n" +
-	"\x0eArticleService\x12@\n" +
-	"\vLikeArticle\x12\x17.hotspot.LikeArticleReq\x1a\x18.hotspot.LikeArticleRespB\x03Z\x01.b\x06proto3"
+	"IsLikedReq\x12\x15\n" +
+	"\x06biz_id\x18\x01 \x01(\tR\x05bizId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\"(\n" +
+	"\vIsLikedResp\x12\x19\n" +
+	"\bis_liked\x18\x01 \x01(\bR\aisLiked\"s\n" +
+	"\n" +
+	"CommentReq\x12\x15\n" +
+	"\x06biz_id\x18\x01 \x01(\tR\x05bizId\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x18\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\x12\x1b\n" +
+	"\tparent_id\x18\x04 \x01(\tR\bparentId\"M\n" +
+	"\vCommentResp\x12\x1d\n" +
+	"\n" +
+	"comment_id\x18\x01 \x01(\tR\tcommentId\x12\x1f\n" +
+	"\vcreate_time\x18\x02 \x01(\x03R\n" +
+	"createTime\"\x92\x01\n" +
+	"\x0eListCommentReq\x12\x15\n" +
+	"\x06biz_id\x18\x01 \x01(\tR\x05bizId\x12\x12\n" +
+	"\x04page\x18\x02 \x01(\x03R\x04page\x12\x1b\n" +
+	"\tpage_size\x18\x03 \x01(\x03R\bpageSize\x12\x1b\n" +
+	"\tsort_type\x18\x04 \x01(\x05R\bsortType\x12\x1b\n" +
+	"\tparent_id\x18\x05 \x01(\tR\bparentId\"\xb1\x01\n" +
+	"\vCommentInfo\x12\x0e\n" +
+	"\x02id\x18\x01 \x01(\tR\x02id\x12\x17\n" +
+	"\auser_id\x18\x02 \x01(\tR\x06userId\x12\x18\n" +
+	"\acontent\x18\x03 \x01(\tR\acontent\x12\x1f\n" +
+	"\vcreate_time\x18\x04 \x01(\x03R\n" +
+	"createTime\x12\x1d\n" +
+	"\n" +
+	"like_count\x18\x05 \x01(\x03R\tlikeCount\x12\x1f\n" +
+	"\vreply_count\x18\x06 \x01(\x05R\n" +
+	"replyCount\"Q\n" +
+	"\x0fListCommentResp\x12(\n" +
+	"\x04list\x18\x01 \x03(\v2\x14.hotspot.CommentInfoR\x04list\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x03R\x05total*e\n" +
+	"\btype_set\x12\x0f\n" +
+	"\vsort_by_hot\x10\x00\x12\x10\n" +
+	"\fsort_by_time\x10\x01\x12\x0f\n" +
+	"\vbiz_article\x10 \x12\x14\n" +
+	"\x10Downvote_Dislike\x10@\x12\x0f\n" +
+	"\vUpvote_Like\x10A2\xf8\x01\n" +
+	"\x0eHotspotService\x121\n" +
+	"\n" +
+	"ToggleLike\x12\x10.hotspot.LikeReq\x1a\x11.hotspot.LikeResp\x124\n" +
+	"\aIsLiked\x12\x13.hotspot.IsLikedReq\x1a\x14.hotspot.IsLikedResp\x12:\n" +
+	"\rCreateComment\x12\x13.hotspot.CommentReq\x1a\x14.hotspot.CommentResp\x12A\n" +
+	"\fListComments\x12\x17.hotspot.ListCommentReq\x1a\x18.hotspot.ListCommentRespB\x04Z\x02./b\x06proto3"
 
 var (
 	file_proto_hotspot_proto_rawDescOnce sync.Once
@@ -154,19 +727,36 @@ func file_proto_hotspot_proto_rawDescGZIP() []byte {
 	return file_proto_hotspot_proto_rawDescData
 }
 
-var file_proto_hotspot_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_proto_hotspot_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_proto_hotspot_proto_msgTypes = make([]protoimpl.MessageInfo, 10)
 var file_proto_hotspot_proto_goTypes = []any{
-	(*LikeArticleReq)(nil),  // 0: hotspot.LikeArticleReq
-	(*LikeArticleResp)(nil), // 1: hotspot.LikeArticleResp
+	(TypeSet)(0),            // 0: hotspot.type_set
+	(*Empty)(nil),           // 1: hotspot.Empty
+	(*LikeReq)(nil),         // 2: hotspot.LikeReq
+	(*LikeResp)(nil),        // 3: hotspot.LikeResp
+	(*IsLikedReq)(nil),      // 4: hotspot.IsLikedReq
+	(*IsLikedResp)(nil),     // 5: hotspot.IsLikedResp
+	(*CommentReq)(nil),      // 6: hotspot.CommentReq
+	(*CommentResp)(nil),     // 7: hotspot.CommentResp
+	(*ListCommentReq)(nil),  // 8: hotspot.ListCommentReq
+	(*CommentInfo)(nil),     // 9: hotspot.CommentInfo
+	(*ListCommentResp)(nil), // 10: hotspot.ListCommentResp
 }
 var file_proto_hotspot_proto_depIdxs = []int32{
-	0, // 0: hotspot.ArticleService.LikeArticle:input_type -> hotspot.LikeArticleReq
-	1, // 1: hotspot.ArticleService.LikeArticle:output_type -> hotspot.LikeArticleResp
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	9,  // 0: hotspot.ListCommentResp.list:type_name -> hotspot.CommentInfo
+	2,  // 1: hotspot.HotspotService.ToggleLike:input_type -> hotspot.LikeReq
+	4,  // 2: hotspot.HotspotService.IsLiked:input_type -> hotspot.IsLikedReq
+	6,  // 3: hotspot.HotspotService.CreateComment:input_type -> hotspot.CommentReq
+	8,  // 4: hotspot.HotspotService.ListComments:input_type -> hotspot.ListCommentReq
+	3,  // 5: hotspot.HotspotService.ToggleLike:output_type -> hotspot.LikeResp
+	5,  // 6: hotspot.HotspotService.IsLiked:output_type -> hotspot.IsLikedResp
+	7,  // 7: hotspot.HotspotService.CreateComment:output_type -> hotspot.CommentResp
+	10, // 8: hotspot.HotspotService.ListComments:output_type -> hotspot.ListCommentResp
+	5,  // [5:9] is the sub-list for method output_type
+	1,  // [1:5] is the sub-list for method input_type
+	1,  // [1:1] is the sub-list for extension type_name
+	1,  // [1:1] is the sub-list for extension extendee
+	0,  // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_proto_hotspot_proto_init() }
@@ -179,13 +769,14 @@ func file_proto_hotspot_proto_init() {
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_hotspot_proto_rawDesc), len(file_proto_hotspot_proto_rawDesc)),
-			NumEnums:      0,
-			NumMessages:   2,
+			NumEnums:      1,
+			NumMessages:   10,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
 		GoTypes:           file_proto_hotspot_proto_goTypes,
 		DependencyIndexes: file_proto_hotspot_proto_depIdxs,
+		EnumInfos:         file_proto_hotspot_proto_enumTypes,
 		MessageInfos:      file_proto_hotspot_proto_msgTypes,
 	}.Build()
 	File_proto_hotspot_proto = out.File

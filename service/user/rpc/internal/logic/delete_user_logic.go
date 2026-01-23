@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"sea-try-go/service/user/rpc/internal/svc"
-	"sea-try-go/service/user/rpc/pb"
+	pb "sea-try-go/service/user/rpc/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +24,14 @@ func NewDeleteUserLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Delete
 }
 
 func (l *DeleteUserLogic) DeleteUser(in *pb.DeleteUserReq) (*pb.DeleteUserResp, error) {
-	// todo: add your logic here and delete this line
 
-	return &pb.DeleteUserResp{}, nil
+	err := l.svcCtx.UserModel.DeleteUserByUid(l.ctx, in.Uid)
+	if err != nil {
+		return &pb.DeleteUserResp{
+			Success: false,
+		}, err
+	}
+	return &pb.DeleteUserResp{
+		Success: true,
+	}, nil
 }

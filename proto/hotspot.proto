@@ -1,21 +1,131 @@
 syntax = "proto3";
 
 package hotspot;
-option go_package = ".";
+option go_package = "./";
 
-//////////////////// hotspot / like /////////////////////
-message LikeArticleReq {
-  string article_id = 1;              // 文章ID
-  string user_id = 2;                 // 用户ID (?)
-  int32 type = 3;                     // 1=点赞, 2=取消
+message Empty {}
+
+enum Type_Set {
+  sort_by_hot = 0;
+  sort_by_time = 1;
+
+  biz_article = 32;
+
+  Downvote_Dislike = 64;
+  Upvote_Like = 65;
 }
 
-message LikeArticleResp {
-  int32 like_count = 1;               // 点赞数量
+// ---------------- 点赞 ----------------
+
+message LikeReq {
+  string biz_id = 1;      // 文章ID
+  int32 biz_type = 2;    // biz_article
+  string user_id = 3;     // 用户ID
+  int32 action = 4;       // Downvote_Dislike, Upvote_Like
+}
+
+message LikeResp {
+  int64 like_count = 2;   // 当前点赞总数
+}
+
+message IsLikedReq {
+  string biz_id = 1;
+  string user_id = 2;
+}
+
+message IsLikedResp {
+  bool is_liked = 1;      // true=已点赞
+}
+
+// ---------------- 评论 ----------------
+
+message CommentReq {
+  string biz_id = 1;      // 文章ID
+  string user_id = 2;     // 用户ID
+  string content = 3;     // 内容
+  string parent_id = 4;   // 回复某条评论的ID (可选)
+}
+
+message CommentResp {
+  string comment_id = 1;  // 生成的雪花ID
+  int64 create_time = 2;
+}
+
+message ListCommentReq {
+  string biz_id = 1;      // biz_article
+  int64 page = 2;         // 分页
+  int64 page_size = 3;    // 一次请求数量
+  int32 sort_type = 4;    // sort_by_time, sort_by_hot
+  string parent_id = 5;   // 某条评论的ID (可选，专门用来查询回复某人的评论)
+}
+
+message CommentInfo {
+  string id = 1;
+  string user_id = 2;
+  string content = 3;
+  int64 create_time = 4;
+  int64 like_count = 5;   // 评论本身也可以被点赞
+  int32 reply_count = 6;  // 回复数
+}
+
+message ListCommentResp {
+  repeated CommentInfo list = 1;
+  int64 total = 2;
+}
+
+// ---------------- 服务 ----------------
+
+service HotspotService {
+  // 点赞/取消点赞
+  rpc ToggleLike(LikeReq) returns (LikeResp);
+  // 查询是否点赞过
+  rpc IsLiked(IsLikedReq) returns (IsLikedResp);
+
+  // 发表评论
+  rpc CreateComment(CommentReq) returns (CommentResp);
+  // 获取评论列表
+  rpc ListComments(ListCommentReq) returns (ListCommentResp);
 }
 
 
-// 文章核心服务定义
-service ArticleService {
-  rpc LikeArticle(LikeArticleReq) returns (LikeArticleResp);
-}
+/*
+```psql
+CREATE TABLE "likes" (
+     "biz_id" BIGINT NOT NULL, -- 文章ID (雪花算法ID)
+     "user_id" BIGINT NOT NULL, -- 用户ID (建立了索引，用于"我点赞过的")
+     "create_time" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP, -- 创建时间
+     PRIMARY KEY ("biz_id", "user_id") -- 一个用户对一篇文章只能有一个记录
+);
+
+-- 查询用户点赞过的文章列表
+CREATE INDEX "idx_likes_user" ON "likes" ("user_id", "create_time" DESC);
+-- 查询“文章的点赞用户”
+CREATE INDEX "idx_likes_biz" ON "likes" ("biz_id", "create_time" DESC);
+
+
+-- 每一次取消赞都物理删除likes表(如果是频繁删除有客户端控制频率+时间小于2s认为是误触不插入+MQ?)
+CREATE TABLE "cancel_likes_log" (
+    "user_id" BIGINT NOT NULL,
+    "biz_id" BIGINT NOT NULL,
+    "update_time" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+     PRIMARY KEY ("user_id", "update_time", "biz_id") -- 主要分析用户的行为
+);
+
+CREATE TABLE "comments" (
+    "id" BIGINT NOT NULL,      -- 评论雪花ID，作为parent
+    "biz_id" BIGINT NOT NULL,  -- 文章ID
+    "user_id" BIGINT NOT NULL, -- 评论者ID
+    "content" TEXT NOT NULL,   -- 评论内容
+    "parent_id" BIGINT DEFAULT 0, -- 父评论ID (树形)
+    "root_id" BIGINT DEFAULT 0,   -- 根评论ID
+    "status" SMALLINT DEFAULT 1, -- 0:删除, 1:正常, 2:隐藏?
+    "create_time" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP,
+    "update_time" TIMESTAMPTZ DEFAULT CURRENT_TIMESTAMP, -- 提供修改评论的功能?
+    PRIMARY KEY ("id")
+
+);
+-- 索引
+CREATE INDEX "idx_comments_biz" ON "comments" ("biz_id");
+CREATE INDEX "idx_comments_user" ON "comments" ("user_id");
+```
+*/

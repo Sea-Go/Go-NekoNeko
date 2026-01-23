@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"sea-try-go/service/user/rpc/internal/svc"
-	"sea-try-go/service/user/rpc/pb"
+	pb "sea-try-go/service/user/rpc/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -24,7 +24,5 @@ func NewLogoutLogic(ctx context.Context, svcCtx *svc.ServiceContext) *LogoutLogi
 }
 
 func (l *LogoutLogic) Logout(in *pb.LogoutReq) (*pb.LogoutResp, error) {
-	// todo: add your logic here and delete this line
-
 	return &pb.LogoutResp{}, nil
 }

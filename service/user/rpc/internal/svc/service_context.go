@@ -1,13 +1,27 @@
 package svc
 
-import "sea-try-go/service/user/rpc/internal/config"
+import (
+	"sea-try-go/service/user/rpc/internal/config"
+	"sea-try-go/service/user/rpc/internal/model"
+)
 
 type ServiceContext struct {
-	Config config.Config
+	Config    config.Config
+	UserModel *model.UserModel
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
+	dbConfig := model.DBConf{
+		Host:     c.Postgres.Host,
+		Port:     c.Postgres.Port,
+		User:     c.Postgres.User,
+		Password: c.Postgres.Password,
+		DBName:   c.Postgres.DBName,
+		Mode:     c.Postgres.Mode,
+	}
+	db := model.InitDB(dbConfig)
 	return &ServiceContext{
-		Config: c,
+		Config:    c,
+		UserModel: model.NewUserModel(db),
 	}
 }

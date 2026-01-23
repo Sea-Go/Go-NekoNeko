@@ -1,6 +1,11 @@
 Name: hotspot.rpc
-ListenOn: 0.0.0.0:8080
+ListenOn: 0.0.0.0:8087
 Etcd:
   Hosts:
-  - 127.0.0.1:2379
+  - 127.0.0.1:32379
   Key: hotspot.rpc
+DB:
+  DataSource: "postgres://admin:Sea-TryGo@127.0.0.1:35432/first_db?sslmode=disable&TimeZone=Asia/Shanghai"
+
+Redis:
+  - Host: 127.0.0.1:36379

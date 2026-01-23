@@ -19,105 +19,223 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ArticleService_LikeArticle_FullMethodName = "/hotspot.ArticleService/LikeArticle"
+	HotspotService_ToggleLike_FullMethodName    = "/hotspot.HotspotService/ToggleLike"
+	HotspotService_IsLiked_FullMethodName       = "/hotspot.HotspotService/IsLiked"
+	HotspotService_CreateComment_FullMethodName = "/hotspot.HotspotService/CreateComment"
+	HotspotService_ListComments_FullMethodName  = "/hotspot.HotspotService/ListComments"
 )
 
-// ArticleServiceClient is the client API for ArticleService service.
+// HotspotServiceClient is the client API for HotspotService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-//
-// 文章核心服务定义
-type ArticleServiceClient interface {
-	LikeArticle(ctx context.Context, in *LikeArticleReq, opts ...grpc.CallOption) (*LikeArticleResp, error)
+type HotspotServiceClient interface {
+	// 点赞/取消点赞
+	ToggleLike(ctx context.Context, in *LikeReq, opts ...grpc.CallOption) (*LikeResp, error)
+	// 查询是否点赞过
+	IsLiked(ctx context.Context, in *IsLikedReq, opts ...grpc.CallOption) (*IsLikedResp, error)
+	// 发表评论
+	CreateComment(ctx context.Context, in *CommentReq, opts ...grpc.CallOption) (*CommentResp, error)
+	// 获取评论列表
+	ListComments(ctx context.Context, in *ListCommentReq, opts ...grpc.CallOption) (*ListCommentResp, error)
 }
 
-type articleServiceClient struct {
+type hotspotServiceClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewArticleServiceClient(cc grpc.ClientConnInterface) ArticleServiceClient {
-	return &articleServiceClient{cc}
+func NewHotspotServiceClient(cc grpc.ClientConnInterface) HotspotServiceClient {
+	return &hotspotServiceClient{cc}
 }
 
-func (c *articleServiceClient) LikeArticle(ctx context.Context, in *LikeArticleReq, opts ...grpc.CallOption) (*LikeArticleResp, error) {
+func (c *hotspotServiceClient) ToggleLike(ctx context.Context, in *LikeReq, opts ...grpc.CallOption) (*LikeResp, error) {
 	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(LikeArticleResp)
-	err := c.cc.Invoke(ctx, ArticleService_LikeArticle_FullMethodName, in, out, cOpts...)
+	out := new(LikeResp)
+	err := c.cc.Invoke(ctx, HotspotService_ToggleLike_FullMethodName, in, out, cOpts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-// ArticleServiceServer is the server API for ArticleService service.
-// All implementations must embed UnimplementedArticleServiceServer
-// for forward compatibility.
-//
-// 文章核心服务定义
-type ArticleServiceServer interface {
-	LikeArticle(context.Context, *LikeArticleReq) (*LikeArticleResp, error)
-	mustEmbedUnimplementedArticleServiceServer()
+func (c *hotspotServiceClient) IsLiked(ctx context.Context, in *IsLikedReq, opts ...grpc.CallOption) (*IsLikedResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(IsLikedResp)
+	err := c.cc.Invoke(ctx, HotspotService_IsLiked_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
-// UnimplementedArticleServiceServer must be embedded to have
+func (c *hotspotServiceClient) CreateComment(ctx context.Context, in *CommentReq, opts ...grpc.CallOption) (*CommentResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(CommentResp)
+	err := c.cc.Invoke(ctx, HotspotService_CreateComment_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *hotspotServiceClient) ListComments(ctx context.Context, in *ListCommentReq, opts ...grpc.CallOption) (*ListCommentResp, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListCommentResp)
+	err := c.cc.Invoke(ctx, HotspotService_ListComments_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+// HotspotServiceServer is the server API for HotspotService service.
+// All implementations must embed UnimplementedHotspotServiceServer
+// for forward compatibility.
+type HotspotServiceServer interface {
+	// 点赞/取消点赞
+	ToggleLike(context.Context, *LikeReq) (*LikeResp, error)
+	// 查询是否点赞过
+	IsLiked(context.Context, *IsLikedReq) (*IsLikedResp, error)
+	// 发表评论
+	CreateComment(context.Context, *CommentReq) (*CommentResp, error)
+	// 获取评论列表
+	ListComments(context.Context, *ListCommentReq) (*ListCommentResp, error)
+	mustEmbedUnimplementedHotspotServiceServer()
+}
+
+// UnimplementedHotspotServiceServer must be embedded to have
 // forward compatible implementations.
 //
 // NOTE: this should be embedded by value instead of pointer to avoid a nil
 // pointer dereference when methods are called.
-type UnimplementedArticleServiceServer struct{}
+type UnimplementedHotspotServiceServer struct{}
 
-func (UnimplementedArticleServiceServer) LikeArticle(context.Context, *LikeArticleReq) (*LikeArticleResp, error) {
-	return nil, status.Error(codes.Unimplemented, "method LikeArticle not implemented")
+func (UnimplementedHotspotServiceServer) ToggleLike(context.Context, *LikeReq) (*LikeResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ToggleLike not implemented")
 }
-func (UnimplementedArticleServiceServer) mustEmbedUnimplementedArticleServiceServer() {}
-func (UnimplementedArticleServiceServer) testEmbeddedByValue()                        {}
+func (UnimplementedHotspotServiceServer) IsLiked(context.Context, *IsLikedReq) (*IsLikedResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method IsLiked not implemented")
+}
+func (UnimplementedHotspotServiceServer) CreateComment(context.Context, *CommentReq) (*CommentResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method CreateComment not implemented")
+}
+func (UnimplementedHotspotServiceServer) ListComments(context.Context, *ListCommentReq) (*ListCommentResp, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListComments not implemented")
+}
+func (UnimplementedHotspotServiceServer) mustEmbedUnimplementedHotspotServiceServer() {}
+func (UnimplementedHotspotServiceServer) testEmbeddedByValue()                        {}
 
-// UnsafeArticleServiceServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to ArticleServiceServer will
+// UnsafeHotspotServiceServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to HotspotServiceServer will
 // result in compilation errors.
-type UnsafeArticleServiceServer interface {
-	mustEmbedUnimplementedArticleServiceServer()
+type UnsafeHotspotServiceServer interface {
+	mustEmbedUnimplementedHotspotServiceServer()
 }
 
-func RegisterArticleServiceServer(s grpc.ServiceRegistrar, srv ArticleServiceServer) {
-	// If the following call panics, it indicates UnimplementedArticleServiceServer was
+func RegisterHotspotServiceServer(s grpc.ServiceRegistrar, srv HotspotServiceServer) {
+	// If the following call panics, it indicates UnimplementedHotspotServiceServer was
 	// embedded by pointer and is nil.  This will cause panics if an
 	// unimplemented method is ever invoked, so we test this at initialization
 	// time to prevent it from happening at runtime later due to I/O.
 	if t, ok := srv.(interface{ testEmbeddedByValue() }); ok {
 		t.testEmbeddedByValue()
 	}
-	s.RegisterService(&ArticleService_ServiceDesc, srv)
+	s.RegisterService(&HotspotService_ServiceDesc, srv)
 }
 
-func _ArticleService_LikeArticle_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(LikeArticleReq)
+func _HotspotService_ToggleLike_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(LikeReq)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(ArticleServiceServer).LikeArticle(ctx, in)
+		return srv.(HotspotServiceServer).ToggleLike(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: ArticleService_LikeArticle_FullMethodName,
+		FullMethod: HotspotService_ToggleLike_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ArticleServiceServer).LikeArticle(ctx, req.(*LikeArticleReq))
+		return srv.(HotspotServiceServer).ToggleLike(ctx, req.(*LikeReq))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-// ArticleService_ServiceDesc is the grpc.ServiceDesc for ArticleService service.
+func _HotspotService_IsLiked_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(IsLikedReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HotspotServiceServer).IsLiked(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HotspotService_IsLiked_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HotspotServiceServer).IsLiked(ctx, req.(*IsLikedReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HotspotService_CreateComment_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(CommentReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HotspotServiceServer).CreateComment(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HotspotService_CreateComment_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HotspotServiceServer).CreateComment(ctx, req.(*CommentReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _HotspotService_ListComments_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListCommentReq)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(HotspotServiceServer).ListComments(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: HotspotService_ListComments_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(HotspotServiceServer).ListComments(ctx, req.(*ListCommentReq))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+// HotspotService_ServiceDesc is the grpc.ServiceDesc for HotspotService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var ArticleService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "hotspot.ArticleService",
-	HandlerType: (*ArticleServiceServer)(nil),
+var HotspotService_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "hotspot.HotspotService",
+	HandlerType: (*HotspotServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "LikeArticle",
-			Handler:    _ArticleService_LikeArticle_Handler,
+			MethodName: "ToggleLike",
+			Handler:    _HotspotService_ToggleLike_Handler,
+		},
+		{
+			MethodName: "IsLiked",
+			Handler:    _HotspotService_IsLiked_Handler,
+		},
+		{
+			MethodName: "CreateComment",
+			Handler:    _HotspotService_CreateComment_Handler,
+		},
+		{
+			MethodName: "ListComments",
+			Handler:    _HotspotService_ListComments_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

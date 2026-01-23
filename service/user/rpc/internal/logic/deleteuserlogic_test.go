@@ -19,7 +19,7 @@ func TestDeleteUser_Success(t *testing.T) {
 	logic := NewDeleteUserLogic(ctx, svcCtx)
 
 	req := &pb.DeleteUserReq{
-		Id: testUser.Id,
+		Uid: testUser.Uid,
 	}
 
 	resp, err := logic.DeleteUser(req)
@@ -34,7 +34,7 @@ func TestDeleteUser_Success(t *testing.T) {
 
 	// 验证用户确实被删除
 	var count int64
-	db.Model(&TestUser{}).Where("id = ?", testUser.Id).Count(&count)
+	db.Model(&TestUser{}).Where("uid = ?", testUser.Uid).Count(&count)
 
 	if count != 0 {
 		t.Error("用户应该已被删除")
@@ -53,7 +53,7 @@ func TestDeleteUser_NotFound(t *testing.T) {
 	logic := NewDeleteUserLogic(ctx, svcCtx)
 
 	req := &pb.DeleteUserReq{
-		Id: 99999, // 不存在的 ID
+		Uid: 99999, // 不存在的 UID
 	}
 
 	resp, err := logic.DeleteUser(req)

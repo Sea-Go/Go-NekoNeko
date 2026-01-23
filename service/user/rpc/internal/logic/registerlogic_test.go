@@ -29,8 +29,8 @@ func TestRegister_Success(t *testing.T) {
 		t.Fatalf("注册失败: %v", err)
 	}
 
-	if resp.Id == 0 {
-		t.Error("注册成功应返回有效的用户ID")
+	if resp.Uid == 0 {
+		t.Error("注册成功应返回有效的用户UID")
 	}
 
 	// 验证用户确实创建成功
@@ -43,7 +43,7 @@ func TestRegister_Success(t *testing.T) {
 		t.Errorf("邮箱不匹配: 期望 %s, 实际 %s", "test@example.com", user.Email)
 	}
 
-	t.Logf("✅ 注册成功，用户ID: %d", resp.Id)
+	t.Logf("✅ 注册成功，用户UID: %d", resp.Uid)
 }
 
 func TestRegister_DuplicateUsername(t *testing.T) {

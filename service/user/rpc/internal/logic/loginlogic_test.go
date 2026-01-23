@@ -33,11 +33,11 @@ func TestLogin_Success(t *testing.T) {
 		t.Errorf("登录应成功(status=0), 实际 status=%d", resp.Status)
 	}
 
-	if resp.Id == 0 {
-		t.Error("登录成功应返回有效的用户ID")
+	if resp.Uid == 0 {
+		t.Error("登录成功应返回有效的用户UID")
 	}
 
-	t.Logf("✅ 登录成功，用户ID: %d", resp.Id)
+	t.Logf("✅ 登录成功，用户UID: %d", resp.Uid)
 }
 
 func TestLogin_UserNotFound(t *testing.T) {

@@ -19,7 +19,7 @@ func TestGetUser_Success(t *testing.T) {
 	logic := NewGetUserLogic(ctx, svcCtx)
 
 	req := &pb.GetUserReq{
-		Id: testUser.Id,
+		Uid: testUser.Uid,
 	}
 
 	resp, err := logic.GetUser(req)
@@ -58,7 +58,7 @@ func TestGetUser_NotFound(t *testing.T) {
 	logic := NewGetUserLogic(ctx, svcCtx)
 
 	req := &pb.GetUserReq{
-		Id: 99999, // 不存在的 ID
+		Uid: 99999, // 不存在的 UID
 	}
 
 	resp, err := logic.GetUser(req)

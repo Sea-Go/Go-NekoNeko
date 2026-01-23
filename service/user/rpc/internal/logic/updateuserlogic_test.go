@@ -19,7 +19,7 @@ func TestUpdateUser_UpdateUsername(t *testing.T) {
 	logic := NewUpdateUserLogic(ctx, svcCtx)
 
 	req := &pb.UpdateUserReq{
-		Id:       testUser.Id,
+		Uid:      testUser.Uid,
 		Username: "newusername",
 	}
 
@@ -35,7 +35,7 @@ func TestUpdateUser_UpdateUsername(t *testing.T) {
 
 	// 验证更新结果
 	var updatedUser TestUser
-	db.Where("id = ?", testUser.Id).First(&updatedUser)
+	db.Where("uid = ?", testUser.Uid).First(&updatedUser)
 
 	if updatedUser.Username != "newusername" {
 		t.Errorf("用户名未更新: 期望 %s, 实际 %s", "newusername", updatedUser.Username)
@@ -56,7 +56,7 @@ func TestUpdateUser_UpdateEmail(t *testing.T) {
 	logic := NewUpdateUserLogic(ctx, svcCtx)
 
 	req := &pb.UpdateUserReq{
-		Id:    testUser.Id,
+		Uid:   testUser.Uid,
 		Email: "new@example.com",
 	}
 
@@ -72,7 +72,7 @@ func TestUpdateUser_UpdateEmail(t *testing.T) {
 
 	// 验证更新结果
 	var updatedUser TestUser
-	db.Where("id = ?", testUser.Id).First(&updatedUser)
+	db.Where("uid = ?", testUser.Uid).First(&updatedUser)
 
 	if updatedUser.Email != "new@example.com" {
 		t.Errorf("邮箱未更新: 期望 %s, 实际 %s", "new@example.com", updatedUser.Email)
@@ -93,7 +93,7 @@ func TestUpdateUser_UpdatePassword(t *testing.T) {
 	logic := NewUpdateUserLogic(ctx, svcCtx)
 
 	req := &pb.UpdateUserReq{
-		Id:       testUser.Id,
+		Uid:      testUser.Uid,
 		Password: "newpassword",
 	}
 
@@ -109,7 +109,7 @@ func TestUpdateUser_UpdatePassword(t *testing.T) {
 
 	// 验证新密码可以登录
 	var updatedUser TestUser
-	db.Where("id = ?", testUser.Id).First(&updatedUser)
+	db.Where("uid = ?", testUser.Uid).First(&updatedUser)
 
 	// 密码应该已更改（哈希值不同）
 	if updatedUser.Password == testUser.Password {
@@ -134,7 +134,7 @@ func TestUpdateUser_DuplicateUsername(t *testing.T) {
 
 	// 尝试将 user2 的用户名改为 user1（已存在）
 	req := &pb.UpdateUserReq{
-		Id:       user2.Id,
+		Uid:      user2.Uid,
 		Username: "user1",
 	}
 
@@ -163,7 +163,7 @@ func TestUpdateUser_UpdateExtraInfo(t *testing.T) {
 	logic := NewUpdateUserLogic(ctx, svcCtx)
 
 	req := &pb.UpdateUserReq{
-		Id: testUser.Id,
+		Uid: testUser.Uid,
 		ExtraInfo: map[string]string{
 			"hobby": "coding",
 			"city":  "Beijing",

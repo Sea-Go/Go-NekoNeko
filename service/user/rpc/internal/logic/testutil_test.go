@@ -5,7 +5,9 @@ import (
 	"fmt"
 	"log"
 	"sea-try-go/service/common/cryptx"
+	"sea-try-go/service/common/snowflake"
 	"sea-try-go/service/user/rpc/internal/config"
+	"sea-try-go/service/user/rpc/internal/model"
 	"sea-try-go/service/user/rpc/internal/svc"
 	"time"
 
@@ -13,9 +15,10 @@ import (
 	"gorm.io/gorm"
 )
 
-// TestUser 测试用的用户模型，使用 test_users 表
+// TestUser 测试用的用户模型，使用 users 表
 type TestUser struct {
 	Id         uint64            `gorm:"primaryKey"`
+	Uid        int64             `gorm:"column:uid;uniqueIndex;not null"`
 	Username   string            `gorm:"column:username"`
 	Password   string            `gorm:"column:password"`
 	Email      string            `gorm:"column:email"`
@@ -61,8 +64,8 @@ func setupTestDB() *gorm.DB {
 // setupTestServiceContext 创建测试用的 ServiceContext
 func setupTestServiceContext(db *gorm.DB) *svc.ServiceContext {
 	return &svc.ServiceContext{
-		Config: config.Config{},
-		DB:     db,
+		Config:    config.Config{},
+		UserModel: model.NewUserModel(db),
 	}
 }
 
@@ -78,7 +81,13 @@ func createTestUser(db *gorm.DB, username, password, email string) *TestUser {
 		log.Fatalf("密码加密失败: %v", err)
 	}
 
+	uid, err := snowflake.GetID()
+	if err != nil {
+		log.Fatalf("生成UID失败: %v", err)
+	}
+
 	user := &TestUser{
+		Uid:       uid,
 		Username:  username,
 		Password:  hashedPassword,
 		Email:     email,
@@ -101,7 +110,13 @@ func createTestUserWithStatus(db *gorm.DB, username, password, email string, sta
 		log.Fatalf("密码加密失败: %v", err)
 	}
 
+	uid, err := snowflake.GetID()
+	if err != nil {
+		log.Fatalf("生成UID失败: %v", err)
+	}
+
 	user := &TestUser{
+		Uid:       uid,
 		Username:  username,
 		Password:  hashedPassword,
 		Email:     email,

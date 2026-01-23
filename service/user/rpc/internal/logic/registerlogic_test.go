@@ -39,8 +39,25 @@ func TestRegister_Success(t *testing.T) {
 		t.Fatalf("未能找到创建的用户: %v", err)
 	}
 
+	// 验证各字段
+	if user.Username != "testuser" {
+		t.Errorf("用户名不匹配: 期望 %s, 实际 %s", "testuser", user.Username)
+	}
+
 	if user.Email != "test@example.com" {
 		t.Errorf("邮箱不匹配: 期望 %s, 实际 %s", "test@example.com", user.Email)
+	}
+
+	if user.Uid != resp.Uid {
+		t.Errorf("UID不匹配: 期望 %d, 实际 %d", resp.Uid, user.Uid)
+	}
+
+	if user.Status != 0 {
+		t.Errorf("状态应为0: 实际 %d", user.Status)
+	}
+
+	if user.Score != 0 {
+		t.Errorf("积分应为0: 实际 %d", user.Score)
 	}
 
 	t.Logf("✅ 注册成功，用户UID: %d", resp.Uid)

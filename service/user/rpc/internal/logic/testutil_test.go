@@ -19,9 +19,9 @@ import (
 type TestUser struct {
 	Id         uint64            `gorm:"primaryKey"`
 	Uid        int64             `gorm:"column:uid;uniqueIndex;not null"`
-	Username   string            `gorm:"column:username"`
+	Username   string            `gorm:"column:username;unique"`
 	Password   string            `gorm:"column:password"`
-	Email      string            `gorm:"column:email"`
+	Email      string            `gorm:"column:email;unique"`
 	Status     int64             `gorm:"column:status;default:0"`
 	Score      int32             `gorm:"column:score"`
 	ExtraInfo  map[string]string `gorm:"column:extra_info;serializer:json"`
@@ -52,7 +52,7 @@ func setupTestDB() *gorm.DB {
 		log.Fatalf("连接测试数据库失败: %v", err)
 	}
 
-	// 自动迁移，创建 test_users 表
+	// 自动迁移，创建 users 表
 	err = db.AutoMigrate(&TestUser{})
 	if err != nil {
 		log.Fatalf("自动迁移失败: %v", err)

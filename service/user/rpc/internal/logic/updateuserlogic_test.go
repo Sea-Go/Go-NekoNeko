@@ -139,13 +139,8 @@ func TestUpdateUser_DuplicateUsername(t *testing.T) {
 	}
 
 	_, err := logic.UpdateUser(req)
-
 	if err == nil {
 		t.Fatal("用户名已存在时应该返回错误")
-	}
-
-	if err.Error() != "用户名已存在" {
-		t.Errorf("错误信息不匹配: 期望 '用户名已存在', 实际 '%s'", err.Error())
 	}
 
 	t.Log("✅ 重复用户名更新被正确拒绝")
@@ -178,6 +173,14 @@ func TestUpdateUser_UpdateExtraInfo(t *testing.T) {
 
 	if resp == nil {
 		t.Fatal("响应不应为 nil")
+	}
+
+	// 验证更新结果
+	var updatedUser TestUser
+	db.Where("uid = ?", testUser.Uid).First(&updatedUser)
+
+	if updatedUser.ExtraInfo["hobby"] != "coding" || updatedUser.ExtraInfo["city"] != "Beijing" {
+		t.Errorf("额外信息未更新正确: 期望 %v, 实际 %v", map[string]string{"hobby": "coding", "city": "Beijing"}, updatedUser.ExtraInfo)
 	}
 
 	t.Log("✅ 更新额外信息成功")

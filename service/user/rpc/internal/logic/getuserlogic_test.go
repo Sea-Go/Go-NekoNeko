@@ -51,7 +51,6 @@ func TestGetUser_NotFound(t *testing.T) {
 	db := setupTestDB()
 	cleanupTestUsers(db)
 
-	db = db.Table("test_users")
 	svcCtx := setupTestServiceContext(db)
 	ctx := newTestContext()
 
@@ -63,14 +62,16 @@ func TestGetUser_NotFound(t *testing.T) {
 
 	resp, err := logic.GetUser(req)
 
-	// GetUser 在用户不存在时会返回 error
-	if err == nil {
-		if resp.Found {
-			t.Error("用户不存在时 Found 应为 false")
-		}
+	// 用户不存在时，应返回 Found=false 且 err=nil
+	if err != nil {
+		t.Fatalf("不应返回错误: %v", err)
 	}
 
-	if resp != nil && resp.Found {
+	if resp == nil {
+		t.Fatal("响应不应为 nil")
+	}
+
+	if resp.Found {
 		t.Error("用户不存在时 Found 应为 false")
 	}
 

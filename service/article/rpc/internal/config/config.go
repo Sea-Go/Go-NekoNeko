@@ -12,8 +12,17 @@ type Postgres struct {
 	Port     string
 	User     string
 }
+
+type AliGreenConf struct {
+	AccessKeyId     string
+	AccessKeySecret string
+	RegionId        string
+	Endpoint        string
+}
 type Config struct {
 	zrpc.RpcServerConf
-	Postgres     Postgres
-	KqPusherConf kq.KqConf
+	Postgres       Postgres
+	KqPusherConf   kq.KqConf
+	KqConsumerConf kq.KqConf
+	AliGreen       AliGreenConf
 }

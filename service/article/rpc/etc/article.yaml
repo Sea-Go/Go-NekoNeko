@@ -18,3 +18,18 @@ KqPusherConf:
   Brokers:
     - 127.0.0.1:39092
   Topic: article-creation-topic
+
+KqConsumerConf:
+  Name: dataclean-consumer
+  Brokers:
+    - 127.0.0.1:39092
+  Group: dataclean
+  Topic: article-creation-topic
+  Offset: first
+  Consumers: 1
+
+AliGreen:
+  AccessKeyId:
+  AccessKeySecret:
+  RegionId: "cn-hangzhou"
+  Endpoint: "green-cip.cn-hangzhou.aliyuncs.com"

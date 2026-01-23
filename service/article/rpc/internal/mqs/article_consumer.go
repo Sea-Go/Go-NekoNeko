@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"sea-try-go/service/dataclean/rpc/internal/svc"
+	"sea-try-go/service/article/rpc/internal/svc"
 
 	green "github.com/alibabacloud-go/green-20220302/v3/client"
 	"github.com/alibabacloud-go/tea/tea"
@@ -25,7 +25,6 @@ func NewArticleConsumer(ctx context.Context, svcCtx *svc.ServiceContext) *Articl
 	}
 }
 
-// 修正后的 Consume 方法签名，添加了 ctx 参数
 func (l *ArticleConsumer) Consume(ctx context.Context, key, val string) error {
 	l.Infof("DataClean Service Consuming: %s", val)
 

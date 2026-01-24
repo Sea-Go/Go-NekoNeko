@@ -57,7 +57,7 @@ func (l *UpdateArticleLogic) UpdateArticle(in *__.UpdateArticleRequest) (*__.Upd
 		article.SecondaryTags = model.StringArray(in.SecondaryTags)
 	}
 	// Status update logic might need more validation in real world, but for now we trust the input
-	if *in.Status != __.ArticleStatus_ARTICLE_STATUS_UNSPECIFIED {
+	if in.Status != nil && *in.Status != __.ArticleStatus_ARTICLE_STATUS_UNSPECIFIED {
 		article.Status = int32(in.Status.Number())
 	}
 

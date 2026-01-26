@@ -1,0 +1,84 @@
+syntax = "v1"
+
+info (
+	title:   "Task API"
+	desc:    "任务模块 HTTP 网关，对接 TaskService gRPC"
+	version: "1.0.0"
+)
+
+type TaskInfo {
+	Name                string `json:"name"`
+	Desc                string `json:"desc,optional"`
+	Task_id             int64  `json:"taskId"`
+	Completion_progress int64  `json:"completionProgress"`
+	Required_progress   int64  `json:"requiredProgress"`
+}
+
+type GetTaskReq {
+	Userid uint `json:"id"`
+}
+
+type GetTaskResp {
+	Tasks []TaskInfo `json:"tasks"`
+}
+
+type CreateTaskReq {
+	Task   TaskInfo `json:"task"`
+	UserId int      `json:"userId"`
+}
+
+type CreateTaskResp {
+	Success bool   `json:"success"`
+	Msg     string `json:"msg"`
+}
+
+type UpdateTaskReq {
+	Task TaskInfo `json:"task"`
+}
+
+type UpdateTaskResp {
+	Success bool   `json:"success"`
+	Msg     string `json:"msg"`
+}
+
+type DeleteTaskReq {
+	TaskId int `json:"taskId"`
+	UserId int `json:"userId"`
+}
+
+type DeleteTaskResp {
+	Success bool   `json:"success"`
+	Msg     string `json:"msg"`
+}
+
+@server (
+	prefix: "/taskcenter/v1"
+	group:  "task"
+	jwt:    Auth
+)
+service task {
+	@doc (
+		GetTask: "获取任务"
+	)
+	@handler GetTask
+	post /task/get (GetTaskReq) returns (GetTaskResp)
+
+	@doc (
+		Create: "新建任务"
+	)
+	@handler Create
+	post /task/create (CreateTaskReq) returns (CreateTaskResp)
+
+	@doc (
+		UpdateTask: "获取任务"
+	)
+	@handler UpdateTask
+	post /task/update (UpdateTaskReq) returns (UpdateTaskResp)
+
+	@doc (
+		DeleteTask: "删除任务"
+	)
+	@handler DeleteTask
+	post /task/delete (DeleteTaskReq) returns (DeleteTaskResp)
+}
+

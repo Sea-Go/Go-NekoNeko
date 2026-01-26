@@ -167,7 +167,7 @@ services:
       - minio
     restart: unless-stopped
 
-  # --- 日志收集 (Elasticsearch) ---
+  # --- 日志检索引擎 (filebeat) ---
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.2.3
     container_name: elasticsearch
@@ -180,6 +180,7 @@ services:
       - "39200:9200"
     restart: unless-stopped
 
+  # --- 日志UI (kibana) ---
   kibana:
     image: docker.elastic.co/kibana/kibana:9.2.3
     container_name: kibana
@@ -190,6 +191,20 @@ services:
     depends_on:
       - elasticsearch
     restart: unless-stopped
+
+  # --- 日志收集 (filebeat) ---
+  filebeat:
+    image: elastic/filebeat:8.13.4
+    container_name: filebeat
+    user: root
+    depends_on:
+      - kafka
+      - elasticsearch
+    volumes:
+      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - forum_logs:/var/log/forum:ro
+    command: [ "-e", "--strict.perms=false" ]
+
 
   # --- 大数据处理 (Flink) ---
   flink-jobmanager:
@@ -342,6 +357,7 @@ volumes:
   prometheus_data:
   grafana_data:
   redisinsight_data:
+  forum_logs:
 networks:
   default:
     name: Sea-TryGo

@@ -1,0 +1,22 @@
+filebeat.inputs:
+  - type: filestream
+    id: forum-app-logs
+    enabled: true
+    paths:
+      - /var/log/forum/*.log
+
+processors:
+  - decode_json_fields:
+      fields: ["message"]
+      target: ""
+      overwrite_keys: true
+      add_error_key: true
+
+output.kafka:
+  hosts: ["kafka:9092"]
+  topic: "forum.logs.raw"
+  compression: gzip
+  required_acks: 1
+  key: "%{[article_id]}"
+
+logging.level: info

@@ -9,6 +9,6 @@ Kafka:
   Brokers:
     - 127.0.0.1:39092
   Topic: task.logs.raw
-  Group: task.rpc.consumer
+  Group: task.rpc.consumer3
   Offset: latest         # latest / earliest
   Consumers: 8           # 并发消费协程数

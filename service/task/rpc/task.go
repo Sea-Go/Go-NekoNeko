@@ -25,7 +25,6 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 	ctx := svc.NewServiceContext(c)
-	fmt.Printf("kafka=%+v\n", c.Kafka)
 	go Init.StartTaskKafkaConsumer(ctx)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {

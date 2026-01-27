@@ -12,7 +12,7 @@ type Config struct {
 		DBName   string
 		Mode     string
 	}
-	Redis struct {
+	RedisConf struct {
 		Addr     string
 		Password string
 		DB       int

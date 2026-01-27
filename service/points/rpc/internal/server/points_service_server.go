@@ -23,12 +23,7 @@ func NewPointsServiceServer(svcCtx *svc.ServiceContext) *PointsServiceServer {
 	}
 }
 
-func (s *PointsServiceServer) AddPoints(ctx context.Context, in *__.AddPointsReq) (*__.AddPointsResp, error) {
-	l := logic.NewAddPointsLogic(ctx, s.svcCtx)
-	return l.AddPoints(in)
-}
-
-func (s *PointsServiceServer) DecPoints(ctx context.Context, in *__.DecPointsReq) (*__.DecPointsResp, error) {
-	l := logic.NewDecPointsLogic(ctx, s.svcCtx)
-	return l.DecPoints(in)
+func (s *PointsServiceServer) Points(ctx context.Context, in *__.PointsReq) (*__.PointsResp, error) {
+	l := logic.NewPointsLogic(ctx, s.svcCtx)
+	return l.Points(in)
 }

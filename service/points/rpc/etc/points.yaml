@@ -4,3 +4,43 @@ Etcd:
   Hosts:
   - 127.0.0.1:2379
   Key: points.rpc
+
+Postgres:
+  Host: "127.0.0.1"
+  Port: "5432"
+  User: "postgres"
+  Password: "pgsql"
+  DBName: "seatrygo"
+  Mode: "disable"
+
+Prometheus:
+  Host: 0.0.0.0
+  Port: 9094
+  Path: /metrics
+
+
+
+Log:
+  Mode: file
+  Path: ../../../log/points
+  Level: info
+  Compress: true
+  KeepDays: 7
+  StackCooldownMillis: 100
+
+RedisConf:
+  Addr: "127.0.0.1:6379"
+  Password: ""
+  DB: 0
+  PoolSize: 100
+KafkaConf:
+  Brokers:
+    - "127.0.0.1:9092"
+  Topic: "points-adjustment"
+  Group: "points-rpc-group"
+# 链路追踪配置
+Telemetry:
+  Name: points-rpc
+  Endpoint: http://127.0.0.1:14268/api/traces
+  Sampler: 1.0
+  Batcher: jaeger

@@ -14,14 +14,11 @@ import (
 )
 
 type (
-	AddPointsReq  = __.AddPointsReq
-	AddPointsResp = __.AddPointsResp
-	DecPointsReq  = __.DecPointsReq
-	DecPointsResp = __.DecPointsResp
+	PointsReq  = __.PointsReq
+	PointsResp = __.PointsResp
 
 	PointsService interface {
-		AddPoints(ctx context.Context, in *AddPointsReq, opts ...grpc.CallOption) (*AddPointsResp, error)
-		DecPoints(ctx context.Context, in *DecPointsReq, opts ...grpc.CallOption) (*DecPointsResp, error)
+		Points(ctx context.Context, in *PointsReq, opts ...grpc.CallOption) (*PointsResp, error)
 	}
 
 	defaultPointsService struct {
@@ -35,12 +32,7 @@ func NewPointsService(cli zrpc.Client) PointsService {
 	}
 }
 
-func (m *defaultPointsService) AddPoints(ctx context.Context, in *AddPointsReq, opts ...grpc.CallOption) (*AddPointsResp, error) {
+func (m *defaultPointsService) Points(ctx context.Context, in *PointsReq, opts ...grpc.CallOption) (*PointsResp, error) {
 	client := __.NewPointsServiceClient(m.cli.Conn())
-	return client.AddPoints(ctx, in, opts...)
-}
-
-func (m *defaultPointsService) DecPoints(ctx context.Context, in *DecPointsReq, opts ...grpc.CallOption) (*DecPointsResp, error) {
-	client := __.NewPointsServiceClient(m.cli.Conn())
-	return client.DecPoints(ctx, in, opts...)
+	return client.Points(ctx, in, opts...)
 }

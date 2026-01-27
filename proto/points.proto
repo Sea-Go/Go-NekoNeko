@@ -3,33 +3,19 @@ syntax = "proto3";
 package points;
 option go_package = ".";
 
-message AddPointsReq{
+message PointsReq{
   int64 user_id = 1;
-  int64 user_points = 2;
-  int64 request_id = 3;
-  int64 add_points = 4;
+  int64 account_id = 2;
+  string amount =3;
 }
 
-message AddPointsResp {
-  bool success = 1;
-  string message = 2;
-}
-
-message DecPointsReq{
-  int64 user_id = 1;
-  int64 user_points = 2;
-  int64 request_id = 3;
-  int64 dec_points = 4;
-}
-
-message DecPointsResp{
+message PointsResp {
   bool success = 1;
   string message = 2;
 }
 
 service PointsService {
-
-  rpc AddPoints(AddPointsReq) returns (AddPointsResp);
-  rpc DecPoints(DecPointsReq) returns (DecPointsResp);
+  rpc Points(PointsReq) returns (PointsResp);
 
 }
+

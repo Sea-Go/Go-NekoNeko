@@ -1,6 +1,11 @@
 Name: user.rpc
 ListenOn: 0.0.0.0:8080
 
+Log:
+  ServiceName: user-rpc
+  Mode: file
+  Path: log/user-rpc
+
 Postgres:
   Host: "127.0.0.1"
   Port: "35432"
@@ -18,13 +23,3 @@ Prometheus:
   Host: 0.0.0.0
   Port: 9094
   Path: /metrics
-
-
-
-Log:
-  Mode: file
-  Path: ../../../log/user
-  Level: info
-  Compress: true
-  KeepDays: 7
-  StackCooldownMillis: 100

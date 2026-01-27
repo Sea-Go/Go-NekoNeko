@@ -1,5 +1,11 @@
 Name: admin.rpc
 ListenOn: 0.0.0.0:8081
+
+Log:
+  ServiceName: admin-rpc
+  Mode: file
+  Path: log/admin-rpc
+
 Etcd:
   Hosts:
   - 127.0.0.1:32379

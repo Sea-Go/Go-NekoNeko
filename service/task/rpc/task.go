@@ -4,6 +4,7 @@ import (
 	"flag"
 	"fmt"
 
+	"sea-try-go/service/task/rpc/Init"
 	"sea-try-go/service/task/rpc/internal/config"
 	"sea-try-go/service/task/rpc/internal/server"
 	"sea-try-go/service/task/rpc/internal/svc"
@@ -24,6 +25,8 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 	ctx := svc.NewServiceContext(c)
+	fmt.Printf("kafka=%+v\n", c.Kafka)
+	go Init.StartTaskKafkaConsumer(ctx)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		__.RegisterTaskServiceServer(grpcServer, server.NewTaskServiceServer(ctx))

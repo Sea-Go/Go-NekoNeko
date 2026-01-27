@@ -2,5 +2,13 @@ Name: task.rpc
 ListenOn: 0.0.0.0:8080
 Etcd:
   Hosts:
-  - 127.0.0.1:2379
+  - 127.0.0.1:32379
   Key: task.rpc
+
+Kafka:
+  Brokers:
+    - 127.0.0.1:39092
+  Topic: task.logs.raw
+  Group: task.rpc.consumer
+  Offset: latest         # latest / earliest
+  Consumers: 8           # 并发消费协程数

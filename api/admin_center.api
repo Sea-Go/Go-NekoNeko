@@ -130,7 +130,6 @@ type UnBanUserResp {
 	prefix: "/admincenter/v1"
 	group:  "admin"
 )
-
 service admincenter {
 	@doc (
 		create: "创建"

@@ -14,7 +14,7 @@ processors:
 
 output.kafka:
   hosts: ["kafka:9092"]
-  topic: "forum.logs.raw"
+  topic: "task.logs.raw"
   compression: gzip
   required_acks: 1
   key: "%{[article_id]}"

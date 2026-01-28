@@ -3,7 +3,7 @@ filebeat.inputs:
     id: forum-app-logs
     enabled: true
     paths:
-      - /var/log/forum/*.log
+      - /var/logs/task/*.log
 
 processors:
   - decode_json_fields:

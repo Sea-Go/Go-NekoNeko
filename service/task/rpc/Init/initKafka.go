@@ -29,7 +29,7 @@ func StartTaskKafkaConsumer(svcCtx *svc.ServiceContext) {
 		Topic:      topic,
 		Group:      group,
 		Consumers:  1,
-		Offset:     "first",
+		Offset:     "latest",
 		Processors: 1,
 	}, PrintConsumer{})
 

@@ -13,7 +13,7 @@ type PrintConsumer struct {
 }
 
 func (c PrintConsumer) Consume(ctx context.Context, key string, val string) error {
-	log.Printf("got msg key=%s val=%s\n", key, val)
+	//log.Printf("got msg key=%s val=%s\n", key, val)
 	return nil
 }
 
@@ -22,7 +22,7 @@ func StartTaskKafkaConsumer(svcCtx *svc.ServiceContext) {
 
 	brokers := svcCtx.Config.Kafka.Brokers
 	topic := svcCtx.Config.Kafka.InTopic
-	group := svcCtx.Config.Kafka.Group
+	group := svcCtx.Config.Kafka.GroupKafka
 
 	q := kq.MustNewQueue(kq.KqConf{
 		Brokers:    brokers,
@@ -41,6 +41,5 @@ func StartTaskKafkaConsumer(svcCtx *svc.ServiceContext) {
 	})
 
 	q.Start()
-
 	<-ctx.Done()
 }

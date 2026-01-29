@@ -39,31 +39,32 @@ type DLQEvent struct {
 }
 
 var (
-	broker     []string
-	inTopic    string
-	outTopic   string
-	group      string
-	topicDLQ   = "raw-logs.dlq"
-	countTable = "like_counts"
+	brokerTask   []string
+	inTopicTask  string
+	outTopicTask string
+	groupTask    string
+	topicDLQ     = "raw-logs.dlq"
+	countTable   = "like_counts"
 )
 
-/*type Int64Codec struct{}
+/*
+type Int64Codec struct{}
 
-func (c *Int64Codec) Encode(value interface{}) ([]byte, error) {
-	v := value.(int64)
-	b := make([]byte, 8)
-	binary.BigEndian.PutUint64(b, uint64(v))
-	return b, nil
-}
-
-func (c *Int64Codec) Decode(data []byte) (interface{}, error) {
-	if len(data) == 0 {
-		return int64(0), nil
+	func (c *Int64Codec) Encode(value interface{}) ([]byte, error) {
+		v := value.(int64)
+		b := make([]byte, 8)
+		binary.BigEndian.PutUint64(b, uint64(v))
+		return b, nil
 	}
-	return int64(binary.BigEndian.Uint64(data)), nil
-}
+
+	func (c *Int64Codec) Decode(data []byte) (interface{}, error) {
+		if len(data) == 0 {
+			return int64(0), nil
+		}
+		return int64(binary.BigEndian.Uint64(data)), nil
+	}
 */
-func process(ctx goka.Context, msg any) {
+func process(ctx goka.Context, msg any) { //核心处理逻辑
 	_ = msg.([]byte)
 
 	var cur int64
@@ -73,31 +74,39 @@ func process(ctx goka.Context, msg any) {
 	cur++
 
 	ctx.SetValue(cur)
-
-	ctx.Emit(goka.Stream(outTopic), ctx.Key(), cur)
+	log.Printf("%d", cur)
+	ctx.Emit(goka.Stream(outTopicTask), ctx.Key(), cur)
 }
 
-func startTaskGoKa(svcCtx *svc.ServiceContext) {
+func StartTaskGoKa(svcCtx *svc.ServiceContext) {
 
 	ctx, cancel := context.WithCancel(context.Background())
 
-	broker = svcCtx.Config.Kafka.Brokers
-	group = svcCtx.Config.Kafka.Group
-	inTopic = svcCtx.Config.Kafka.InTopic
-	outTopic = svcCtx.Config.Kafka.OutTopic
+	brokerTask = svcCtx.Config.Kafka.Brokers
+	groupTask = svcCtx.Config.Kafka.GroupGoKa
+	inTopicTask = svcCtx.Config.Kafka.InTopic
+	outTopicTask = svcCtx.Config.Kafka.OutTopic
+
+	log.Printf("like aggregator started: in=%s table=%s out=%s\n", inTopicTask, countTable, outTopicTask)
 
 	g := goka.DefineGroup(
-		goka.Group(group),
-		goka.Input(goka.Stream(inTopic), new(codec.Bytes), process),
+		goka.Group(groupTask),
+		goka.Input(goka.Stream(inTopicTask), new(codec.Bytes), process),
 		goka.Persist(new(codec.Int64)),
-		goka.Output(goka.Stream(outTopic), new(codec.String)),
+		goka.Output(goka.Stream(outTopicTask), new(codec.Int64)),
 	)
 
 	cfg := goka.DefaultConfig()
 	cfg.Consumer.Offsets.Initial = sarama.OffsetOldest
 
-	p, err := goka.NewProcessor(broker, g,
+	//修复topic复制因子rfactor=2的问题
+	tmCfg := goka.NewTopicManagerConfig()
+	tmCfg.Stream.Replication = 1
+	tmCfg.Table.Replication = 1
+
+	p, err := goka.NewProcessor(brokerTask, g,
 		goka.WithConsumerGroupBuilder(goka.ConsumerGroupBuilderWithConfig(cfg)),
+		goka.WithTopicManagerBuilder(goka.TopicManagerBuilderWithConfig(cfg, tmCfg)),
 	)
 
 	if err != nil {
@@ -112,7 +121,7 @@ func startTaskGoKa(svcCtx *svc.ServiceContext) {
 		<-ch
 		cancel()
 	}()
-	log.Printf("like aggregator started: in=%s table=%s out=%s\n", inTopic, countTable, outTopic)
+	log.Printf("like aggregator started: in=%s table=%s out=%s\n", inTopicTask, countTable, outTopicTask)
 	if err := p.Run(ctx); err != nil {
 		log.Fatal(err)
 	}

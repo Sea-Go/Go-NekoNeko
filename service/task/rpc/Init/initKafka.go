@@ -21,7 +21,7 @@ func StartTaskKafkaConsumer(svcCtx *svc.ServiceContext) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	brokers := svcCtx.Config.Kafka.Brokers
-	topic := svcCtx.Config.Kafka.Topic
+	topic := svcCtx.Config.Kafka.InTopic
 	group := svcCtx.Config.Kafka.Group
 
 	q := kq.MustNewQueue(kq.KqConf{

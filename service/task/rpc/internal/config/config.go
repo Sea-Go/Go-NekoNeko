@@ -6,7 +6,8 @@ type Config struct {
 	zrpc.RpcServerConf
 	Kafka struct {
 		Brokers   []string
-		Topic     string
+		InTopic   string
+		OutTopic  string
 		Group     string
 		Offset    string
 		Consumers int

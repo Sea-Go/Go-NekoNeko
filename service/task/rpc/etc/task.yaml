@@ -10,7 +10,8 @@ Kafka:
     - 127.0.0.1:39092
   InTopic: task.logs.raw
   OutTopic: task.logs.filtered
-  GroupKafka: task.rpc.consumer3
+  GroupKafkaRaw: task.rpc.consumer3
+  GroupKafkaFilter: task.rpc.consumer5
   GroupGoKa: task.rpc.consumer4
   Offset: latest         # latest / earliest
   Consumers: 8           # 并发消费协程数

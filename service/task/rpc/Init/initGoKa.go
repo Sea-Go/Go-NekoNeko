@@ -3,14 +3,12 @@ package Init
 import (
 	"context"
 	"log"
-	"os"
-	"os/signal"
 	"sea-try-go/service/task/rpc/internal/svc"
-	"syscall"
 
 	"github.com/IBM/sarama"
 	"github.com/lovoo/goka"
 	"github.com/lovoo/goka/codec"
+	"github.com/zeromicro/go-zero/core/proc"
 )
 
 /*var (
@@ -74,7 +72,7 @@ func process(ctx goka.Context, msg any) { //核心处理逻辑
 	cur++
 
 	ctx.SetValue(cur)
-	log.Printf("%d", cur)
+	//log.Printf("%d", cur)
 	ctx.Emit(goka.Stream(outTopicTask), ctx.Key(), cur)
 }
 
@@ -113,16 +111,13 @@ func StartTaskGoKa(svcCtx *svc.ServiceContext) {
 		log.Fatal(err)
 	}
 
-	defer cancel()
-
-	go func() {
-		ch := make(chan os.Signal, 2)
-		signal.Notify(ch, syscall.SIGINT, syscall.SIGTERM)
-		<-ch
-		cancel()
-	}()
 	log.Printf("like aggregator started: in=%s table=%s out=%s\n", inTopicTask, countTable, outTopicTask)
 	if err := p.Run(ctx); err != nil {
 		log.Fatal(err)
 	}
+
+	proc.AddShutdownListener(func() {
+		cancel()
+	})
+	<-ctx.Done()
 }

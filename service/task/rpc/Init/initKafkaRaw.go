@@ -2,7 +2,6 @@ package Init
 
 import (
 	"context"
-	"log"
 	"sea-try-go/service/task/rpc/internal/svc"
 
 	"github.com/zeromicro/go-queue/kq"
@@ -17,12 +16,12 @@ func (c PrintConsumer) Consume(ctx context.Context, key string, val string) erro
 	return nil
 }
 
-func StartTaskKafkaConsumer(svcCtx *svc.ServiceContext) {
+func StartTaskKafkaRaw(svcCtx *svc.ServiceContext) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	brokers := svcCtx.Config.Kafka.Brokers
 	topic := svcCtx.Config.Kafka.InTopic
-	group := svcCtx.Config.Kafka.GroupKafka
+	group := svcCtx.Config.Kafka.GroupKafkaRaw
 
 	q := kq.MustNewQueue(kq.KqConf{
 		Brokers:    brokers,
@@ -35,7 +34,6 @@ func StartTaskKafkaConsumer(svcCtx *svc.ServiceContext) {
 
 	// 退出时停掉 consumer
 	proc.AddShutdownListener(func() {
-		log.Println("kafka consumer stopping...")
 		cancel()
 		q.Stop()
 	})

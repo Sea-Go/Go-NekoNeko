@@ -4,15 +4,14 @@
 package types
 
 type AdminInfo struct {
-	Id        uint64            `json:"id"`
-	Uid       int64             `json:"uid"`
+	Uid       int64             `json:"uid,string"`
 	Username  string            `json:"username"`
 	Email     string            `json:"email"`
 	Extrainfo map[string]string `json:"extra_info,omitempty"`
 }
 
 type BanUserReq struct {
-	Uid int64 `json:"uid"`
+	Uid int64 `json:"uid,string"`
 }
 
 type BanUserResp struct {
@@ -27,11 +26,11 @@ type CreateAdminReq struct {
 }
 
 type CreateAdminResp struct {
-	Uid int64 `json:"uid"`
+	Uid int64 `json:"uid,string"`
 }
 
 type DeleteUserReq struct {
-	Uid int64 `json:"uid"`
+	Uid int64 `json:"uid,string"`
 }
 
 type DeleteUserResp struct {
@@ -57,7 +56,7 @@ type GetUserListResp struct {
 }
 
 type GetUserReq struct {
-	Uid int64 `form:"uid"`
+	Uid int64 `form:"uid,string"`
 }
 
 type GetUserResp struct {
@@ -75,7 +74,7 @@ type LoginResp struct {
 }
 
 type ResetUserPasswordReq struct {
-	Uid int64 `json:"uid"`
+	Uid int64 `json:"uid,string"`
 }
 
 type ResetUserPasswordResp struct {
@@ -83,7 +82,7 @@ type ResetUserPasswordResp struct {
 }
 
 type UnBanUserReq struct {
-	Uid int64 `json:"uid"`
+	Uid int64 `json:"uid,string"`
 }
 
 type UnBanUserResp struct {
@@ -103,7 +102,7 @@ type UpdateSelfResp struct {
 }
 
 type UpdateUserReq struct {
-	Uid       int64             `json:"uid"`
+	Uid       int64             `json:"uid,string"`
 	Username  string            `json:"username,omitempty"`
 	Password  string            `json:"password,omitempty"`
 	Email     string            `json:"email,omitempty"`
@@ -116,8 +115,7 @@ type UpdateUserResp struct {
 }
 
 type UserInfo struct {
-	Id        uint64            `json:"id"`
-	Uid       int64             `json:"uid"`
+	Uid       int64             `json:"uid,string"`
 	Username  string            `json:"username"`
 	Status    int64             `json:"status"`
 	Email     string            `json:"email,omitempty"`

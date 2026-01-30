@@ -12,13 +12,13 @@ import (
 )
 
 type UserLikeCount struct {
-	UserId    string    `gorm:"primary_key;column:user_id"`
+	UserID    string    `gorm:"primary_key;column:user_id"`
 	LikeCount int64     `gorm:"column:like_count"`
-	UpdateAt  time.Time `gorm:"column:update_at"`
+	UpdatedAt time.Time `gorm:"column:updated_at;autoUpdateTime"`
 }
 
 func (UserLikeCount) TableName() string {
-	return "user_likes_count"
+	return "user_like_count"
 }
 
 type LikeSinkConsumer struct {
@@ -172,7 +172,7 @@ func (c *LikeSinkConsumer) upsertChunk(rows []row) error {
 	records := make([]UserLikeCount, 0, len(rows))
 	for _, row := range rows {
 		records = append(records, UserLikeCount{
-			UserId:    row.uid,
+			UserID:    row.uid,
 			LikeCount: row.delta,
 		})
 	}
@@ -181,8 +181,8 @@ func (c *LikeSinkConsumer) upsertChunk(rows []row) error {
 		Clauses(clause.OnConflict{
 			Columns: []clause.Column{{Name: "user_id"}},
 			DoUpdates: clause.Assignments(map[string]any{
-				"like_count": gorm.Expr("user_like_count.like_count + EXCLUDE.like_count"),
-				"update_at":  gorm.Expr("now()"),
+				"like_count": gorm.Expr("user_like_count.like_count + EXCLUDED.like_count"),
+				"updated_at": gorm.Expr("now()"),
 			}),
 		}).Create(&records).Error
 }

@@ -16,7 +16,7 @@ type Config struct {
 		Offset           string
 		Consumers        int
 	}
-	Redis struct {
+	LikeRedis struct {
 		Addr string
 		Pass string
 		DB   int

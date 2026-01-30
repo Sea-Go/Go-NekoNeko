@@ -360,7 +360,6 @@ volumes:
   prometheus_data:
   grafana_data:
   redisinsight_data:
-  forum_logs:
 networks:
   default:
     name: Sea-TryGo

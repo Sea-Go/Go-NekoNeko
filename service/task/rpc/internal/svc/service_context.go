@@ -17,9 +17,9 @@ type ServiceContext struct {
 
 func NewServiceContext(c config.Config) *ServiceContext {
 	rdb := redis.NewClient(&redis.Options{
-		Addr:     c.Redis.Addr,
-		Password: c.Redis.Pass,
-		DB:       c.Redis.DB,
+		Addr:     c.LikeRedis.Addr,
+		Password: c.LikeRedis.Pass,
+		DB:       c.LikeRedis.DB,
 	})
 
 	gdb, err := gorm.Open(postgres.Open(c.Postgres.Dsn), &gorm.Config{})

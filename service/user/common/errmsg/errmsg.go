@@ -17,6 +17,7 @@ const (
 	ErrorUserNoRight    = 1008
 	ErrorUserNoLogin    = 1009
 	ErrorUserLogined    = 1010
+	ErrorUserBanned     = 1011
 )
 
 var codeMsg = map[int]string{
@@ -36,6 +37,7 @@ var codeMsg = map[int]string{
 	ErrorUserNoRight:    "权限不足",
 	ErrorUserNoLogin:    "未登录",
 	ErrorUserLogined:    "已登录",
+	ErrorUserBanned:     "用户已被封禁",
 }
 
 func GetErrMsg(code int) string {

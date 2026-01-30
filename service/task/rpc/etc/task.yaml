@@ -15,3 +15,20 @@ Kafka:
   GroupGoKa: task.rpc.consumer4
   Offset: latest         # latest / earliest
   Consumers: 8           # 并发消费协程数
+  Processors: 8
+
+Redis:
+  Addr: 127.0.0.1:6379
+  Pass: ""
+  DB: 0
+  DialTimeoutMs: 500
+  ReadTimeoutMs: 1000
+  WriteTimeoutMs: 1000
+  PoolSize: 200
+  MinIdleConns: 20
+
+Postgres:
+  Dsn: "host=127.0.0.1 user=xxx password=xxx dbname=xxx port=5432 sslmode=disable TimeZone=Asia/Shanghai"
+  MaxOpenConns: 50
+  MaxIdleConns: 50
+  ConnMaxLifetimeMinutes: 30

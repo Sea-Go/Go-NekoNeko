@@ -45,23 +45,6 @@ var (
 	countTable   = "like_counts"
 )
 
-/*
-type Int64Codec struct{}
-
-	func (c *Int64Codec) Encode(value interface{}) ([]byte, error) {
-		v := value.(int64)
-		b := make([]byte, 8)
-		binary.BigEndian.PutUint64(b, uint64(v))
-		return b, nil
-	}
-
-	func (c *Int64Codec) Decode(data []byte) (interface{}, error) {
-		if len(data) == 0 {
-			return int64(0), nil
-		}
-		return int64(binary.BigEndian.Uint64(data)), nil
-	}
-*/
 func process(ctx goka.Context, msg any) { //核心处理逻辑
 	_ = msg.([]byte)
 
@@ -70,9 +53,7 @@ func process(ctx goka.Context, msg any) { //核心处理逻辑
 		cur = v.(int64)
 	}
 	cur++
-
 	ctx.SetValue(cur)
-	//log.Printf("%d", cur)
 	ctx.Emit(goka.Stream(outTopicTask), ctx.Key(), cur)
 }
 
@@ -84,8 +65,6 @@ func StartTaskGoKa(svcCtx *svc.ServiceContext) {
 	groupTask = svcCtx.Config.Kafka.GroupGoKa
 	inTopicTask = svcCtx.Config.Kafka.InTopic
 	outTopicTask = svcCtx.Config.Kafka.OutTopic
-
-	log.Printf("like aggregator started: in=%s table=%s out=%s\n", inTopicTask, countTable, outTopicTask)
 
 	g := goka.DefineGroup(
 		goka.Group(groupTask),

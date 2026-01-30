@@ -14,6 +14,7 @@ type PrintFilterConsumer struct {
 
 func (c PrintFilterConsumer) Consume(ctx context.Context, key string, val string) error {
 	log.Printf("got msg key=%s val=%s\n", key, val)
+	
 	return nil
 }
 

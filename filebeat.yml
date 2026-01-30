@@ -17,6 +17,6 @@ output.kafka:
   topic: "task.logs.raw"
   compression: gzip
   required_acks: 1
-  key: "%{[article_id]}"
+  key: "%{[user_id]}"
 
 logging.level: info

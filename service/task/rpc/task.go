@@ -3,8 +3,8 @@ package main
 import (
 	"flag"
 	"fmt"
+	"sea-try-go/service/task/rpc/internal/Init"
 
-	"sea-try-go/service/task/rpc/Init"
 	"sea-try-go/service/task/rpc/internal/config"
 	"sea-try-go/service/task/rpc/internal/server"
 	"sea-try-go/service/task/rpc/internal/svc"

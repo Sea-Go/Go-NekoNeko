@@ -9,10 +9,21 @@ Kafka:
   Brokers:
     - 127.0.0.1:39092
   InTopic: task.logs.raw
-  OutTopic: task.logs.filtered
+  RawUserTopic: task.logs.raw.User
+  RawArticleTopic: task.logs.raw.Article
+  OutUserTopic: task.logs.filtered.User
+  OutArticleTopic: task.logs.filtered.Article
+
   GroupKafkaRaw: task.rpc.consumer3
-  GroupKafkaFilter: task.rpc.consumer5
+
   GroupGoKa: task.rpc.consumer4
+
+  GroupGoKaUser: task.rpc.consumer6
+  GroupGoKaArticle: task.rpc.consumer7
+
+  GroupFilterUser: task.rpc.consumer8
+  GroupFilterArticle: task.rpc.consumer9
+  
   Offset: latest         # latest / earliest
   Consumers: 8           # 并发消费协程数
   Processors: 8

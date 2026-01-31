@@ -7,12 +7,22 @@ import (
 type Config struct {
 	zrpc.RpcServerConf
 	Kafka struct {
-		Brokers          []string
-		InTopic          string
-		OutTopic         string
-		GroupKafkaRaw    string
+		Brokers         []string
+		InTopic         string
+		RawUserTopic    string
+		RawArticleTopic string
+		OutUserTopic    string
+		OutArticleTopic string
+		GroupKafkaRaw   string
+
 		GroupKafkaFilter string
+
+		GroupFilterUser    string
+		GroupFilterArticle string
+
 		GroupGoKa        string
+		GroupGoKaUser    string
+		GroupGoKaArticle string
 		Offset           string
 		Consumers        int
 	}

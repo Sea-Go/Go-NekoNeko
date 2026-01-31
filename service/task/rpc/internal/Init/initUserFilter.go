@@ -19,15 +19,15 @@ func (c PrintFilterConsumer) Consume(ctx context.Context, key string, val string
 	return nil
 }*/
 
-func StartTaskKafkaFilter(svcCtx *svc.ServiceContext) {
+func StartTaskKafkaUserFilter(svcCtx *svc.ServiceContext) {
 
 	log.Println("start task kafka filter")
 
 	ctx, cancel := context.WithCancel(context.Background())
 
 	brokers := svcCtx.Config.Kafka.Brokers
-	topic := svcCtx.Config.Kafka.OutTopic
-	group := svcCtx.Config.Kafka.GroupKafkaFilter
+	topic := svcCtx.Config.Kafka.OutUserTopic
+	group := svcCtx.Config.Kafka.GroupFilterUser
 
 	consumer := likesink.NewSinkConsumer(svcCtx.Rdb, svcCtx.Gdb)
 	consumer.Start(ctx) //异步二级存储

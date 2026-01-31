@@ -8,6 +8,7 @@ import (
 	"github.com/zeromicro/go-zero/core/proc"
 )
 
+// 这个是用来测试哪一步的kafka死掉了
 type PrintConsumer struct {
 }
 

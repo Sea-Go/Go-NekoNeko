@@ -2,6 +2,7 @@ package Init
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 	"sea-try-go/service/task/rpc/internal/svc"
 
@@ -37,15 +38,33 @@ type DLQEvent struct {
 }
 
 var (
-	brokerTask   []string
-	inTopicTask  string
-	outTopicTask string
-	groupTask    string
-	topicDLQ     = "raw-logs.dlq"
-	countTable   = "like_counts"
+	brokerTask          []string
+	inTopicTask         string
+	rawTopicTaskUser    string
+	rawTopicTaskArticle string
+	outTopicTaskUser    string
+	outTopicTaskArticle string
+	groupTask           string
+	groupTaskUser       string
+	groupTaskArticle    string
+	//找个时间补一下DLQ
+	topicDLQ   = "raw-logs.dlq"
+	countTable = "like_counts"
 )
 
 func process(ctx goka.Context, msg any) { //核心处理逻辑
+	raw := msg.([]byte)
+
+	var logEvent LogEvent
+	if err := json.Unmarshal(raw, &logEvent); err != nil {
+		log.Println(err)
+	}
+
+	ctx.Emit(goka.Stream(rawTopicTaskUser), logEvent.UserID, raw)
+	ctx.Emit(goka.Stream(rawTopicTaskArticle), logEvent.ArticleID, raw)
+}
+
+func processUserCount(ctx goka.Context, msg any) { //核心处理逻辑
 	_ = msg.([]byte)
 
 	var cur int64
@@ -54,7 +73,19 @@ func process(ctx goka.Context, msg any) { //核心处理逻辑
 	}
 	cur++
 	ctx.SetValue(cur)
-	ctx.Emit(goka.Stream(outTopicTask), ctx.Key(), cur)
+	ctx.Emit(goka.Stream(outTopicTaskUser), ctx.Key(), cur)
+}
+
+func processArticleCount(ctx goka.Context, msg any) { //核心处理逻辑
+	_ = msg.([]byte)
+
+	var cur int64
+	if v := ctx.Value(); v != nil {
+		cur = v.(int64)
+	}
+	cur++
+	ctx.SetValue(cur)
+	ctx.Emit(goka.Stream(outTopicTaskArticle), ctx.Key(), cur)
 }
 
 func StartTaskGoKa(svcCtx *svc.ServiceContext) {
@@ -63,14 +94,19 @@ func StartTaskGoKa(svcCtx *svc.ServiceContext) {
 
 	brokerTask = svcCtx.Config.Kafka.Brokers
 	groupTask = svcCtx.Config.Kafka.GroupGoKa
+	groupTaskUser = svcCtx.Config.Kafka.GroupGoKaUser
+	groupTaskArticle = svcCtx.Config.Kafka.GroupGoKaArticle
 	inTopicTask = svcCtx.Config.Kafka.InTopic
-	outTopicTask = svcCtx.Config.Kafka.OutTopic
+	rawTopicTaskUser = svcCtx.Config.Kafka.RawUserTopic
+	rawTopicTaskArticle = svcCtx.Config.Kafka.RawArticleTopic
+	outTopicTaskUser = svcCtx.Config.Kafka.OutUserTopic
+	outTopicTaskArticle = svcCtx.Config.Kafka.OutArticleTopic
 
 	g := goka.DefineGroup(
 		goka.Group(groupTask),
 		goka.Input(goka.Stream(inTopicTask), new(codec.Bytes), process),
-		goka.Persist(new(codec.Int64)),
-		goka.Output(goka.Stream(outTopicTask), new(codec.Int64)),
+		goka.Output(goka.Stream(rawTopicTaskUser), new(codec.Bytes)),
+		goka.Output(goka.Stream(rawTopicTaskArticle), new(codec.Bytes)),
 	)
 
 	cfg := goka.DefaultConfig()
@@ -90,11 +126,82 @@ func StartTaskGoKa(svcCtx *svc.ServiceContext) {
 		log.Fatal(err)
 	}
 
-	log.Printf("like aggregator started: in=%s table=%s out=%s\n", inTopicTask, countTable, outTopicTask)
+	go startTaskUserGoKa(svcCtx)
+	go startTaskArticleGoKa(svcCtx)
+
+	log.Printf("like aggregator started: in=%s table=%s out=%s\n", inTopicTask, countTable, outTopicTaskUser)
 	if err := p.Run(ctx); err != nil {
 		log.Fatal(err)
 	}
 
+	proc.AddShutdownListener(func() {
+		cancel()
+	})
+	<-ctx.Done()
+}
+
+func startTaskUserGoKa(svcCtx *svc.ServiceContext) {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	g := goka.DefineGroup(
+		goka.Group(groupTaskUser),
+		goka.Input(goka.Stream(rawTopicTaskUser), new(codec.Bytes), processUserCount),
+		goka.Persist(new(codec.Int64)),
+		goka.Output(goka.Stream(outTopicTaskUser), new(codec.Int64)),
+	)
+
+	//为了防止出现不知道的意外，原谅我写重复代码
+	cfg := goka.DefaultConfig()
+	cfg.Consumer.Offsets.Initial = sarama.OffsetOldest
+	tmCfg := goka.NewTopicManagerConfig()
+	tmCfg.Stream.Replication = 1
+	tmCfg.Table.Replication = 1
+
+	p, err := goka.NewProcessor(brokerTask, g,
+		goka.WithConsumerGroupBuilder(goka.ConsumerGroupBuilderWithConfig(cfg)),
+		goka.WithTopicManagerBuilder(goka.TopicManagerBuilderWithConfig(cfg, tmCfg)),
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := p.Run(ctx); err != nil {
+		log.Fatal(err)
+	}
+	proc.AddShutdownListener(func() {
+		cancel()
+	})
+	<-ctx.Done()
+}
+
+func startTaskArticleGoKa(svcCtx *svc.ServiceContext) {
+	ctx, cancel := context.WithCancel(context.Background())
+
+	g := goka.DefineGroup(
+		goka.Group(groupTaskArticle),
+		goka.Input(goka.Stream(rawTopicTaskArticle), new(codec.Bytes), processArticleCount),
+		goka.Persist(new(codec.Int64)),
+		goka.Output(goka.Stream(outTopicTaskArticle), new(codec.Int64)),
+	)
+
+	//为了防止出现不知道的意外，原谅我写重复代码
+	cfg := goka.DefaultConfig()
+	cfg.Consumer.Offsets.Initial = sarama.OffsetOldest
+	tmCfg := goka.NewTopicManagerConfig()
+	tmCfg.Stream.Replication = 1
+	tmCfg.Table.Replication = 1
+
+	p, err := goka.NewProcessor(brokerTask, g,
+		goka.WithConsumerGroupBuilder(goka.ConsumerGroupBuilderWithConfig(cfg)),
+		goka.WithTopicManagerBuilder(goka.TopicManagerBuilderWithConfig(cfg, tmCfg)),
+	)
+
+	if err != nil {
+		log.Fatal(err)
+	}
+	if err := p.Run(ctx); err != nil {
+		log.Fatal(err)
+	}
 	proc.AddShutdownListener(func() {
 		cancel()
 	})

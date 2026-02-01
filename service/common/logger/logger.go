@@ -13,6 +13,7 @@ import (
 
 	"github.com/zeromicro/go-zero/core/logx"
 	z_trace "github.com/zeromicro/go-zero/core/trace"
+	"sea-try-go/service/common/snowflake"
 )
 
 // Logger 日志工具结构体（替代全局变量，支持多实例/并发安全）

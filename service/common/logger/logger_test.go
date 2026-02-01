@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"os"
 	"runtime"
+	"sea-try-go/service/common/snowflake"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/zeromicro/go-zero/core/logx"
 	z_trace "github.com/zeromicro/go-zero/core/trace"
@@ -52,6 +54,9 @@ func TestInit(t *testing.T) {
 
 // TestLogInfo 测试信息日志输出
 func TestLogInfo(t *testing.T) {
+	// 0. 初始化snowflake
+	snowflake.Init()
+
 	// 1. 初始化logger
 	globalLogger = &Logger{}
 	Init("test-api")
@@ -65,6 +70,25 @@ func TestLogInfo(t *testing.T) {
 
 	// 4. 测试空上下文
 	LogInfo(context.Background(), "test empty ctx message")
+
+	// 5. 测试带可选参数的日志
+	LogInfo(ctx, "test message with user and article",
+		WithUserID("user123"),
+		WithArticleID("article456"))
+
+	// 6. 测试只带UserID的日志
+	LogInfo(ctx, "test message with user only",
+		WithUserID("user789"))
+
+	// 7. 测试只带ArticleID的日志
+	LogInfo(ctx, "test message with article only",
+		WithArticleID("article789"))
+
+	// 8. 验证时间戳格式
+	ts := time.Now().UTC().Format("2006-01-02T15:04:05.000Z")
+	if len(ts) != 24 {
+		t.Errorf("Timestamp length should be 24, got %d: %s", len(ts), ts)
+	}
 }
 
 // TestLogBusinessErr 测试业务错误日志输出
@@ -82,6 +106,19 @@ func TestLogBusinessErr(t *testing.T) {
 
 	// 4. 测试空上下文+空错误
 	LogBusinessErr(context.Background(), 400, nil) // 验证无panic
+
+	// 5. 测试带可选参数的业务错误日志
+	LogBusinessErr(ctx, 404, fmt.Errorf("not found"),
+		WithUserID("user123"),
+		WithArticleID("article456"))
+
+	// 6. 测试只带UserID的业务错误日志
+	LogBusinessErr(ctx, 403, fmt.Errorf("forbidden"),
+		WithUserID("user789"))
+
+	// 7. 测试只带ArticleID的业务错误日志
+	LogBusinessErr(ctx, 400, fmt.Errorf("bad request"),
+		WithArticleID("article789"))
 }
 
 // TestLogFatal 测试致命错误日志输出

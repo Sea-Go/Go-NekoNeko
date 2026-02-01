@@ -11,3 +11,8 @@ ArticleRpcConf:
 Auth:
   AccessSecret: ae0536f9-6450-4606-8e13-5a19ed505da0
   AccessExpire: 31536000
+
+Log:
+  ServiceName: article-api
+  Mode: file
+  Path: ../../../log/article-api

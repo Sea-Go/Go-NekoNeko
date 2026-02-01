@@ -5,6 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"github.com/zeromicro/go-queue/kq"
+	"github.com/zeromicro/go-zero/core/logx"
 	"os"
 	"sea-try-go/service/article/rpc/internal/config"
 	"sea-try-go/service/article/rpc/internal/model"
@@ -12,6 +13,7 @@ import (
 	"sea-try-go/service/article/rpc/internal/server"
 	"sea-try-go/service/article/rpc/internal/svc"
 	"sea-try-go/service/article/rpc/pb"
+	"sea-try-go/service/common/logger"
 
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
@@ -28,6 +30,9 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 
+	logx.MustSetup(c.Log)
+	logger.Init(c.Name)
+	
 	if c.AliGreen.AccessKeyId == "" {
 		c.AliGreen.AccessKeyId = os.Getenv("ALIYUN_ACCESS_KEY_ID")
 	}

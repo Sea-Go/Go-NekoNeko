@@ -12,6 +12,11 @@ Postgres:
   Password: "Sea-TryGo"
   DBName: first_db
 
+Log:
+  ServiceName: article-rpc
+  Mode: file
+  Path: ../../../log/article-rpc
+
 KqPusherConf:
   Name: article-mq-pusher
   Group: "article-creation-group"

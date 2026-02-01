@@ -11,12 +11,36 @@ import (
 
 	"github.com/zeromicro/go-zero/core/logx"
 	z_trace "github.com/zeromicro/go-zero/core/trace"
+	"sea-try-go/service/common/snowflake"
 )
 
 // Logger 日志工具结构体（替代全局变量，支持多实例/并发安全）
 type Logger struct {
 	serviceName string    // 服务名（用于日志标识）
 	once        sync.Once // 确保初始化只执行一次
+}
+
+// LogOptions 日志选项配置
+type LogOptions struct {
+	UserID    string // 用户ID（可选）
+	ArticleID string // 文章ID（可选）
+}
+
+// LogOption 函数选项类型
+type LogOption func(*LogOptions)
+
+// WithUserID 设置用户ID选项
+func WithUserID(userID string) LogOption {
+	return func(opts *LogOptions) {
+		opts.UserID = userID
+	}
+}
+
+// WithArticleID 设置文章ID选项
+func WithArticleID(articleID string) LogOption {
+	return func(opts *LogOptions) {
+		opts.ArticleID = articleID
+	}
 }
 
 // 全局实例（方便业务层快速调用，也可按需创建独立实例）
@@ -47,36 +71,54 @@ func Init(svcName string) {
 // ctx：上下文（用于提取TraceID）
 // code：业务错误码
 // err：原始错误对象
-func LogBusinessErr(ctx context.Context, code int, err error) {
-	globalLogger.logBusinessErr(ctx, code, err)
+// opts：可选参数（用户ID、文章ID等）
+func LogBusinessErr(ctx context.Context, code int, err error, opts ...LogOption) {
+	globalLogger.logBusinessErr(ctx, code, err, opts...)
 }
 
 // LogInfo 打印业务信息日志
 // ctx：上下文
 // msg：信息内容
-func LogInfo(ctx context.Context, msg string) {
-	globalLogger.logInfo(ctx, msg)
+// opts：可选参数（用户ID、文章ID等）
+func LogInfo(ctx context.Context, msg string, opts ...LogOption) {
+	globalLogger.logInfo(ctx, msg, opts...)
 }
 
 // LogFatal 打印致命错误日志并终止程序（仅用于初始化失败）
 // ctx：上下文
 // err：致命错误对象
-func LogFatal(ctx context.Context, err error) {
-	globalLogger.logFatal(ctx, err)
+// opts：可选参数（用户ID、文章ID等）
+func LogFatal(ctx context.Context, err error, opts ...LogOption) {
+	globalLogger.logFatal(ctx, err, opts...)
 }
 
 // logBusinessErr 私有实现：业务错误日志
-func (l *Logger) logBusinessErr(ctx context.Context, code int, err error) {
+func (l *Logger) logBusinessErr(ctx context.Context, code int, err error, opts ...LogOption) {
 	// 1. 校验服务名是否初始化
 	if l.serviceName == "" {
 		panic("logger not initialized, call logger.Init() first")
 	}
-	errorReason := "no return,missing task error"
+
+	// 2. 处理可选参数
+	logOpts := &LogOptions{}
+	for _, opt := range opts {
+		opt(logOpts)
+	}
+
+	// 3. 生成EventID
+	eventID, e := snowflake.GetID()
+	eventIDStr := "unknown"
+	if e == nil {
+		eventIDStr = fmt.Sprintf("%d", eventID)
+	}
+
+	// 4. 处理错误原因
+	errorReason := "unknown error"
 	if err != nil {
 		errorReason = err.Error()
 	}
 
-	// 2. 采集单步调用信息（文件行号、函数名）
+	// 6. 采集单步调用信息（文件行号、函数名）
 	pc, file, line, ok := runtime.Caller(2) //获取业务调用方法
 	fileLine := ""
 	callPath := ""
@@ -87,33 +129,57 @@ func (l *Logger) logBusinessErr(ctx context.Context, code int, err error) {
 		callPath = fmt.Sprintf("%s:%s", fileName, funcName)
 	}
 
-	// 3. 采集完整调用链路
+	// 7. 采集完整调用链路
 	callChain := getCallChain(3) // skip=3：跳过当前方法+LogBusinessErr+业务直接调用方法
 
-	// 4. 提取TraceID
+	// 8. 提取TraceID
 	traceID := z_trace.TraceIDFromContext(ctx)
 	if traceID == "" {
 		traceID = "unknown"
 	}
 
-	// 5. 输出标准化日志
-	logx.WithContext(ctx).Errorw(
-		"business_error",
+	// 9. 构建日志字段
+	fields := []logx.LogField{
 		logx.Field("service", l.serviceName),
+		logx.Field("event_id", eventIDStr),
 		logx.Field("trace_id", traceID),
 		logx.Field("error_code", code),
 		logx.Field("file_line", fileLine),
 		logx.Field("call_path", callPath),
 		logx.Field("call_chain", callChain),
 		logx.Field("error_reason", errorReason),
-	)
+	}
+
+	// 10. 添加可选字段
+	if logOpts.UserID != "" {
+		fields = append(fields, logx.Field("user_id", logOpts.UserID))
+	}
+	if logOpts.ArticleID != "" {
+		fields = append(fields, logx.Field("article_id", logOpts.ArticleID))
+	}
+
+	// 11. 输出标准化日志
+	logx.WithContext(ctx).Errorw("business_error", fields...)
 }
 
 // logInfo 私有实现：业务信息日志
-func (l *Logger) logInfo(ctx context.Context, msg string) {
+func (l *Logger) logInfo(ctx context.Context, msg string, opts ...LogOption) {
 	// 校验初始化
 	if l.serviceName == "" {
 		panic("logger not initialized, call logger.Init() first")
+	}
+
+	// 处理可选参数
+	logOpts := &LogOptions{}
+	for _, opt := range opts {
+		opt(logOpts)
+	}
+
+	// 生成EventID
+	eventID, e := snowflake.GetID()
+	eventIDStr := "unknown"
+	if e == nil {
+		eventIDStr = fmt.Sprintf("%d", eventID)
 	}
 
 	// 采集调用位置
@@ -131,23 +197,49 @@ func (l *Logger) logInfo(ctx context.Context, msg string) {
 		traceID = "unknown"
 	}
 
-	// 输出日志
-	logx.WithContext(ctx).Infow(
-		"business_info",
+	// 构建日志字段
+	fields := []logx.LogField{
 		logx.Field("service", l.serviceName),
+		logx.Field("event_id", eventIDStr),
 		logx.Field("trace_id", traceID),
 		logx.Field("position", position),
 		logx.Field("msg", msg),
-	)
+	}
+
+	// 添加可选字段
+	if logOpts.UserID != "" {
+		fields = append(fields, logx.Field("user_id", logOpts.UserID))
+	}
+	if logOpts.ArticleID != "" {
+		fields = append(fields, logx.Field("article_id", logOpts.ArticleID))
+	}
+
+	// 输出日志
+	logx.WithContext(ctx).Infow("business_info", fields...)
 }
 
 // logFatal 私有实现：致命错误日志
-func (l *Logger) logFatal(ctx context.Context, err error) {
+func (l *Logger) logFatal(ctx context.Context, err error, opts ...LogOption) {
 	// 校验初始化
 	if l.serviceName == "" {
 		panic("logger not initialized, call logger.Init() first")
 	}
-	errorReason := "no return,missing task error "
+
+	// 处理可选参数
+	logOpts := &LogOptions{}
+	for _, opt := range opts {
+		opt(logOpts)
+	}
+
+	// 生成EventID
+	eventID, e := snowflake.GetID()
+	eventIDStr := "unknown"
+	if e == nil {
+		eventIDStr = fmt.Sprintf("%d", eventID)
+	}
+
+	// 处理错误原因
+	errorReason := "unknown error"
 	if err != nil {
 		errorReason = err.Error()
 	}
@@ -172,16 +264,27 @@ func (l *Logger) logFatal(ctx context.Context, err error) {
 		traceID = "unknown"
 	}
 
-	// 输出致命错误日志（内部已调用os.Exit(1)）
-	logx.WithContext(ctx).Errorw(
-		"fatal_error",
+	// 构建日志字段
+	fields := []logx.LogField{
 		logx.Field("service", l.serviceName),
+		logx.Field("event_id", eventIDStr),
 		logx.Field("trace_id", traceID),
 		logx.Field("file_line", fileLine),
 		logx.Field("call_path", callPath),
 		logx.Field("call_chain", callChain),
 		logx.Field("error_reason", errorReason),
-	)
+	}
+
+	// 添加可选字段
+	if logOpts.UserID != "" {
+		fields = append(fields, logx.Field("user_id", logOpts.UserID))
+	}
+	if logOpts.ArticleID != "" {
+		fields = append(fields, logx.Field("article_id", logOpts.ArticleID))
+	}
+
+	// 输出致命错误日志（内部已调用os.Exit(1)）
+	logx.WithContext(ctx).Errorw("fatal_error", fields...)
 
 	// 兜底退出（极端场景）
 	os.Exit(1)

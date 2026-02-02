@@ -21,18 +21,21 @@ func (UserLikeCount) TableName() string {
 	return "user_like_count"
 }
 
+func (UserTaskProgress) TableName() string {
+	return "user_total_like_task_progress"
+}
+
 const (
-	taskID = ""
-	target = ""
-	total  = 5
+	taskID = "test"
+	target = 5
 )
 
 type UserTaskProgress struct {
-	UserID   string  `gorm:"column:user_id"`
-	TaskID   string  `gorm:"primary_key;column:task_id"`
-	Status   string  `gorm:"column:status"`
-	Progress float64 `gorm:"column:progress"`
-	Target   string  `gorm:"column:target"`
+	UserID   string `gorm:"primary_key;column:user_id"`
+	TaskID   string `gorm:"primary_key;column:task_id"`
+	Status   string `gorm:"column:status"`
+	Progress int64  `gorm:"column:progress"`
+	Target   int64  `gorm:"column:target"`
 }
 
 type LikeSinkConsumer struct {
@@ -177,8 +180,8 @@ func (c *LikeSinkConsumer) lazyInitTaskIfNeeded(ctx context.Context, batch map[s
 		pk := "task:progress:" + uid + ":" + taskID
 		pipe2.HSet(ctx, pk,
 			"status", "doing",
-			"process", 0,
-			"target", "target",
+			"progress", 0,
+			"target", target,
 			"createAt", now,
 			"updateAt", now)
 	}
@@ -239,7 +242,7 @@ func (c *LikeSinkConsumer) flushRedis(ctx context.Context, batch map[string]int6
 			if e != nil {
 				continue
 			}
-			if nowTotal > 5 {
+			if nowTotal >= target {
 				_ = c.completeLikeGT5(ctx, uid, nowTotal)
 			}
 		}
@@ -274,10 +277,38 @@ func (c *LikeSinkConsumer) completeLikeGT5(ctx context.Context, uid string, tota
 	_, err = c.rdb.HSet(ctx, pk,
 		"status", "done",
 		"doneAt", now,
-		"progress", total, // 你也可以写成 5 或 likeTotal，看你语义
-		"updatedAt", now,
+		"progress", target, // 你也可以写成 5 或 likeTotal，看你语义
+		"updateAt", now,
 	).Result()
-	return err
+	if err != nil {
+		return err
+	}
+	if err := c.markTaskDoneInDB(uid, total); err != nil {
+		// 这里建议记录日志即可，不要让整个 sink 挂掉（看你容错策略）
+		return err
+	}
+	return nil
+}
+
+func (c *LikeSinkConsumer) markTaskDoneInDB(uid string, progress int64) error {
+	rec := UserTaskProgress{
+		UserID:   uid,
+		TaskID:   taskID,
+		Status:   "done",
+		Progress: target,
+		Target:   target,
+	}
+
+	return c.gdb.Clauses(clause.OnConflict{
+		Columns: []clause.Column{{Name: "user_id"}, {Name: "task_id"}},
+		DoUpdates: clause.Assignments(map[string]any{
+			"status":     "done",
+			"progress":   target,
+			"target":     target,
+			"done_at":    gorm.Expr("COALESCE(user_total_like_task_progress.done_at, now())"),
+			"updated_at": gorm.Expr("now()"),
+		}),
+	}).Create(&rec).Error
 }
 
 func (c *LikeSinkConsumer) flushPostgres(ctx context.Context, batch map[string]int64) error {

@@ -13,8 +13,8 @@ type Config struct {
 		RawArticleTopic string
 		OutUserTopic    string
 		OutArticleTopic string
-		GroupKafkaRaw   string
 
+		GroupKafkaRaw    string
 		GroupKafkaFilter string
 
 		GroupFilterUser    string
@@ -23,8 +23,9 @@ type Config struct {
 		GroupGoKa        string
 		GroupGoKaUser    string
 		GroupGoKaArticle string
-		Offset           string
-		Consumers        int
+		
+		Offset    string
+		Consumers int
 	}
 	LikeRedis struct {
 		Addr string

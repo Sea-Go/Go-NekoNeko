@@ -14,15 +14,16 @@ Kafka:
   OutUserTopic: task.logs.filtered.User
   OutArticleTopic: task.logs.filtered.Article
 
-  GroupKafkaRaw: task.rpc.consumer3
+  GroupKafkaRaw: task.rpc.consumer31
+  GroupKafkaFilter: task.rpc.consumer101
 
-  GroupGoKa: task.rpc.consumer4
+  GroupGoKa: task.rpc.consumer41
 
-  GroupGoKaUser: task.rpc.consumer6
-  GroupGoKaArticle: task.rpc.consumer7
+  GroupGoKaUser: task.rpc.consumer61
+  GroupGoKaArticle: task.rpc.consumer71
 
-  GroupFilterUser: task.rpc.consumer8
-  GroupFilterArticle: task.rpc.consumer9
+  GroupFilterUser: task.rpc.consumer81
+  GroupFilterArticle: task.rpc.consumer91
   
   Offset: latest         # latest / earliest
   Consumers: 8           # 并发消费协程数

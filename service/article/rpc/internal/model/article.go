@@ -108,7 +108,6 @@ type ListArticlesOption struct {
 	ManualTypeTag string
 	SecondaryTag  string
 	AuthorId      string
-	RelatedGameId string
 }
 
 func (m *ArticleRepo) List(ctx context.Context, opt ListArticlesOption) ([]*Article, int64, error) {
@@ -125,9 +124,6 @@ func (m *ArticleRepo) List(ctx context.Context, opt ListArticlesOption) ([]*Arti
 	}
 	if opt.AuthorId != "" {
 		db = db.Where("author_id = ?", opt.AuthorId)
-	}
-	if opt.RelatedGameId != "" {
-		db = db.Where("ext_info ->> 'related_game_id' = ?", opt.RelatedGameId)
 	}
 
 	if err := db.Count(&total).Error; err != nil {

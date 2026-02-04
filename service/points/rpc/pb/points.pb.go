@@ -312,9 +312,9 @@ var file_proto_points_proto_goTypes = []any{
 	(*DecPointsResp)(nil), // 3: points.DecPointsResp
 }
 var file_proto_points_proto_depIdxs = []int32{
-	0, // 0: points.PointsService.AddPoints:input_type -> points.AddPointsReq
+	0, // 0: points.PointsService.reward:input_type -> points.AddPointsReq
 	2, // 1: points.PointsService.DecPoints:input_type -> points.DecPointsReq
-	1, // 2: points.PointsService.AddPoints:output_type -> points.AddPointsResp
+	1, // 2: points.PointsService.reward:output_type -> points.AddPointsResp
 	3, // 3: points.PointsService.DecPoints:output_type -> points.DecPointsResp
 	2, // [2:4] is the sub-list for method output_type
 	0, // [0:2] is the sub-list for method input_type

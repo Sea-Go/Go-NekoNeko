@@ -3,7 +3,7 @@ package Init
 import (
 	"context"
 	"log"
-	"sea-try-go/service/task/rpc/internal/likesink"
+	"sea-try-go/service/task/rpc/internal/sink"
 	"sea-try-go/service/task/rpc/internal/svc"
 
 	"github.com/zeromicro/go-queue/kq"
@@ -29,7 +29,7 @@ func StartTaskKafkaUserFilter(svcCtx *svc.ServiceContext) {
 	topic := svcCtx.Config.Kafka.OutUserTopic
 	group := svcCtx.Config.Kafka.GroupFilterUser
 
-	consumer := likesink.NewSinkConsumer(svcCtx.Rdb, svcCtx.Gdb)
+	consumer := sink.NewSinkConsumer(svcCtx.Rdb, svcCtx.Gdb)
 	consumer.Start(ctx) //异步二级存储
 
 	/*q := kq.MustNewQueue(kq.KqConf{

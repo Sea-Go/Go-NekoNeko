@@ -30,7 +30,7 @@ Kafka:
   Processors: 8
 
 LikeRedis:
-  Addr: 127.0.0.1:6379
+  Addr: 127.0.0.1:36379
   Pass: ""
   DB: 0
   DialTimeoutMs: 500
@@ -38,6 +38,7 @@ LikeRedis:
   WriteTimeoutMs: 1000
   PoolSize: 200
   MinIdleConns: 20
+  consumerName: task.reward.test
 
 Postgres:
   Dsn: "host=127.0.0.1 user=admin password=Sea-TryGo dbname=first_db port=35432 sslmode=disable TimeZone=Asia/Shanghai"

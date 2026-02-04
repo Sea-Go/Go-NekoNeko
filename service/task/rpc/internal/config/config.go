@@ -6,7 +6,8 @@ import (
 
 type Config struct {
 	zrpc.RpcServerConf
-	Kafka struct {
+	PointsRpc zrpc.RpcClientConf
+	Kafka     struct {
 		Brokers         []string
 		InTopic         string
 		RawUserTopic    string
@@ -23,14 +24,15 @@ type Config struct {
 		GroupGoKa        string
 		GroupGoKaUser    string
 		GroupGoKaArticle string
-		
+
 		Offset    string
 		Consumers int
 	}
 	LikeRedis struct {
-		Addr string
-		Pass string
-		DB   int
+		Addr         string
+		Pass         string
+		DB           int
+		ConsumerName string
 	}
 	Postgres struct {
 		Dsn                    string

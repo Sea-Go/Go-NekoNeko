@@ -1,7 +1,8 @@
-package likesink
+package sink
 
 import (
 	"context"
+	"sea-try-go/service/task/rpc/internal/reward"
 	"strconv"
 	"sync"
 	"time"
@@ -49,7 +50,8 @@ type LikeSinkConsumer struct {
 	redisPipeMax int
 	pgBatchMax   int
 
-	flushCh chan struct{}
+	rewardProduct *reward.Product
+	flushCh       chan struct{}
 }
 
 type row struct {
@@ -59,13 +61,14 @@ type row struct {
 
 func NewSinkConsumer(rdb *redis.Client, gdb *gorm.DB) *LikeSinkConsumer {
 	return &LikeSinkConsumer{
-		rdb:          rdb,
-		gdb:          gdb,
-		delta:        make(map[string]int64, 1<<16),
-		flushEvery:   1 * time.Second,
-		redisPipeMax: 5000,
-		pgBatchMax:   2000,
-		flushCh:      make(chan struct{}, 1),
+		rdb:           rdb,
+		gdb:           gdb,
+		delta:         make(map[string]int64, 1<<16),
+		flushEvery:    1 * time.Second,
+		redisPipeMax:  5000,
+		pgBatchMax:    2000,
+		flushCh:       make(chan struct{}, 1),
+		rewardProduct: reward.NewProduct(rdb),
 	}
 }
 
@@ -281,6 +284,10 @@ func (c *LikeSinkConsumer) completeLikeGT5(ctx context.Context, uid string, tota
 		"updateAt", now,
 	).Result()
 	if err != nil {
+		return err
+	}
+	ev := reward.NewEvent(uid, taskID, 5)
+	if err := c.rewardProduct.Enqueue(ctx, ev); err != nil {
 		return err
 	}
 	if err := c.markTaskDoneInDB(uid, total); err != nil {

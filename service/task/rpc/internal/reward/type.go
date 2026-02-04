@@ -8,19 +8,21 @@ const (
 )
 
 type RedisEvent struct {
-	RewardID string
-	UID      string
-	TaskID   string
+	RewardID int64 //幂等ID
+	UID      int64
+	TaskID   int64
 	Ts       int64
 	Score    int64
+	AddScore int64
 }
 
-func NewEvent(uid, taskID string, score int64) *RedisEvent {
+func NewEvent(uid int64, taskID int64, score, addScore int64) *RedisEvent {
 	return &RedisEvent{
-		RewardID: uid + ":" + taskID,
+		RewardID: uid + taskID,
 		UID:      uid,
 		TaskID:   taskID,
 		Ts:       time.Now().Unix(),
 		Score:    score,
+		AddScore: addScore,
 	}
 }

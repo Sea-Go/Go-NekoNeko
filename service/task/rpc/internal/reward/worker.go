@@ -2,6 +2,7 @@ package reward
 
 import (
 	"context"
+	pointspb "sea-try-go/service/points/rpc/pb"
 	"strconv"
 	"strings"
 	"time"
@@ -9,14 +10,15 @@ import (
 	"github.com/redis/go-redis/v9"
 )
 
-type PointsClient interface {
+/*type PointsClient interface {
 	// rpc调用
-	AddPoints(ctx context.Context, rewardID, uid, reason string, delta int64) error
-}
+	//	AddPoints(ctx context.Context, in *AddPointsReq, opts ...grpc.CallOption) (*AddPointsResp, error)
+	AddPoints(ctx context.Context, userID, requestID, addPoints int64) error
+}*/
 
 type Worker struct {
 	rdb          *redis.Client
-	points       PointsClient
+	points       pointspb.PointsServiceClient
 	consumerName string
 
 	batch    int64
@@ -25,7 +27,7 @@ type Worker struct {
 	failSleep time.Duration
 }
 
-func NewWorker(rdb *redis.Client, points PointsClient, consumerName string) *Worker {
+func NewWorker(rdb *redis.Client, points pointspb.PointsServiceClient, consumerName string) *Worker {
 	return &Worker{
 		rdb:          rdb,
 		points:       points,
@@ -72,10 +74,13 @@ func (w *Worker) Run(ctx context.Context) error {
 			for _, msg := range s.Messages {
 				ev := parseRedisEvent(msg.Values)
 
-				delta := ev.Score
-				reason := "task_done:" + ev.TaskID
-
-				if err := w.points.AddPoints(ctx, ev.RewardID, ev.UID, reason, delta); err != nil {
+				req := &pointspb.AddPointsReq{
+					UserId:     ev.UID,
+					UserPoints: ev.Score,
+					RequestId:  ev.RewardID,
+					AddPoints:  ev.AddScore,
+				}
+				if _, err := w.points.AddPoints(ctx, req); err != nil {
 					//留给后边重试
 					continue
 				}
@@ -87,7 +92,7 @@ func (w *Worker) Run(ctx context.Context) error {
 }
 
 func parseRedisEvent(values map[string]any) RedisEvent {
-	getStr := func(k string) string {
+	/*getStr := func(k string) string {
 		if v, ok := values[k]; ok {
 			switch x := v.(type) {
 			case string:
@@ -99,7 +104,7 @@ func parseRedisEvent(values map[string]any) RedisEvent {
 			}
 		}
 		return ""
-	}
+	}*/
 	getI64 := func(k string) int64 {
 		if v, ok := values[k]; ok {
 			switch x := v.(type) {
@@ -121,10 +126,11 @@ func parseRedisEvent(values map[string]any) RedisEvent {
 	}
 
 	return RedisEvent{
-		RewardID: getStr("reward_id"),
-		UID:      getStr("uid"),
-		TaskID:   getStr("task_id"),
+		RewardID: getI64("reward_id"),
+		UID:      getI64("uid"),
+		TaskID:   getI64("task_id"),
 		Ts:       getI64("ts"),
 		Score:    getI64("score"),
+		AddScore: getI64("add_score"),
 	}
 }

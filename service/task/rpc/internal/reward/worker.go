@@ -1,5 +1,7 @@
 package reward
 
+/*
+
 import (
 	"context"
 	"log"
@@ -12,12 +14,6 @@ import (
 
 	"github.com/redis/go-redis/v9"
 )
-
-/*type PointsClient interface {
-	// rpc调用
-	//	AddPoints(ctx context.Context, in *AddPointsReq, opts ...grpc.CallOption) (*AddPointsResp, error)
-	AddPoints(ctx context.Context, userID, requestID, addPoints int64) error
-}*/
 
 type Worker struct {
 	rdb          *redis.Client
@@ -98,19 +94,6 @@ func (w *Worker) Run(ctx context.Context, svc *svc.ServiceContext) error {
 }
 
 func parseRedisEvent(values map[string]any) RedisEvent {
-	/*getStr := func(k string) string {
-		if v, ok := values[k]; ok {
-			switch x := v.(type) {
-			case string:
-				return x
-			case []byte:
-				return string(x)
-			default:
-				return ""
-			}
-		}
-		return ""
-	}*/
 	getI64 := func(k string) int64 {
 		if v, ok := values[k]; ok {
 			switch x := v.(type) {
@@ -139,3 +122,4 @@ func parseRedisEvent(values map[string]any) RedisEvent {
 		AddScore: getI64("add_score"),
 	}
 }
+*/

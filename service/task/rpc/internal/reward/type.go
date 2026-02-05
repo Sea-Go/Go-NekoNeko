@@ -1,6 +1,9 @@
 package reward
 
-import "time"
+import (
+	"strconv"
+	"time"
+)
 
 const (
 	StreamKey = "stream:task:reward"
@@ -12,17 +15,17 @@ type RedisEvent struct {
 	UID      int64
 	TaskID   int64
 	Ts       int64
-	Score    int64
 	AddScore int64
 }
 
-func NewEvent(uid int64, taskID int64, score, addScore int64) *RedisEvent {
+func NewEvent(_uid, _taskID string, addScore int64) *RedisEvent {
+	uid, _ := strconv.ParseInt(_uid, 10, 64)
+	taskID, _ := strconv.ParseInt(_taskID, 10, 64)
 	return &RedisEvent{
 		RewardID: uid + taskID,
 		UID:      uid,
 		TaskID:   taskID,
 		Ts:       time.Now().Unix(),
-		Score:    score,
 		AddScore: addScore,
 	}
 }

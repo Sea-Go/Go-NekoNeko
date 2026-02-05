@@ -2,7 +2,10 @@ package reward
 
 import (
 	"context"
+	"log"
 	pointspb "sea-try-go/service/points/rpc/pb"
+	"sea-try-go/service/task/rpc/internal/svc"
+	userpb "sea-try-go/service/user/rpc/pb"
 	"strconv"
 	"strings"
 	"time"
@@ -46,7 +49,7 @@ func (w *Worker) EnsureGroup(ctx context.Context) error {
 	return nil
 }
 
-func (w *Worker) Run(ctx context.Context) error {
+func (w *Worker) Run(ctx context.Context, svc *svc.ServiceContext) error {
 	if err := w.EnsureGroup(ctx); err != nil {
 		return err
 	}
@@ -73,10 +76,13 @@ func (w *Worker) Run(ctx context.Context) error {
 		for _, s := range res {
 			for _, msg := range s.Messages {
 				ev := parseRedisEvent(msg.Values)
-
+				userResp, err := svc.UserClient.GetUser(ctx, &userpb.GetUserReq{Id: uint64(ev.UID)})
+				if err != nil {
+					log.Println(err)
+				}
 				req := &pointspb.AddPointsReq{
 					UserId:     ev.UID,
-					UserPoints: ev.Score,
+					UserPoints: int64(userResp.User.Score),
 					RequestId:  ev.RewardID,
 					AddPoints:  ev.AddScore,
 				}
@@ -130,7 +136,6 @@ func parseRedisEvent(values map[string]any) RedisEvent {
 		UID:      getI64("uid"),
 		TaskID:   getI64("task_id"),
 		Ts:       getI64("ts"),
-		Score:    getI64("score"),
 		AddScore: getI64("add_score"),
 	}
 }

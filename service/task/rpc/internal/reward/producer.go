@@ -24,7 +24,7 @@ func (p *Product) Enqueue(ctx context.Context, ev *RedisEvent) error {
 			"uid":       ev.UID,
 			"task_id":   ev.TaskID,
 			"ts":        ev.Ts,
-			"score":     ev.Score,
+			"score":     ev.AddScore,
 		},
 	}).Result()
 	return err

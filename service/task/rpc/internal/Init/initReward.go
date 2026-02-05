@@ -17,7 +17,7 @@ func StartInitReward(svc *svc.ServiceContext) {
 	//reclaimer := reward.NewReclaimer(rdb, consumerName)
 
 	go func() {
-		_ = worker.Run(ctx)
+		_ = worker.Run(ctx, svc)
 	}()
 	//go reclaimer.Run(ctx)
 

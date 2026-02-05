@@ -4,16 +4,19 @@ import (
 	"sea-try-go/service/task/rpc/internal/config"
 	"time"
 
+	pointspb "sea-try-go/service/points/rpc/pb"
+	userpb "sea-try-go/service/user/rpc/pb"
+
 	"github.com/redis/go-redis/v9"
 	"github.com/zeromicro/go-zero/zrpc"
 	"gorm.io/driver/postgres"
 	"gorm.io/gorm"
-	pointspb "sea-try-go/service/points/rpc/pb"
 )
 
 type ServiceContext struct {
 	Config       config.Config
 	PointsClient pointspb.PointsServiceClient
+	UserClient   userpb.UserServiceClient
 	Rdb          *redis.Client
 	Gdb          *gorm.DB
 }
@@ -25,7 +28,8 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		DB:       c.LikeRedis.DB,
 	})
 
-	cli := zrpc.MustNewClient(c.PointsRpc)
+	pointsCli := zrpc.MustNewClient(c.PointsRpc)
+	userCli := zrpc.MustNewClient(c.UserRpc)
 
 	gdb, err := gorm.Open(postgres.Open(c.Postgres.Dsn), &gorm.Config{})
 	if err != nil {
@@ -44,6 +48,7 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		Config:       c,
 		Rdb:          rdb,
 		Gdb:          gdb,
-		PointsClient: pointspb.NewPointsServiceClient(cli.Conn()),
+		PointsClient: pointspb.NewPointsServiceClient(pointsCli.Conn()),
+		UserClient:   userpb.NewUserServiceClient(userCli.Conn()),
 	}
 }

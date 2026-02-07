@@ -14,21 +14,19 @@ import (
 )
 
 type (
-	CreateUserReq        = pb.CreateUserReq
-	CreateUserResp       = pb.CreateUserResp
-	DeleteUserReq        = pb.DeleteUserReq
-	DeleteUserResp       = pb.DeleteUserResp
-	GetUserReq           = pb.GetUserReq
-	GetUserResp          = pb.GetUserResp
-	LoginReq             = pb.LoginReq
-	LoginResp            = pb.LoginResp
-	LogoutReq            = pb.LogoutReq
-	LogoutResp           = pb.LogoutResp
-	UpdateUserPointsReq  = pb.UpdateUserPointsReq
-	UpdateUserPointsResp = pb.UpdateUserPointsResp
-	UpdateUserReq        = pb.UpdateUserReq
-	UpdateUserResp       = pb.UpdateUserResp
-	UserInfo             = pb.UserInfo
+	CreateUserReq  = pb.CreateUserReq
+	CreateUserResp = pb.CreateUserResp
+	DeleteUserReq  = pb.DeleteUserReq
+	DeleteUserResp = pb.DeleteUserResp
+	GetUserReq     = pb.GetUserReq
+	GetUserResp    = pb.GetUserResp
+	LoginReq       = pb.LoginReq
+	LoginResp      = pb.LoginResp
+	LogoutReq      = pb.LogoutReq
+	LogoutResp     = pb.LogoutResp
+	UpdateUserReq  = pb.UpdateUserReq
+	UpdateUserResp = pb.UpdateUserResp
+	UserInfo       = pb.UserInfo
 
 	UserService interface {
 		GetUser(ctx context.Context, in *GetUserReq, opts ...grpc.CallOption) (*GetUserResp, error)
@@ -37,7 +35,6 @@ type (
 		Logout(ctx context.Context, in *LogoutReq, opts ...grpc.CallOption) (*LogoutResp, error)
 		UpdateUser(ctx context.Context, in *UpdateUserReq, opts ...grpc.CallOption) (*UpdateUserResp, error)
 		DeleteUser(ctx context.Context, in *DeleteUserReq, opts ...grpc.CallOption) (*DeleteUserResp, error)
-		UpdateUserPoints(ctx context.Context, in *UpdateUserPointsReq, opts ...grpc.CallOption) (*UpdateUserPointsResp, error)
 	}
 
 	defaultUserService struct {
@@ -79,9 +76,4 @@ func (m *defaultUserService) UpdateUser(ctx context.Context, in *UpdateUserReq, 
 func (m *defaultUserService) DeleteUser(ctx context.Context, in *DeleteUserReq, opts ...grpc.CallOption) (*DeleteUserResp, error) {
 	client := pb.NewUserServiceClient(m.cli.Conn())
 	return client.DeleteUser(ctx, in, opts...)
-}
-
-func (m *defaultUserService) UpdateUserPoints(ctx context.Context, in *UpdateUserPointsReq, opts ...grpc.CallOption) (*UpdateUserPointsResp, error) {
-	client := pb.NewUserServiceClient(m.cli.Conn())
-	return client.UpdateUserPoints(ctx, in, opts...)
 }

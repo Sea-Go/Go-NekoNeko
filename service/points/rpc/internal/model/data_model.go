@@ -17,7 +17,7 @@ type Points struct {
 	Uid         int64        `gorm:"column:uid;uniqueIndex;not null"`
 	AccountId   int64        `gorm:"column:account_id;not null;uniqueIndex:idx_account_user"` // 交易ID
 	UserId      int64        `gorm:"column:user_id;not null;uniqueIndex:idx_account_user"`    // 交易用户ID
-	Amount      int64        `gorm:"column:amount;not null"`                                  // 交易详情（+为增加，-为减少）
+	Amount      int32        `gorm:"column:amount;not null"`                                  // 交易详情（+为增加，-为减少）
 	Status      PointsStatus `gorm:"column:status;default:0"`                                 // 交易状态
 	WrongAnswer string       `gorm:"column:wrong_answer;type:text"`                           // 错误原因，用于统计溯源
 	Tracing     string       `gorm:"column:tracing;type:text"`                                // 用于追踪

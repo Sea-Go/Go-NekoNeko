@@ -69,19 +69,6 @@ message DeleteUserResp {
   bool success = 1;
 }
 
-// 积分更新请求
-message UpdateUserPointsReq {
-  int64 uid = 1;
-  int64 points = 2;  // 积分变动值，正数加积分，负数减积分
-}
-
-// 积分更新响应
-message UpdateUserPointsResp {
-  bool success = 1;
-  int32 new_score = 2;  // 更新后的积分值
-  string message = 3;   // 错误信息（如积分不足）
-}
-
 service UserService {
   rpc GetUser(GetUserReq) returns (GetUserResp);
   rpc Register(CreateUserReq) returns (CreateUserResp);
@@ -89,5 +76,4 @@ service UserService {
   rpc Logout(LogoutReq) returns (LogoutResp);
   rpc UpdateUser(UpdateUserReq) returns (UpdateUserResp);
   rpc DeleteUser(DeleteUserReq) returns (DeleteUserResp);
-  rpc UpdateUserPoints(UpdateUserPointsReq) returns (UpdateUserPointsResp);
 }

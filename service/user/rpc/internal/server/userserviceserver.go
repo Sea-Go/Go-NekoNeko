@@ -52,8 +52,3 @@ func (s *UserServiceServer) DeleteUser(ctx context.Context, in *pb.DeleteUserReq
 	l := logic.NewDeleteUserLogic(ctx, s.svcCtx)
 	return l.DeleteUser(in)
 }
-
-func (s *UserServiceServer) UpdateUserPoints(ctx context.Context, in *pb.UpdateUserPointsReq) (*pb.UpdateUserPointsResp, error) {
-	l := logic.NewUpdateUserPointsLogic(ctx, s.svcCtx)
-	return l.UpdateUserPoints(in)
-}

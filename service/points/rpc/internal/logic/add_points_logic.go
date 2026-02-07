@@ -100,7 +100,6 @@ func (l *AddPointsLogic) AddPoints(in *pb.AddPointsReq) (*pb.AddPointsResp, erro
 	}
 
 	// TODO 发送kafka
-	//错误  go l.AsyncProcess(pointsLog.Uid)
 	return &pb.AddPointsResp{Success: true, Message: "处理中"}, nil
 }
 
@@ -118,22 +117,3 @@ func (l *AddPointsLogic) sendDelayCheck(uid int64) error {
 	l.Logger.Infof("延时消息发送成功, uid: %d, 将在 %v 后检查", uid, delay)
 	return nil
 }
-
-// AsyncProcess 异步执行真正的积分增加业务逻辑
-//func (l *AddPointsLogic) AsyncProcess(uid int64) {
-//	points, err := l.svcCtx.PointsModel.FindOneByUid(l.ctx, uid)
-//	if err != nil {
-//		l.Logger.Errorf("AsyncProcess: 查询记录失败, uid: %d, error: %v", uid, err)
-//		return
-//	}
-//	// Step 2: 执行真正的积分增加逻辑
-//	updateUserPointsResp, err := l.svcCtx.UserRpc.UpdateUserPoints(l.ctx, &userservice.UpdateUserPointsReq{Uid: points.Uid, Points: points.Amount})
-//	if err != nil {
-//		l.Logger.Errorf("积分处理失败: logID=%d, error=%v", uid, err)
-//		return
-//	}
-//	if !updateUserPointsResp.Success {
-//		l.Logger.Errorf("积分处理失败: logID=%d, Message=%v", uid, updateUserPointsResp.Message)
-//		return
-//	}
-//}

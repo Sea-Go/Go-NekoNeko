@@ -11,6 +11,15 @@ import (
 	"gorm.io/gorm"
 )
 
+const (
+	ArticleStatusUnspecified int32 = 0 // 未指定
+	ArticleStatusDraft       int32 = 1 // 草稿
+	ArticleStatusPublished   int32 = 2 // 已发布
+	ArticleStatusReviewing   int32 = 3 // 审核中
+	ArticleStatusRejected    int32 = 4 // 审核被拒
+	ArticleStatusDeleted     int32 = 5 // 已删除
+)
+
 // Article GORM Model
 type Article struct {
 	ID            string         `gorm:"primaryKey;type:varchar(32)"`

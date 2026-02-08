@@ -43,7 +43,7 @@ func (l *CreateArticleLogic) CreateArticle(in *__.CreateArticleRequest) (*__.Cre
 		ManualTypeTag: in.ManualTypeTag,
 		SecondaryTags: model.StringArray(in.SecondaryTags),
 		AuthorID:      in.AuthorId,
-		Status:        3,
+		Status:        model.ArticleStatusReviewing,
 	}
 
 	if err := l.svcCtx.ArticleRepo.Insert(l.ctx, newArticle); err != nil {

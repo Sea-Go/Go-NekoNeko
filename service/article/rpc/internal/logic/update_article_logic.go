@@ -5,7 +5,6 @@ import (
 
 	"fmt"
 
-	"sea-try-go/service/article/rpc/internal/model"
 	"sea-try-go/service/article/rpc/internal/svc"
 	"sea-try-go/service/article/rpc/pb"
 
@@ -52,7 +51,7 @@ func (l *UpdateArticleLogic) UpdateArticle(in *__.UpdateArticleRequest) (*__.Upd
 		article.ManualTypeTag = *in.ManualTypeTag
 	}
 	if len(in.SecondaryTags) > 0 {
-		article.SecondaryTags = model.StringArray(in.SecondaryTags)
+		article.SecondaryTags = in.SecondaryTags
 	}
 	if in.Status != nil && *in.Status != __.ArticleStatus_ARTICLE_STATUS_UNSPECIFIED {
 		article.Status = int32(in.Status.Number())

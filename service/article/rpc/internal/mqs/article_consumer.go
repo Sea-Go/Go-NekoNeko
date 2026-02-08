@@ -8,8 +8,8 @@ import (
 	"strings"
 
 	"sea-try-go/service/article/common/errmsg"
-	"sea-try-go/service/article/rpc/internal/model"
 	"sea-try-go/service/article/rpc/internal/svc"
+	pb "sea-try-go/service/article/rpc/pb"
 	"sea-try-go/service/common/logger"
 
 	green "github.com/alibabacloud-go/green-20220302/v3/client"
@@ -53,7 +53,7 @@ func (l *ArticleConsumer) Consume(ctx context.Context, key, val string) error {
 	}
 
 	// Idempotency check: skip if not in pending status (3)
-	if article.Status != model.ArticleStatusReviewing {
+	if article.Status != int32(pb.ArticleStatus_REVIEWING) {
 		logger.LogInfo(ctx, fmt.Sprintf("Article %s status is %d, skipping duplicate processing.", msg.ArticleId, article.Status))
 		return nil
 	}
@@ -89,7 +89,7 @@ func (l *ArticleConsumer) Consume(ctx context.Context, key, val string) error {
 
 			if len(reason) > 0 || len(labels) > 0 {
 				logger.LogInfo(ctx, fmt.Sprintf("Article %s RISK DETECTED! Reason: %s, Labels: %s", msg.ArticleId, reason, labels), logger.WithArticleID(msg.ArticleId), logger.WithUserID(msg.AuthorId))
-				article.Status = model.ArticleStatusRejected
+				article.Status = int32(pb.ArticleStatus_REJECTED)
 				if err := l.svcCtx.ArticleRepo.Update(ctx, article); err != nil {
 					logger.LogBusinessErr(ctx, errmsg.ErrorDbUpdate, fmt.Errorf("failed to update article status to Rejected: %w", err), logger.WithArticleID(msg.ArticleId), logger.WithUserID(msg.AuthorId))
 					return err
@@ -111,7 +111,7 @@ func (l *ArticleConsumer) Consume(ctx context.Context, key, val string) error {
 				
 				logger.LogInfo(ctx, fmt.Sprintf("Article %s uploaded to MinIO bucket %s", msg.ArticleId, bucketName), logger.WithArticleID(msg.ArticleId), logger.WithUserID(msg.AuthorId))
 
-				article.Status = model.ArticleStatusPublished
+				article.Status = int32(pb.ArticleStatus_PUBLISHED)
 				if err := l.svcCtx.ArticleRepo.Update(ctx, article); err != nil {
 					logger.LogBusinessErr(ctx, errmsg.ErrorDbUpdate, fmt.Errorf("failed to update article status to Published: %w", err), logger.WithArticleID(msg.ArticleId), logger.WithUserID(msg.AuthorId))
 					return err

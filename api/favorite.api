@@ -1,0 +1,51 @@
+syntax = "v1"
+
+info (
+	title:   "Favorite API"
+	desc:    "收藏夹系统"
+	version: "1.0.0"
+)
+
+type CreateFolderReq {
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+	IsPublic    bool   `json:"is_public"`
+}
+
+type CreateFolderResp {
+	Id int64 `json:"id,string"`
+}
+
+type ListFolderReq {}
+
+type FolderInfo {
+	Id          int64  `json:"id,string"`
+	Name        string `json:"name"`
+	Description string `json:"description,omitempty"`
+	IsPublic    bool   `json:"is_public"`
+	CreatedAt   string `json:"created_at"`
+}
+
+type ListFolderResp {
+	List []FolderInfo `json:"list"`
+}
+
+@server (
+	prefix: "/favorite/v1"
+	group:  "favorite"
+	jwt:    UserAuth
+)
+service favorite {
+	@doc (
+		summary: "创建收藏夹"
+	)
+	@handler createFolder
+	post /folders (CreateFolderReq) returns (CreateFolderResp)
+
+	@doc (
+		summary: "获取收藏夹列表"
+	)
+	@handler listFolder
+	get /folders (ListFolderReq) returns (ListFolderResp)
+}
+

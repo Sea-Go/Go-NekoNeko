@@ -1,3 +1,25 @@
+## Redis 缓存（Cache）
+项目支持使用 Redis 对收藏列表进行读缓存以提升查询性能。
+- 启用：在 `api/etc/favorite.yaml` 和 `api/etc/usercenter.yaml` 中设置 `Redis.Enabled: true` 并配置 `Addr`。
+- 本地测试：可以使用 Docker 启动 Redis：
+
+```bash
+docker run -d --name redis-test -p 6379:6379 redis:7
+```
+
+- 运行服务并测试缓存：
+
+```bash
+# 启动收藏服务
+cd api
+./api_favorite -f etc/favorite.yaml
+
+# 用 curl 触发缓存命中
+curl -s "http://localhost:8888/favorite/items?folder_id=1&page=1"
+# 再次调用应命中缓存，服务日志会输出 cache hit
+```
+
+CI：已添加 GitHub Actions 工作流 `.github/workflows/ci.yml`，会在 push/PR 时运行 `go test ./...`。
 **🚀 2025寒假开源实践，从0到1打造你的顶级项目经历！
 准备好让你的简历在春招/实习招聘中脱颖而出了吗？厌倦了把玩具项目吹成西瓜？想亲手铸造一个能落地、有真实数据、经得起面试官考验的硬核项目吗？
 我们的项目旨在完整复现一个互联网产品从0到1的全生命周期，深度融合大厂实践与前沿AI技术。现在，我们正式邀请有志之士，在今年寒假（1月至3月初），用两个月左右的时间，与我们共同完成这段激动人心的旅程！

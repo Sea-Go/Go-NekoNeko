@@ -10,6 +10,7 @@ import (
 
 type Config struct {
 	rest.RestConf
+	PgDsn    string
 	UserAuth struct {
 		AccessSecret string
 		AccessExpire int64

@@ -1,0 +1,25 @@
+Name: favorite-api
+Host: 0.0.0.0
+Port: 8888
+
+Log:
+  ServiceName: favorite-api
+  Level: info
+  Mode: console
+  Encoding: plain
+  Path: logs
+  KeepDays: 7
+
+PgDsn: "postgres://postgres:123456@127.0.0.1:5432/favorite_db?sslmode=disable"
+
+
+UserAuth:
+  AccessSecret: "favorite-secret-key"
+  AccessExpire: 7200
+
+# Redis 缓存配置
+Redis:
+  Enabled: true           # 是否启用 Redis 缓存
+  Addr: "127.0.0.1:6379" # Redis 服务器地址和端口
+  Password: ""            # Redis 密码（如果有）
+  TTL: 3600              # 缓存过期时间（秒，默认 1 小时）

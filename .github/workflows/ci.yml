@@ -1,0 +1,71 @@
+name: CI
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  # manual trigger for integration tests
+  workflow_dispatch:
+
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25'
+      - name: Cache modules
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/.cache/go-build
+            /home/runner/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+      - name: Install test deps
+        run: go mod download
+      - name: Run unit tests (skip integration)
+        run: |
+          # integration tests are marked with the 'integration' build tag and will be skipped
+          go test ./... -v
+
+  integration-tests:
+    name: Integration Tests (manual)
+    runs-on: ubuntu-latest
+    if: github.event_name == 'workflow_dispatch'
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: test
+          POSTGRES_PASSWORD: test
+          POSTGRES_DB: test_db
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U test -d test_db"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.25'
+      - name: Wait for Postgres
+        run: |
+          for i in $(seq 1 30); do
+            pg_isready -h localhost -p 5432 -U test -d test_db && break || sleep 1
+          done
+      - name: Install test deps
+        run: go mod download
+      - name: Run integration tests
+        env:
+          PG_DSN: postgres://test:test@127.0.0.1:5432/test_db?sslmode=disable
+        run: |
+          # run only tests marked with build tag 'integration'
+          go test -tags=integration ./... -v

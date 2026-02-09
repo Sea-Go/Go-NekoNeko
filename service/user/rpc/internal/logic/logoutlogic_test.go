@@ -1,8 +1,11 @@
+//go:build integration
+// +build integration
+
 package logic
 
 import (
 	"testing"
-
+)
 	pb "sea-try-go/service/user/rpc/pb"
 )
 

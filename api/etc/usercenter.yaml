@@ -1,0 +1,24 @@
+Name: usercenter
+Host: 0.0.0.0
+Port: 8889
+
+Log:
+  ServiceName: usercenter-api
+  Level: info
+  Mode: console
+  Encoding: plain
+  Path: logs
+  KeepDays: 7
+
+PgDsn: "postgres://postgres:123456@127.0.0.1:5432/favorite_db?sslmode=disable"
+
+UserAuth:
+  AccessSecret: "favorite-secret-key"
+  AccessExpire: 7200
+
+# Redis 缓存配置
+Redis:
+  Enabled: true
+  Addr: "127.0.0.1:6379"
+  Password: ""
+  TTL: 3600

@@ -2,9 +2,9 @@ package favorite_item
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/jackc/pgx/v5/pgxpool"
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 // Service 收藏项业务逻辑
@@ -70,9 +70,9 @@ func (s *Service) CreateItem(ctx context.Context, userID int64, folderID int64, 
 	pattern := s.cacheKey.FavoriteFolderPattern(userID, folderID)
 	if err := s.cache.DeletePattern(ctx, pattern); err != nil {
 		// 缓存失效失败不应影响业务逻辑，只记录日志
-		fmt.Printf("cache DeletePattern failed: %v\n", err)
+		logx.Errorf("cache DeletePattern failed: %v", err)
 	} else {
-		fmt.Printf("cache invalidated for pattern=%s\n", pattern)
+		logx.Infof("cache invalidated for pattern=%s", pattern)
 	}
 
 	// 返回响应数据
@@ -110,9 +110,9 @@ func (s *Service) DeleteItem(ctx context.Context, userID int64, objectType strin
 		pattern := s.cacheKey.FavoriteFolderPattern(userID, folderID)
 		if err := s.cache.DeletePattern(ctx, pattern); err != nil {
 			// 缓存失效失败不应影响业务逻辑，只记录日志
-			fmt.Printf("cache DeletePattern failed: %v\n", err)
+			logx.Errorf("cache DeletePattern failed: %v", err)
 		} else {
-			fmt.Printf("cache invalidated for pattern=%s\n", pattern)
+			logx.Infof("cache invalidated for pattern=%s", pattern)
 		}
 	}
 
@@ -151,10 +151,10 @@ func (s *Service) ListItems(ctx context.Context, userID int64, folderID int64, p
 
 	if err := s.cache.Get(ctx, cacheKey, &cachedResult); err == nil && cachedResult.Items != nil {
 		// 缓存命中，直接返回
-		fmt.Printf("cache hit key=%s\n", cacheKey)
+		logx.Infof("cache hit key=%s", cacheKey)
 		return cachedResult.Items, cachedResult.Total, nil
 	}
-	fmt.Printf("cache miss key=%s\n", cacheKey)
+	logx.Infof("cache miss key=%s", cacheKey)
 
 	// 步骤 2: 缓存未命中，从数据库读取
 	items, err := s.itemRepo.ListByFolder(ctx, folderID, offset, pageSize)
@@ -192,9 +192,9 @@ func (s *Service) ListItems(ctx context.Context, userID int64, folderID int64, p
 
 	if err := s.cache.Set(ctx, cacheKey, toCache); err != nil {
 		// 缓存写入失败不影响返回，只记录日志
-		fmt.Printf("cache set failed key=%s err=%v\n", cacheKey, err)
+		logx.Errorf("cache set failed key=%s err=%v", cacheKey, err)
 	} else {
-		fmt.Printf("cache set key=%s\n", cacheKey)
+		logx.Infof("cache set key=%s", cacheKey)
 	}
 
 	return infos, total, nil

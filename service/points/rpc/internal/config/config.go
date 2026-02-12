@@ -16,8 +16,9 @@ type Config struct {
 		DBName   string
 		Mode     string
 	}
-	DqConf       dq.DqConf
 	UserRpcConf  zrpc.RpcClientConf
+	RetryDqConf  dq.DqConf
+	DqConf       dq.DqConf
 	KqPusherConf struct {
 		Brokers []string
 		Topic   string

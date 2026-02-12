@@ -14,6 +14,14 @@ Etcd:
   - 127.0.0.1:2379
   Key: points.rpc
 
+RetryDqConf:
+  Beanstalks:
+    - Endpoint: 127.0.0.1:41300
+      Tube: points_retry_tube
+  Redis:
+    Host: 127.0.0.1:36379
+    Type: node
+
 DqConf:
   Beanstalks:
     - Endpoint: 127.0.0.1:41300

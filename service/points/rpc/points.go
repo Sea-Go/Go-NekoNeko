@@ -2,13 +2,14 @@ package main
 
 import (
 	"flag"
-	"fmt"
+	"sea-try-go/service/points/rpc/internal/mqs"
 
 	"sea-try-go/service/points/rpc/internal/config"
 	"sea-try-go/service/points/rpc/internal/server"
 	"sea-try-go/service/points/rpc/internal/svc"
 	__ "sea-try-go/service/points/rpc/pb"
 
+	"github.com/zeromicro/go-queue/kq"
 	"github.com/zeromicro/go-zero/core/conf"
 	"github.com/zeromicro/go-zero/core/service"
 	"github.com/zeromicro/go-zero/zrpc"
@@ -24,7 +25,7 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 	ctx := svc.NewServiceContext(c)
-
+	serviceGroup := service.NewServiceGroup()
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		__.RegisterPointsServiceServer(grpcServer, server.NewPointsServiceServer(ctx))
 
@@ -32,8 +33,13 @@ func main() {
 			reflection.Register(grpcServer)
 		}
 	})
-	defer s.Stop()
+	serviceGroup.Add(s)
 
-	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)
-	s.Start()
+	consumer := kq.MustNewQueue(c.KqConsumerConf, mqs.NewPointsHandler(ctx))
+	serviceGroup.Add(consumer)
+
+	retryHandler := mqs.NewRetryHandler(ctx)
+	go ctx.RetryDqConsumer.Consume(retryHandler.Consume)
+
+	serviceGroup.Start()
 }

@@ -11,12 +11,14 @@ import (
 )
 
 type ServiceContext struct {
-	Config         config.Config
-	PointsModel    *model.PointsModel
-	DqPusherClient dq.Producer
-	DqConsumer     dq.Consumer
-	UserRpc        userservice.UserService
-	KqPusherClient *kq.Pusher
+	Config              config.Config
+	PointsModel         *model.PointsModel
+	UserRpc             userservice.UserService
+	RetryDqPusherClient dq.Producer
+	RetryDqConsumer     dq.Consumer
+	DqPusherClient      dq.Producer
+	DqConsumer          dq.Consumer
+	KqPusherClient      *kq.Pusher
 }
 
 func NewServiceContext(c config.Config) *ServiceContext {
@@ -31,11 +33,13 @@ func NewServiceContext(c config.Config) *ServiceContext {
 	db := model.InitDB(dbConfig)
 
 	return &ServiceContext{
-		Config:         c,
-		PointsModel:    model.NewPointsModel(db),
-		DqPusherClient: dq.NewProducer(c.DqConf.Beanstalks),
-		DqConsumer:     dq.NewConsumer(c.DqConf),
-		UserRpc:        userservice.NewUserService(zrpc.MustNewClient(c.UserRpcConf)),
-		KqPusherClient: kq.NewPusher(c.KqPusherConf.Brokers, c.KqPusherConf.Topic),
+		Config:              c,
+		PointsModel:         model.NewPointsModel(db),
+		RetryDqPusherClient: dq.NewProducer(c.RetryDqConf.Beanstalks),
+		RetryDqConsumer:     dq.NewConsumer(c.RetryDqConf),
+		DqPusherClient:      dq.NewProducer(c.DqConf.Beanstalks),
+		DqConsumer:          dq.NewConsumer(c.DqConf),
+		UserRpc:             userservice.NewUserService(zrpc.MustNewClient(c.UserRpcConf)),
+		KqPusherClient:      kq.NewPusher(c.KqPusherConf.Brokers, c.KqPusherConf.Topic),
 	}
 }

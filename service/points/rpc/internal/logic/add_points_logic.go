@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"sea-try-go/service/common/snowflake"
 	"sea-try-go/service/points/rpc/internal/model"
@@ -13,6 +14,14 @@ import (
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
+
+type UserPointsMsg struct {
+	Uid        int64 `json:"uid"`
+	AccountId  int64 `json:"accountId"`
+	UserId     int64 `json:"userId"`
+	Amount     int32 `json:"amount"`
+	RetryTimes int32 `json:"retryTimes"`
+}
 
 type AddPointsLogic struct {
 	ctx    context.Context
@@ -99,7 +108,22 @@ func (l *AddPointsLogic) AddPoints(in *pb.AddPointsReq) (*pb.AddPointsResp, erro
 		return &pb.AddPointsResp{Success: true, Message: "任务已排队"}, nil
 	}
 
-	// TODO 发送kafka
+	// 发送kafka
+	msg := UserPointsMsg{
+		Uid:        uid,
+		AccountId:  accountId,
+		UserId:     userId,
+		Amount:     in.AddPoints,
+		RetryTimes: 0,
+	}
+	msgBytes, err := json.Marshal(msg)
+	if err != nil {
+		return nil, err
+	}
+	if err := l.svcCtx.KqPusherClient.Push(l.ctx, string(msgBytes)); err != nil {
+		return nil, err
+	}
+
 	return &pb.AddPointsResp{Success: true, Message: "处理中"}, nil
 }
 
@@ -111,9 +135,7 @@ func (l *AddPointsLogic) sendDelayCheck(uid int64) error {
 
 	_, err := l.svcCtx.DqPusherClient.Delay(body, delay)
 	if err != nil {
-		l.Logger.Errorf("发送延时消息失败, uid: %d, error: %v", uid, err)
 		return err
 	}
-	l.Logger.Infof("延时消息发送成功, uid: %d, 将在 %v 后检查", uid, delay)
 	return nil
 }

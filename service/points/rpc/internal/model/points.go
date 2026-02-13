@@ -91,9 +91,14 @@ func (m *PointsModel) HasOtherProcessingByUserId(ctx context.Context, userId int
 }
 
 func (m *PointsModel) UpdateUserPoints(ctx context.Context, userId int64, amount int32) (bool, error) {
-	err := m.conn.WithContext(ctx).Model(&User{}).Where("user_id = ?", userId).Update("score", gorm.Expr("score + ", amount)).Error
-	if err != nil {
-		return false, err
+	result := m.conn.WithContext(ctx).Model(&User{}).
+		Where("user_id = ? AND score + ? >= 0", userId, amount).
+		Update("score", gorm.Expr("score + ?", amount))
+	if result.Error != nil {
+		return false, result.Error
+	}
+	if result.RowsAffected == 0 {
+		return false, nil
 	}
 	return true, nil
 }

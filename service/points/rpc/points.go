@@ -2,6 +2,7 @@ package main
 
 import (
 	"flag"
+	"sea-try-go/service/common/logger"
 	"sea-try-go/service/points/rpc/internal/mqs"
 
 	"sea-try-go/service/points/rpc/internal/config"
@@ -24,6 +25,7 @@ func main() {
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
+	logger.Init("points-rpc")
 	ctx := svc.NewServiceContext(c)
 	serviceGroup := service.NewServiceGroup()
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
@@ -40,6 +42,9 @@ func main() {
 
 	retryHandler := mqs.NewRetryHandler(ctx)
 	go ctx.RetryDqConsumer.Consume(retryHandler.Consume)
+
+	delayHandler := mqs.NewDelayHandler(ctx)
+	go ctx.DqConsumer.Consume(delayHandler.Consume)
 
 	serviceGroup.Start()
 }

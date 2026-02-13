@@ -3,17 +3,14 @@ package svc
 import (
 	"sea-try-go/service/points/rpc/internal/config"
 	"sea-try-go/service/points/rpc/internal/model"
-	"sea-try-go/service/user/rpc/userservice"
 
 	"github.com/zeromicro/go-queue/dq"
 	"github.com/zeromicro/go-queue/kq"
-	"github.com/zeromicro/go-zero/zrpc"
 )
 
 type ServiceContext struct {
 	Config              config.Config
 	PointsModel         *model.PointsModel
-	UserRpc             userservice.UserService
 	RetryDqPusherClient dq.Producer
 	RetryDqConsumer     dq.Consumer
 	DqPusherClient      dq.Producer
@@ -39,7 +36,6 @@ func NewServiceContext(c config.Config) *ServiceContext {
 		RetryDqConsumer:     dq.NewConsumer(c.RetryDqConf),
 		DqPusherClient:      dq.NewProducer(c.DqConf.Beanstalks),
 		DqConsumer:          dq.NewConsumer(c.DqConf),
-		UserRpc:             userservice.NewUserService(zrpc.MustNewClient(c.UserRpcConf)),
 		KqPusherClient:      kq.NewPusher(c.KqPusherConf.Brokers, c.KqPusherConf.Topic),
 	}
 }

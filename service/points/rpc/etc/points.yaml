@@ -1,5 +1,5 @@
 Name: points.rpc
-ListenOn: 0.0.0.0:8080
+ListenOn: 0.0.0.0:8081
 
 Postgres:
   Host: "127.0.0.1"
@@ -11,13 +11,15 @@ Postgres:
 
 Etcd:
   Hosts:
-  - 127.0.0.1:2379
+  - 127.0.0.1:32379
   Key: points.rpc
 
 RetryDqConf:
   Beanstalks:
     - Endpoint: 127.0.0.1:41300
       Tube: points_retry_tube
+    - Endpoint: 127.0.0.1:41301
+      Tube: points_retry_tube2
   Redis:
     Host: 127.0.0.1:36379
     Type: node
@@ -25,7 +27,9 @@ RetryDqConf:
 DqConf:
   Beanstalks:
     - Endpoint: 127.0.0.1:41300
-      Tube: points_delay_tube
+      Tube: points_retry_tube
+    - Endpoint: 127.0.0.1:41301
+      Tube: points_retry_tube2
   Redis:
     Host: 127.0.0.1:36379
     Type: node

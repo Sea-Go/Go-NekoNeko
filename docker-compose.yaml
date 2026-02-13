@@ -14,7 +14,7 @@ services:
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/etcd:/etcd
     command: >
       etcd
-      -advertise-client-urls=http://etcd:2379
+      -advertise-client-urls=http://127.0.0.1:32379
       -listen-client-urls http://0.0.0.0:2379
       --data-dir /etcd
     ports:
@@ -59,12 +59,18 @@ services:
     restart: unless-stopped
 
   # --- Beanstalkd ---
-  beanstalkd:
-    image: beanstalkd:latest
-    container_name: beanstalkd
+  beanstalkd1:
+    image: schickling/beanstalkd
+    container_name: beanstalkd1
     ports:
       - "41300:11300"
     restart: unless-stopped
+  beanstalkd2:
+    image: schickling/beanstalkd
+    container_name: beanstalkd2
+    ports:
+      - "41301:11300"
+    restart: unless-stopped  
 
   # --- 图数据库 (Neo4j) ---
   neo4j:

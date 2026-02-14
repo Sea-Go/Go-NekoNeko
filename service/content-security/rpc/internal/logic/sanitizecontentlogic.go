@@ -37,7 +37,7 @@ func NewSanitizeContentLogic(ctx context.Context, svcCtx *svc.ServiceContext) *S
 func (l *SanitizeContentLogic) SanitizeContent(in *pb.SanitizeContentRequest) (*pb.SanitizeContentResponse, error) {
 	if in == nil || in.Text == "" {
 		return &pb.SanitizeContentResponse{
-			Success: false,
+			Success:      false,
 			ErrorMessage: "输入文本为空",
 		}, nil
 	}
@@ -47,9 +47,9 @@ func (l *SanitizeContentLogic) SanitizeContent(in *pb.SanitizeContentRequest) (*
 	if options == nil {
 		// 默认启用所有选项
 		options = &pb.SanitizeOptions{
-			EnableHtmlSanitization:      true,
-			EnableAdDetection:           true,
-			EnableUnicodeNormalization:  true,
+			EnableHtmlSanitization:        true,
+			EnableAdDetection:             true,
+			EnableUnicodeNormalization:    true,
 			EnableWhitespaceNormalization: true,
 		}
 	}
@@ -84,7 +84,7 @@ func (l *SanitizeContentLogic) SanitizeContent(in *pb.SanitizeContentRequest) (*
 	}
 
 	return &pb.SanitizeContentResponse{
-		SanitizedText:  text,
+		SanitizedText: text,
 		IsAd:          isAd,
 		AdConfidence:  adConfidence,
 		Success:       true,
@@ -106,7 +106,7 @@ func normalizeWhitespace(text string) string {
 }
 
 // sanitizeHTML 使用 bluemonday 净化 HTML
-func sanitizeHTML(text string, config *config.Config) string {
+func sanitizeHTML(text string, config config.Config) string {
 	p := bluemonday.NewPolicy()
 
 	// 允许基本的格式化标签
@@ -118,7 +118,7 @@ func sanitizeHTML(text string, config *config.Config) string {
 
 	// 允许的标签
 	allowedTags := []string{"b", "i", "p", "br", "strong", "em", "u", "s", "sub", "sup", "blockquote", "code", "pre", "ul", "ol", "li", "dl", "dt", "dd"}
-	
+
 	// 如果配置中指定了允许的标签，则使用配置
 	if len(config.HtmlSanitization.AllowedTags) > 0 {
 		allowedTags = config.HtmlSanitization.AllowedTags
@@ -134,7 +134,7 @@ func sanitizeHTML(text string, config *config.Config) string {
 // detectAd 调用外部 AI 模型进行广告检测
 func (l *SanitizeContentLogic) detectAd(text string) (bool, float32, error) {
 	config := l.svcCtx.Config.AdDetection
-	
+
 	if config.ApiEndpoint == "" {
 		return false, 0, fmt.Errorf("广告检测 API 端点未配置")
 	}
@@ -145,11 +145,11 @@ func (l *SanitizeContentLogic) detectAd(text string) (bool, float32, error) {
 		"input": map[string]interface{}{
 			"messages": []map[string]string{
 				{
-					"role": "system",
+					"role":    "system",
 					"content": "你是一个广告检测器。请分析以下内容是否包含广告，并返回置信度（0-1之间）。只返回JSON格式：{\"is_ad\": boolean, \"confidence\": float}",
 				},
 				{
-					"role": "user",
+					"role":    "user",
 					"content": text,
 				},
 			},
@@ -198,10 +198,10 @@ func (l *SanitizeContentLogic) detectAd(text string) (bool, float32, error) {
 
 	// 解析响应
 	var result struct {
-		IsAd        bool    `json:"is_ad"`
-		Confidence  float64 `json:"confidence"`
+		IsAd       bool    `json:"is_ad"`
+		Confidence float64 `json:"confidence"`
 	}
-	
+
 	if err := json.Unmarshal(body, &result); err != nil {
 		// 尝试解析可能的嵌套响应
 		var wrapper struct {
@@ -213,7 +213,7 @@ func (l *SanitizeContentLogic) detectAd(text string) (bool, float32, error) {
 				} `json:"choices"`
 			} `json:"output"`
 		}
-		
+
 		if err2 := json.Unmarshal(body, &wrapper); err2 == nil && len(wrapper.Output.Choices) > 0 {
 			// 解析 AI 返回的 JSON 字符串
 			content := wrapper.Output.Choices[0].Message.Content

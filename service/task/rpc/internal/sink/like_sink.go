@@ -59,7 +59,7 @@ type row struct {
 	delta int64
 }
 
-func NewSinkConsumer(rdb *redis.Client, gdb *gorm.DB) *LikeSinkConsumer {
+func NewUserLikeSinkConsumer(rdb *redis.Client, gdb *gorm.DB) *LikeSinkConsumer {
 	return &LikeSinkConsumer{
 		rdb:           rdb,
 		gdb:           gdb,

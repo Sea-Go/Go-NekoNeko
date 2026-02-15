@@ -31,6 +31,11 @@ type LogEvent struct {
 	Msg       string `json:"msg"`        // 信息
 }
 
+type TaskArticleEvent struct {
+	UserID string `json:"user_id"` // 用户ID
+	Cur    int64  `json:"cur"`
+}
+
 type DLQEvent struct {
 	RawLog     []byte `json:"raw_log"`
 	FailReason string `json:"fail_reason"`
@@ -77,7 +82,12 @@ func processUserCount(ctx goka.Context, msg any) { //核心处理逻辑
 }
 
 func processArticleCount(ctx goka.Context, msg any) { //核心处理逻辑
-	_ = msg.([]byte)
+	raw := msg.([]byte)
+
+	var logEvent LogEvent
+	if err := json.Unmarshal(raw, &logEvent); err != nil {
+		log.Println(err)
+	}
 
 	var cur int64
 	if v := ctx.Value(); v != nil {
@@ -85,7 +95,15 @@ func processArticleCount(ctx goka.Context, msg any) { //核心处理逻辑
 	}
 	cur++
 	ctx.SetValue(cur)
-	ctx.Emit(goka.Stream(outTopicTaskArticle), ctx.Key(), cur)
+	_val := TaskArticleEvent{
+		UserID: logEvent.UserID,
+		Cur:    cur,
+	}
+	val, err := json.Marshal(_val)
+	if err != nil {
+		log.Println(err)
+	}
+	ctx.Emit(goka.Stream(outTopicTaskArticle), ctx.Key(), val)
 }
 
 func StartTaskGoKa(svcCtx *svc.ServiceContext) {
@@ -181,7 +199,7 @@ func startTaskArticleGoKa(svcCtx *svc.ServiceContext) {
 		goka.Group(groupTaskArticle),
 		goka.Input(goka.Stream(rawTopicTaskArticle), new(codec.Bytes), processArticleCount),
 		goka.Persist(new(codec.Int64)),
-		goka.Output(goka.Stream(outTopicTaskArticle), new(codec.Int64)),
+		goka.Output(goka.Stream(outTopicTaskArticle), new(codec.Bytes)),
 	)
 
 	//为了防止出现不知道的意外，原谅我写重复代码

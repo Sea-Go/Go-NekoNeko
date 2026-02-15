@@ -29,17 +29,8 @@ func StartTaskKafkaArticleFilter(svcCtx *svc.ServiceContext) {
 	topic := svcCtx.Config.Kafka.OutArticleTopic
 	group := svcCtx.Config.Kafka.GroupKafkaFilter
 
-	consumer := sink.NewSinkConsumer(svcCtx.Rdb, svcCtx.Gdb)
+	consumer := sink.NewArticleLikeSinkConsumer(svcCtx.Rdb, svcCtx.Gdb)
 	consumer.Start(ctx) //异步二级存储
-
-	/*q := kq.MustNewQueue(kq.KqConf{
-		Brokers:    brokers,
-		Topic:      topic,
-		Group:      group,
-		Consumers:  1,
-		Offset:     "latest",
-		Processors: 1,
-	}, PrintFilterConsumer{})*/
 
 	q := kq.MustNewQueue(kq.KqConf{
 		Brokers:    brokers,

@@ -29,7 +29,7 @@ func StartTaskKafkaUserFilter(svcCtx *svc.ServiceContext) {
 	topic := svcCtx.Config.Kafka.OutUserTopic
 	group := svcCtx.Config.Kafka.GroupFilterUser
 
-	consumer := sink.NewSinkConsumer(svcCtx.Rdb, svcCtx.Gdb)
+	consumer := sink.NewUserLikeSinkConsumer(svcCtx.Rdb, svcCtx.Gdb)
 	consumer.Start(ctx) //异步二级存储
 
 	/*q := kq.MustNewQueue(kq.KqConf{

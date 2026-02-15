@@ -10,32 +10,30 @@ import (
 	"strings"
 	"time"
 
+	"sea-try-go/service/common/logger"
 	"sea-try-go/service/content-security/rpc/internal/config"
 	"sea-try-go/service/content-security/rpc/internal/svc"
 	"sea-try-go/service/content-security/rpc/pb"
 
 	"github.com/microcosm-cc/bluemonday"
 	"golang.org/x/text/unicode/norm"
-
-	"github.com/zeromicro/go-zero/core/logx"
 )
 
 type SanitizeContentLogic struct {
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
-	logx.Logger
 }
 
 func NewSanitizeContentLogic(ctx context.Context, svcCtx *svc.ServiceContext) *SanitizeContentLogic {
 	return &SanitizeContentLogic{
 		ctx:    ctx,
 		svcCtx: svcCtx,
-		Logger: logx.WithContext(ctx),
 	}
 }
 
 func (l *SanitizeContentLogic) SanitizeContent(in *pb.SanitizeContentRequest) (*pb.SanitizeContentResponse, error) {
 	if in == nil || in.Text == "" {
+		logger.LogInfo(l.ctx, "收到空内容请求")
 		return &pb.SanitizeContentResponse{
 			Success:      false,
 			ErrorMessage: "输入文本为空",
@@ -53,6 +51,8 @@ func (l *SanitizeContentLogic) SanitizeContent(in *pb.SanitizeContentRequest) (*
 			EnableWhitespaceNormalization: true,
 		}
 	}
+
+	logger.LogInfo(l.ctx, "开始内容安全清洗")
 
 	// 1. Unicode 标准化
 	if options.EnableUnicodeNormalization {
@@ -76,13 +76,14 @@ func (l *SanitizeContentLogic) SanitizeContent(in *pb.SanitizeContentRequest) (*
 		var err error
 		isAd, adConfidence, err = l.detectAd(text)
 		if err != nil {
-			l.Errorf("广告检测失败: %v", err)
+			logger.LogBusinessErr(l.ctx, 500, err, logger.WithArticleID("unknown"))
 			// 降级策略：跳过广告检测，返回安全结果
 			isAd = false
 			adConfidence = 0
 		}
 	}
 
+	logger.LogInfo(l.ctx, "内容清洗完成")
 	return &pb.SanitizeContentResponse{
 		SanitizedText: text,
 		IsAd:          isAd,

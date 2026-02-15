@@ -8,7 +8,7 @@ enum ArticleStatus {
   ARTICLE_STATUS_UNSPECIFIED = 0; // 未指定
   DRAFT = 1;                      // 草稿
   PUBLISHED = 2;                  // 已发布
-  REVIEWING = 3;                  // 审核中（社区必备）
+  REVIEWING = 3;                  // 审核中（社区必备)
   REJECTED = 4;                   // 审核被拒
   DELETED = 5;                    // 已删除（逻辑删除）
 }

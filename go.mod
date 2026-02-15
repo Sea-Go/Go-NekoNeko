@@ -5,6 +5,7 @@ go 1.25.4
 require (
 	github.com/bwmarrin/snowflake v0.3.0
 	github.com/golang-jwt/jwt/v4 v4.5.2
+	github.com/neo4j/neo4j-go-driver/v5 v5.28.4
 	github.com/zeromicro/go-zero v1.9.4
 	golang.org/x/crypto v0.33.0
 	google.golang.org/grpc v1.65.0

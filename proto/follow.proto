@@ -1,0 +1,63 @@
+syntax = "proto3";
+
+package follow;
+
+// 指定生成的 go 代码路径
+option go_package = "./pb";
+
+// --- 基础请求与响应 ---
+message RelationReq {
+  int64 user_id = 1;     // 发起操作的用户 U
+  int64 target_id = 2;   // 被操作的目标用户 V
+}
+
+message BaseResp {
+  int32 code = 1;        // 状态码 (0为AC，非0为WA/异常)
+  string msg = 2;        // 提示信息
+}
+
+// --- 分页拉取列表的请求与响应 ---
+message ListReq {
+  int64 user_id = 1;     // 查询哪个用户的列表
+  int32 offset = 2;      // 偏移量 (类似跳过前 N 个)
+  int32 limit = 3;       // 页面容量 (单次查询最大边数，防止 MLE)
+}
+
+message UserListResp {
+  int32 code = 1;
+  string msg = 2;
+  repeated int64 user_ids = 3; // 返回目标用户的 UID 列表
+}
+
+message RecommendResp {
+  int32 code = 1;
+  string msg = 2;
+  // 由于可能喜欢列表需要打分排序，我们可以返回结构体数组
+  message RecommendUser {
+    int64 target_id = 1;
+    int32 mutual_score = 2; // 共同关注度 (BFS 路径上的权重)
+  }
+  repeated RecommendUser users = 3;
+}
+
+// --- 定义 Follow RPC 微服务 ---
+service FollowService {
+  // 1. 点击关注 (O(1) 插入边)
+  rpc Follow(RelationReq) returns(BaseResp);
+  // 2. 取消关注 (O(1) 删除边)
+  rpc Unfollow(RelationReq) returns(BaseResp);
+  // 3. 拉入黑名单 (O(1) 插入边并清理双向 Follow 边)
+  rpc Block(RelationReq) returns(BaseResp);
+  // 4. 拉出黑名单 (O(1) 删除边)
+  rpc Unblock(RelationReq) returns(BaseResp);
+
+  // 5. 获取关注列表 (O(K), K 为 limit)
+  rpc GetFollowList(ListReq) returns(UserListResp);
+  // 6. 获取黑名单列表 (O(K))
+  rpc GetBlockList(ListReq) returns(UserListResp);
+  // 7. 获取粉丝列表 (O(K))
+  rpc GetFollowerList(ListReq) returns(UserListResp);
+
+  // 8. 遍历三层关系查找可能喜欢 (受限 BFS)
+  rpc GetRecommendations(ListReq) returns(RecommendResp);
+}

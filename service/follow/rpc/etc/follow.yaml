@@ -1,0 +1,8 @@
+Name: follow.rpc
+ListenOn: 127.0.0.1:8080
+
+# 必须追加这段 Neo4j 的配置
+Neo4j:
+  Uri: "neo4j://127.0.0.1:7687"
+  Username: "neo4j"
+  Password: "12345678"

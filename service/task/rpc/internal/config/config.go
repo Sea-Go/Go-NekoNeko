@@ -6,9 +6,9 @@ import (
 
 type Config struct {
 	zrpc.RpcServerConf
-	//PointsRpc zrpc.RpcClientConf
-	//UserRpc   zrpc.RpcClientConf
-	Kafka struct {
+	PointsRpc zrpc.RpcClientConf
+	UserRpc   zrpc.RpcClientConf
+	Kafka     struct {
 		Brokers         []string
 		InTopic         string
 		RawUserTopic    string

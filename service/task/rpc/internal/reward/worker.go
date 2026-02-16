@@ -1,7 +1,5 @@
 package reward
 
-/*
-
 import (
 	"context"
 	"log"
@@ -122,4 +120,3 @@ func parseRedisEvent(values map[string]any) RedisEvent {
 		AddScore: getI64("add_score"),
 	}
 }
-*/

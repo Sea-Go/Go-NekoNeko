@@ -1,6 +1,14 @@
 package Init
 
-/*func StartInitReward(svc *svc.ServiceContext) {
+import (
+	"context"
+	"sea-try-go/service/task/rpc/internal/reward"
+	"sea-try-go/service/task/rpc/internal/svc"
+
+	"github.com/zeromicro/go-zero/core/proc"
+)
+
+func StartInitReward(svc *svc.ServiceContext) {
 	ctx, cancel := context.WithCancel(context.Background())
 
 	consumerName := svc.Config.LikeRedis.ConsumerName
@@ -17,4 +25,4 @@ package Init
 		cancel()
 	})
 	<-ctx.Done()
-}*/
+}

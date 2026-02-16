@@ -204,7 +204,7 @@ services:
       - kafka
       - elasticsearch
     volumes:
-      - ./filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./service/task/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
       - ./log:/var/logs:ro
     command: [ "-e", "--strict.perms=false" ]
 

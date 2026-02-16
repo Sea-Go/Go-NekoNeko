@@ -1,0 +1,116 @@
+syntax = "v1"
+
+info (
+	title:   "User Center API"
+	desc:    "用户中心 HTTP 网关,对接 UserService gRPC"
+	version: "1.0.0"
+)
+
+type UserInfo {
+	Uid       int64             `json:"uid,string"`
+	Score     uint32            `json:"score"`
+	Username  string            `json:"username"`
+	Email     string            `json:"email,omitempty"`
+	Extrainfo map[string]string `json:"extra_info,omitempty"`
+}
+
+type GetUserReq {}
+
+type GetUserResp {
+	User  UserInfo `json:"user,omitempty"`
+	Found bool     `json:"found"`
+}
+
+type CreateUserReq {
+	Username  string            `json:"username"`
+	Password  string            `json:"password"`
+	Email     string            `json:"email,omitempty"`
+	Extrainfo map[string]string `json:"extra_info,omitempty"`
+}
+
+type CreateUserResp {
+	Uid int64 `json:"uid,string"`
+}
+
+type LoginReq {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type LoginResp {
+	Token string `json:"token"`
+}
+
+type LogoutReq {}
+
+type LogoutResp {
+	Success bool `json:"success"`
+}
+
+type UpdateUserReq {
+	Username  string            `json:"username,omitempty"`
+	Password  string            `json:"password,omitempty"`
+	Email     string            `json:"email,omitempty"`
+	Extrainfo map[string]string `json:"extra_info,omitempty"`
+}
+
+type UpdateUserResp {
+	User UserInfo `json:"user"`
+}
+
+type DeleteUserReq {}
+
+type DeleteUserResp {
+	Success bool `json:"success"`
+}
+
+@server (
+	prefix: "/usercenter/v1"
+	group:  "user"
+)
+service usercenter {
+	@doc (
+		register: "注册"
+	)
+	@handler register
+	post /user/register (CreateUserReq) returns (CreateUserResp)
+
+	@doc (
+		login: "登录"
+	)
+	@handler login
+	post /user/login (LoginReq) returns (LoginResp)
+}
+
+//以下是需要登录的服务,假设使用jwt方案
+@server (
+	prefix: "/usercenter/v1"
+	group:  "user"
+	jwt:    UserAuth
+)
+service usercenter {
+	@doc (
+		getuser: "查询用户"
+	)
+	@handler getuser
+	get /user/get (GetUserReq) returns (GetUserResp)
+
+	@doc (
+		logout: "登出"
+	)
+	@handler logout
+	post /user/logout (LogoutReq) returns (LogoutResp)
+
+	@doc (
+		updateuser: "更新用户"
+	)
+	@handler updateuser
+	post /user/update (UpdateUserReq) returns (UpdateUserResp)
+
+	@doc (
+		deleteuser: "删除用户"
+	)
+	@handler deleteuser
+	delete /user/delete (DeleteUserReq) returns (DeleteUserResp)
+}
+

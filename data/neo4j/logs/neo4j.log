@@ -1,0 +1,15 @@
+2026-01-30 15:14:39.545+0000 INFO  Logging config in use: Embedded default config 'default-user-logs.xml'
+2026-01-30 15:14:39.558+0000 WARN  Setting 'dbms.logs.debug.level' is removed. It no longer has any effect.
+2026-01-30 15:14:39.583+0000 INFO  Starting...
+2026-01-30 15:14:41.155+0000 INFO  This instance is ServerId{867cff75} (867cff75-3736-45fe-81fb-93c39b0e6d70)
+2026-01-30 15:14:43.443+0000 INFO  ======== Neo4j 2025.12.1 ========
+2026-01-30 15:14:46.035+0000 INFO  Anonymous Usage Data is being sent to Neo4j, see https://neo4j.com/docs/usage-data/
+2026-01-30 15:14:46.864+0000 INFO  Bolt enabled on 0.0.0.0:7687.
+2026-01-30 15:14:47.909+0000 INFO  HTTP enabled on 0.0.0.0:7474.
+2026-01-30 15:14:47.910+0000 INFO  Remote interface available at http://localhost:7474/
+2026-01-30 15:14:47.914+0000 INFO  id: EB3DBD664D78CE87AAE48638B1D0C47501A0215F62BC12DEBEEB6EDD5719492B
+2026-01-30 15:14:47.915+0000 INFO  name: system
+2026-01-30 15:14:47.915+0000 INFO  creationDate: 2026-01-30T15:14:45.405Z
+2026-01-30 15:14:47.916+0000 INFO  Started.
+2026-01-30 17:34:06.393+0000 INFO  Neo4j Server shutdown initiated by request
+2026-01-30 17:34:06.427+0000 INFO  Stopping...

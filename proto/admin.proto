@@ -1,0 +1,141 @@
+syntax = "proto3";
+
+package admin;
+
+option go_package = "./pb";
+
+message AdminInfo{
+ int64 uid = 1;
+ string username = 2;
+ string email = 3;
+ map<string,string> extra_info = 4;
+}
+
+message UserInfo {
+ int64 uid = 1;
+ uint32 score = 2;
+ string username = 3;
+ string email = 4;
+ uint64 status = 5;
+ map<string,string> extra_info = 6;
+}
+
+message GetUserReq{
+ int64 uid = 1;
+}
+
+message GetUserResp{
+ UserInfo user = 1;
+ bool found = 2;
+}
+
+message GetSelfReq{
+ int64 uid = 1;
+}
+
+message GetSelfResp {
+  AdminInfo admin = 1;
+}
+
+message CreateAdminReq {
+  string username = 1;
+  string password = 2;
+  string email = 3;
+  map<string,string> extra_info = 4;
+}
+
+message CreateAdminResp {
+  int64 uid = 1;
+}
+
+message LoginReq{
+ string username = 1;
+ string password = 2;
+}
+
+message LoginResp{
+  int64 uid = 1;
+}
+
+message DeleteUserReq {
+  int64 uid = 1;
+}
+
+message DeleteUserResp {
+  bool success = 1;
+}
+
+message ResetUserPasswordReq{
+ int64 uid = 1;
+}
+
+message ResetUserPasswordResp {
+  bool success = 1;
+}
+
+message UpdateSelfReq {
+  int64 uid = 1;
+  string username = 2;
+  string password = 3;
+  string email = 4;
+  map<string,string> extra_info = 5;
+}
+
+message UpdateSelfResp {
+   bool success = 1;
+   AdminInfo admin = 2;
+}
+
+message UpdateUserReq {
+  int64 uid = 1;
+  string username = 2;
+  string password = 3;
+  string email = 4;
+  map<string,string> extra_info = 5;
+}
+
+message UpdateUserResp {
+  bool success = 1;
+  UserInfo user = 2;
+}
+
+message GetUserListReq {
+  int64 page = 1;
+  int64 page_size = 2;
+  string keyword = 3;
+}
+
+message GetUserListResp {
+  repeated UserInfo list = 1;
+  int64 total = 2;
+}
+
+message BanUserReq {
+  int64 uid = 1;
+}
+
+message BanUserResp {
+  bool success = 1;
+}
+
+message UnBanUserReq {
+  int64 uid = 1;
+}
+
+message UnBanUserResp {
+  bool success = 1;
+}
+
+service AdminService {
+  rpc GetUser(GetUserReq) returns (GetUserResp);
+  rpc GetUserList(GetUserListReq) returns (GetUserListResp);
+  rpc GetSelf(GetSelfReq) returns (GetSelfResp);
+  rpc CreateAdmin(CreateAdminReq) returns (CreateAdminResp);
+  rpc Login(LoginReq) returns (LoginResp);
+  rpc DeleteUser(DeleteUserReq) returns (DeleteUserResp);
+  rpc ResetUserPassword(ResetUserPasswordReq) returns (ResetUserPasswordResp);
+  rpc UpdateSelf(UpdateSelfReq) returns (UpdateSelfResp);
+  rpc UpdateUser(UpdateUserReq) returns (UpdateUserResp);
+  rpc BanUser(BanUserReq) returns (BanUserResp);
+  rpc UnBanUser(UnBanUserReq) returns (UnBanUserResp);
+}

@@ -1,3 +1,7 @@
 /Data
 /volumes
 /log
+
+.env
+
+*.exe

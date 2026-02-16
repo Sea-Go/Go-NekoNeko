@@ -1,0 +1,206 @@
+syntax = "v1"
+
+info (
+	title:   "Admin Center API"
+	desc:    "管理员中心 HTTP 网关,对接 AdminService gRPC"
+	version: "1.0.0"
+)
+
+type UserInfo {
+	Uid       int64             `json:"uid,string"`
+	Username  string            `json:"username"`
+	Status    int64             `json:"status"`
+	Email     string            `json:"email,omitempty"`
+	Extrainfo map[string]string `json:"extra_info,omitempty"`
+}
+
+type AdminInfo {
+	Uid       int64             `json:"uid,string"`
+	Username  string            `json:"username"`
+	Email     string            `json:"email"`
+	Extrainfo map[string]string `json:"extra_info,omitempty"`
+}
+
+type GetUserReq {
+	Uid int64 `form:"uid,string"`
+}
+
+type GetUserResp {
+	User  UserInfo `json:"user,omitempty"`
+	Found bool     `json:"found"`
+}
+
+type GetSelfReq {}
+
+type GetSelfResp {
+	Admin AdminInfo `json:"admin"`
+}
+
+type CreateAdminReq {
+	Username  string            `json:"username"`
+	Password  string            `json:"password"`
+	Email     string            `json:"email,omitempty"`
+	Extrainfo map[string]string `json:"extra_info,omitempty"`
+}
+
+type CreateAdminResp {
+	Uid int64 `json:"uid,string"`
+}
+
+type LoginReq {
+	Username string `json:"username"`
+	Password string `json:"password"`
+}
+
+type LoginResp {
+	Token string `json:"token"`
+}
+
+type DeleteUserReq {
+	Uid int64 `json:"uid,string"`
+}
+
+type DeleteUserResp {
+	Success bool `json:"success"`
+}
+
+type ResetUserPasswordReq {
+	Uid int64 `json:"uid,string"`
+}
+
+type ResetUserPasswordResp {
+	Success bool `json:"success"`
+}
+
+type UpdateSelfReq {
+	Username  string            `json:"username,omitempty"`
+	Password  string            `json:"password,omitempty"`
+	Email     string            `json:"email,omitempty"`
+	Extrainfo map[string]string `json:"extra_info,omitempty"`
+}
+
+type UpdateSelfResp {
+	Success bool      `json:"success"`
+	Admin   AdminInfo `json:"admin"`
+}
+
+type UpdateUserReq {
+	Uid       int64             `json:"uid,string"`
+	Username  string            `json:"username,omitempty"`
+	Password  string            `json:"password,omitempty"`
+	Email     string            `json:"email,omitempty"`
+	Extrainfo map[string]string `json:"extra_info,omitempty"`
+}
+
+type UpdateUserResp {
+	Success bool     `json:"success"`
+	User    UserInfo `json:"user"`
+}
+
+type GetUserListReq {
+	Page     int64  `form:"page,default=1"`
+	PageSize int64  `form:"page_size,default=20"`
+	Keyword  string `form:"keyword,omitempty"`
+}
+
+type GetUserListResp {
+	List  []UserInfo `json:"list"`
+	Total int64      `json:"total"`
+}
+
+type BanUserReq {
+	Uid int64 `json:"uid,string"`
+}
+
+type BanUserResp {
+	Success bool `json:"success"`
+}
+
+type UnBanUserReq {
+	Uid int64 `json:"uid,string"`
+}
+
+type UnBanUserResp {
+	Success bool `json:"success"`
+}
+
+@server (
+	prefix: "/admincenter/v1"
+	group:  "admin"
+)
+service admincenter {
+	@doc (
+		create: "创建"
+	)
+	@handler create
+	post /admin/create (CreateAdminReq) returns (CreateAdminResp)
+
+	@doc (
+		login: "登录"
+	)
+	@handler login
+	post /admin/login (LoginReq) returns (LoginResp)
+}
+
+//需要登录的服务,用jwt
+@server (
+	prefix: "/admincenter/v1"
+	group:  "admin"
+	jwt:    AdminAuth
+)
+service admincenter {
+	@doc (
+		getuser: "查询用户"
+	)
+	@handler getuser
+	get /admin/getuser (GetUserReq) returns (GetUserResp)
+
+	@doc (
+		getself: "查看自己"
+	)
+	@handler getself
+	get /admin/getself (GetSelfReq) returns (GetSelfResp)
+
+	@doc (
+		getuserlist: "获取指定用户列表"
+	)
+	@handler getuserlist
+	get /admin/getuserlist (GetUserListReq) returns (GetUserListResp)
+
+	@doc (
+		delete: "删除用户"
+	)
+	@handler delete
+	delete /admin/delete (DeleteUserReq) returns (DeleteUserResp)
+
+	@doc (
+		update: "修改个人信息"
+	)
+	@handler update
+	post /admin/update (UpdateSelfReq) returns (UpdateSelfResp)
+
+	@doc (
+		resetuserpassword: "重置user密码"
+	)
+	@handler resetuserpassword
+	post /admin/resetuserpassword (ResetUserPasswordReq) returns (ResetUserPasswordResp)
+
+	@doc (
+		updateuser: "修改用户信息"
+	)
+	@handler updateuser
+	post /admin/updateuser (UpdateUserReq) returns (UpdateUserResp)
+
+	@doc (
+		banuser: "封禁用户"
+	)
+	@handler banuser
+	post /admin/banuser (BanUserReq) returns (BanUserResp)
+
+	@doc (
+		unbanuser: "解封用户"
+	)
+	@handler unbanuser
+	post /admin/unbanuser (UnBanUserReq) returns (UnBanUserResp)
+}
+

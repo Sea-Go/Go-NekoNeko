@@ -30,7 +30,7 @@ func main() {
 	go Init.StartTaskGoKa(ctx)
 	go Init.StartTaskKafkaUserFilter(ctx)
 	go Init.StartTaskKafkaArticleFilter(ctx)
-	go Init.StartInitReward(ctx)
+	//go Init.StartInitReward(ctx)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		__.RegisterTaskServiceServer(grpcServer, server.NewTaskServiceServer(ctx))

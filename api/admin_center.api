@@ -7,8 +7,7 @@ info (
 )
 
 type UserInfo {
-	Id        uint64            `json:"id"`
-	Uid       int64             `json:"uid"`
+	Uid       int64             `json:"uid,string"`
 	Username  string            `json:"username"`
 	Status    int64             `json:"status"`
 	Email     string            `json:"email,omitempty"`
@@ -16,15 +15,14 @@ type UserInfo {
 }
 
 type AdminInfo {
-	Id        uint64            `json:"id"`
-	Uid       int64             `json:"uid"`
+	Uid       int64             `json:"uid,string"`
 	Username  string            `json:"username"`
 	Email     string            `json:"email"`
 	Extrainfo map[string]string `json:"extra_info,omitempty"`
 }
 
 type GetUserReq {
-	Uid int64 `form:"uid"`
+	Uid int64 `form:"uid,string"`
 }
 
 type GetUserResp {
@@ -46,7 +44,7 @@ type CreateAdminReq {
 }
 
 type CreateAdminResp {
-	Uid int64 `json:"uid"`
+	Uid int64 `json:"uid,string"`
 }
 
 type LoginReq {
@@ -59,7 +57,7 @@ type LoginResp {
 }
 
 type DeleteUserReq {
-	Uid int64 `json:"uid"`
+	Uid int64 `json:"uid,string"`
 }
 
 type DeleteUserResp {
@@ -67,7 +65,7 @@ type DeleteUserResp {
 }
 
 type ResetUserPasswordReq {
-	Uid int64 `json:"uid"`
+	Uid int64 `json:"uid,string"`
 }
 
 type ResetUserPasswordResp {
@@ -87,7 +85,7 @@ type UpdateSelfResp {
 }
 
 type UpdateUserReq {
-	Uid       int64             `json:"uid"`
+	Uid       int64             `json:"uid,string"`
 	Username  string            `json:"username,omitempty"`
 	Password  string            `json:"password,omitempty"`
 	Email     string            `json:"email,omitempty"`
@@ -111,7 +109,7 @@ type GetUserListResp {
 }
 
 type BanUserReq {
-	Uid int64 `json:"uid"`
+	Uid int64 `json:"uid,string"`
 }
 
 type BanUserResp {
@@ -119,7 +117,7 @@ type BanUserResp {
 }
 
 type UnBanUserReq {
-	Uid int64 `json:"uid"`
+	Uid int64 `json:"uid,string"`
 }
 
 type UnBanUserResp {
@@ -130,7 +128,6 @@ type UnBanUserResp {
 	prefix: "/admincenter/v1"
 	group:  "admin"
 )
-
 service admincenter {
 	@doc (
 		create: "创建"

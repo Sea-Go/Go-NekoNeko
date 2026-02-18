@@ -1,0 +1,17 @@
+Name: admincenter
+Host: 0.0.0.0
+Port: 8889
+
+Log:
+  ServiceName: admincenter
+  Mode: file       
+  Path: ../../../../log/admin
+
+AdminAuth:
+  AccessSecret : "yU-hCm)2*?NQmWG"
+  AccessExpire : 86400
+AdminRpc:
+ Etcd:
+  Hosts:
+   - 127.0.0.1:32379
+  Key: admin.rpc

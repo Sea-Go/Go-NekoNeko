@@ -1,0 +1,18 @@
+Name: usercenter
+Host: 0.0.0.0
+Port: 8888
+
+Log:
+  ServiceName: usercenter
+  Mode: file        
+  Path: ../../../../log/user  
+
+UserAuth:
+ AccessSecret: ae0536f9-6450-4606-8e13-5a19ed505da0
+ AccessExpire: 31536000
+
+UserRpc:
+ Etcd:
+  Hosts:
+   - 127.0.0.1:32379
+  Key: user.rpc

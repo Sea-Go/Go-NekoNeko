@@ -1,0 +1,244 @@
+
+syntax = "proto3";
+
+package pb;
+
+option go_package = "./pb";
+
+
+
+//参考B站设计用枚举类型表示某条评论的状态
+enum CommentState {
+    STATE_NORMAL = 0; //正常
+    STATE_REVIEWING = 1; //审核中
+    STATE_DELETED = 2; //评论被删除
+    STATE_BLOCKED = 3; //评论被封禁
+}
+
+//评论区状态
+enum SubjectState {
+    SUBJECT_OPEN = 0; //正常
+    SUBJECT_CLOSED = 1; //评论区关闭
+    SUBJECT_ONLY = 2; //仅粉丝可互动
+}
+
+enum ReportReason {
+    REASON_UNKNOWN = 0;
+    //垃圾广告
+    REASON_SPAM_ADVERT = 1;
+    //色情低俗
+    REASON_PORN_VULGAR = 2;
+    //人身攻击
+    REASON_HARASSMENT_ABUSE = 3;
+    //违法违规
+    REASON_ILLEGAL_COTENT = 4;
+    //诈骗钓鱼
+    REASON_FRAUD_SCAM = 5;
+    //恶意剧透
+    REASON_SPOILER = 6;
+    //侵犯隐私
+    REASON_PRIVACY_LEAK = 7;
+    //刷屏水军
+    REASON_MEANINGLESS_SPAM = 8;
+    //...预留其他违规类型
+    REASON_OTHER = 99;
+}
+
+enum ManageType {
+  UNKNOWN = 0;
+  //置顶
+  MANAGE_PIN = 1;
+  //取消置顶
+  MANAGE_UNPIN = 2;
+  //精选
+  MANAGE_FEATURE = 3;
+  //取消精选
+  MANAGE_UNFEATURE = 4;
+}
+
+message CommentItem {
+    //评论Id
+    int64 id = 1;
+    //发布者Id
+    string user_id = 2;
+    //评论内容
+    string content = 3;
+    //评论结构部分参考了B站的那篇文章
+    //根评论的id
+    int64 root_id = 4;
+    //父评论的id
+    int64 parent_id = 5;
+    //点赞数
+    int64 like_count = 6;
+    //点踩数
+    int64 dislike_count = 7;
+    //该评论下的评论数
+    int64 reply_count = 8;
+    //该评论的属性,同样参考了B站的设计
+    //用类似bitset的东西来存属性
+    //目前设计的是第0位表示作者赞过,第1位表示作者回复过,第2位表示评论置顶,第3位表示评论精选
+    int64 attribute = 9;
+    //该评论的状态
+    CommentState state = 10;
+    //创建时间
+    string created_at = 11;
+    //可扩展
+    string meta = 12;
+    //该评论下的2-3条子评论
+    repeated CommentItem children = 13;
+}
+
+message SubjectInfo {
+  //该评论区所属内容的类型,包括article,vedio等
+  string target_type = 1;
+  //所属内容的ID,例如B站的BV号
+  string target_id = 2;
+  //总评论数
+  int64 total_count = 3;
+  //总的根评论数
+  int64 root_count = 4;
+  //评论区状态
+  SubjectState state = 5;
+  //评论区属性,比如第0位为0表示按热度排序,1表示按照时间排序,第1位表示能否附带图片,...
+  int64 attribute = 6;
+}
+
+message CreateCommentReq {
+  //发布者id
+  string user_id = 1;
+  //该评论区所属内容的类型,包括article,vedio等
+  string target_type = 2;
+  //所属内容的ID,例如B站的BV号
+  string target_id = 3;
+  //顶层楼主id
+  int64 root_id = 4;
+  //回复的评论id
+  int64 parent_id = 5;
+  //评论内容
+  string content = 6;
+  //扩展内容
+  string meta = 7;
+}
+
+message CreateCommentResp {
+  //评论id
+  int64 id = 1;
+  //创建时间
+  string created_at = 2;
+  //操作后评论区的总评论数
+  int64 subject_count = 3;
+}
+
+message GetCommentReq {
+  //所属内容类型
+  string target_type = 1;
+  //所属内容id
+  string target_id = 2;
+  //评论的排序方式,0表示按热度,1表示按时间
+  int64 sort_type = 3;
+  //根评论id,为0表示查询根评论
+  int64 root_id = 4;
+  //页码
+  int64 page = 5;
+  //每一页大小
+  int64 page_size = 6;
+}
+
+message GetCommentResp {
+  //评论内容
+  repeated CommentItem comment = 1;
+  //评论区
+  SubjectInfo subject = 2;
+}
+
+message LikeCommentReq {
+  //点赞者id
+  string user_id = 1;
+  //评论所属内容类型
+  string target_type = 2;
+  //内容id
+  string target_id = 3;
+  //点赞的评论id
+  int64 comment_id = 4;
+  //1表示点赞,2表示取消点赞,3表示点踩,4表示取消点踩
+  int32 action_type = 5;
+}
+
+message LikeCommentResp {
+  //操作是否成功
+  bool success = 1;
+  //操作后的点赞数
+  int64 like_count = 2;
+}
+
+message DeleteCommentReq {
+  //操作人id,用于检测是否为本人或up主操作防止出现安全问题
+  string user_id = 1;
+  //评论id
+  int64 comment_id = 2;
+  //同上
+  string target_type = 3;
+  string target_id = 4;
+}
+
+message DeleteCommentResp {
+  //操作是否成功
+  bool success = 1;
+  //删除后评论区剩下的评论数
+  int64 subject_total_count = 2;
+}
+
+//置顶评论
+message ManageCommentReq {
+  //参数含义同Delete部分
+  string user_id = 1;
+  int64 comment_id = 2;
+  string target_type = 3;
+  string target_id = 4;
+  //管理类型
+  ManageType action_type = 5;
+}
+
+message ManageCommentResp {
+    bool success = 1;
+}
+
+//举报评论
+message ReportCommentReq {
+  string user_id = 1;
+  int64 comment_id = 2;
+  string target_type = 3;
+  string target_id = 4;
+  //举报原因
+  ReportReason reason = 5;
+  //具体举报内容
+  string detail = 6;
+}
+
+message ReportCommentResp {
+  bool success = 1;
+}
+
+message UpdateSubjectStateReq {
+  //只有up主或管理员才有权关闭评论区
+  string user_id = 1;
+  string target_type = 2;
+  string target_id = 3;
+  //目标状态
+  SubjectState state = 4;
+}
+
+message UpdateSubjectStateResp {
+  bool success = 1;
+}
+
+service CommentService {
+  rpc CreateComment (CreateCommentReq) returns (CreateCommentResp);
+  rpc GetComment (GetCommentReq) returns (GetCommentResp);
+  rpc DeleteComment (DeleteCommentReq) returns (DeleteCommentResp);
+  rpc LikeComment (LikeCommentReq) returns (LikeCommentResp);
+  rpc ReportComment (ReportCommentReq) returns (ReportCommentResp);
+  rpc ManageComment (ManageCommentReq) returns (ManageCommentResp);
+  rpc UpdateSubjectState (UpdateSubjectStateReq) returns (UpdateSubjectStateResp);
+  
+}

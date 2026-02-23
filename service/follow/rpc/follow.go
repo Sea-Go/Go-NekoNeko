@@ -1,10 +1,13 @@
 package main
 
 import (
+	"context"
 	"flag"
-	"fmt"
+
+	"sea-try-go/service/common/logger"
 
 	"sea-try-go/service/follow/rpc/internal/config"
+	"sea-try-go/service/follow/rpc/internal/metrics"
 	"sea-try-go/service/follow/rpc/internal/server"
 	"sea-try-go/service/follow/rpc/internal/svc"
 	"sea-try-go/service/follow/rpc/pb"
@@ -24,6 +27,8 @@ func main() {
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
 	ctx := svc.NewServiceContext(c)
+	logger.Init(c.Name)
+	metrics.InitMetrics(&c)
 
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		pb.RegisterFollowServiceServer(grpcServer, server.NewFollowServiceServer(ctx))
@@ -34,6 +39,6 @@ func main() {
 	})
 	defer s.Stop()
 
-	fmt.Printf("Starting rpc server at %s...\n", c.ListenOn)
+	logger.LogInfo(context.Background(), "Starting rpc server", nil)
 	s.Start()
 }

@@ -2,5 +2,46 @@ Name: task.rpc
 ListenOn: 0.0.0.0:8080
 Etcd:
   Hosts:
-  - 127.0.0.1:2379
+  - 127.0.0.1:32379
   Key: task.rpc
+
+Kafka:
+  Brokers:
+    - 127.0.0.1:39092
+  InTopic: task.logs.raw
+  RawUserTopic: task.logs.raw.User
+  RawArticleTopic: task.logs.raw.Article
+  OutUserTopic: task.logs.filtered.User
+  OutArticleTopic: task.logs.filtered.Article
+
+  GroupKafkaRaw: task.rpc.consumer31
+  GroupKafkaFilter: task.rpc.consumer101
+
+  GroupGoKa: task.rpc.consumer41
+
+  GroupGoKaUser: task.rpc.consumer61
+  GroupGoKaArticle: task.rpc.consumer71
+
+  GroupFilterUser: task.rpc.consumer81
+  GroupFilterArticle: task.rpc.consumer91
+  
+  Offset: latest         # latest / earliest
+  Consumers: 8           # 并发消费协程数
+  Processors: 8
+
+LikeRedis:
+  Addr: 127.0.0.1:36379
+  Pass: ""
+  DB: 0
+  DialTimeoutMs: 500
+  ReadTimeoutMs: 1000
+  WriteTimeoutMs: 1000
+  PoolSize: 200
+  MinIdleConns: 20
+  consumerName: task.reward.test
+
+Postgres:
+  Dsn: "host=127.0.0.1 user=admin password=Sea-TryGo dbname=first_db port=35432 sslmode=disable TimeZone=Asia/Shanghai"
+  MaxOpenConns: 50
+  MaxIdleConns: 50
+  ConnMaxLifetimeMinutes: 30

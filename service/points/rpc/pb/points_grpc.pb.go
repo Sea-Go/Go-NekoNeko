@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PointsService_AddPoints_FullMethodName = "/points.PointsService/AddPoints"
+	PointsService_AddPoints_FullMethodName = "/points.PointsService/reward"
 	PointsService_DecPoints_FullMethodName = "/points.PointsService/DecPoints"
 )
 
@@ -76,7 +76,11 @@ type PointsServiceServer interface {
 type UnimplementedPointsServiceServer struct{}
 
 func (UnimplementedPointsServiceServer) AddPoints(context.Context, *AddPointsReq) (*AddPointsResp, error) {
+<<<<<<< HEAD
+	return nil, status.Errorf(codes.Unimplemented, "method reward not implemented")
+=======
 	return nil, status.Error(codes.Unimplemented, "method AddPoints not implemented")
+>>>>>>> main
 }
 func (UnimplementedPointsServiceServer) DecPoints(context.Context, *DecPointsReq) (*DecPointsResp, error) {
 	return nil, status.Error(codes.Unimplemented, "method DecPoints not implemented")
@@ -146,7 +150,7 @@ var PointsService_ServiceDesc = grpc.ServiceDesc{
 	HandlerType: (*PointsServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
-			MethodName: "AddPoints",
+			MethodName: "reward",
 			Handler:    _PointsService_AddPoints_Handler,
 		},
 		{

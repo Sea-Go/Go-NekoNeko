@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"sea-try-go/service/points/rpc/internal/svc"
-	"sea-try-go/service/points/rpc/pb"
+	pb "sea-try-go/service/points/rpc/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -23,8 +23,10 @@ func NewAddPointsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *AddPoin
 	}
 }
 
-func (l *AddPointsLogic) AddPoints(in *__.AddPointsReq) (*__.AddPointsResp, error) {
-	// todo: add your logic here and delete this line
-
-	return &__.AddPointsResp{}, nil
+func (l *AddPointsLogic) AddPoints(in *pb.AddPointsReq) (*pb.AddPointsResp, error) {
+	result, err := ProcessPoints(l.ctx, l.svcCtx, in.UserId, in.RequestId, in.AddPoints)
+	if err != nil {
+		return nil, err
+	}
+	return &pb.AddPointsResp{Success: result.Success, Message: result.Message}, nil
 }

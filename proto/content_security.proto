@@ -1,0 +1,29 @@
+syntax = "proto3";
+
+package content_security;
+
+option go_package = "sea-try-go/service/content-security/rpc/pb";
+
+message SanitizeContentRequest {
+  string text = 1;
+  SanitizeOptions options = 2;
+}
+
+message SanitizeOptions {
+  bool enable_html_sanitization = 1;
+  bool enable_ad_detection = 2;
+  bool enable_unicode_normalization = 3;
+  bool enable_whitespace_normalization = 4;
+}
+
+message SanitizeContentResponse {
+  string sanitized_text = 1;
+  bool is_ad = 2;
+  float ad_confidence = 3;
+  bool success = 4;
+  string error_message = 5;
+}
+
+service ContentSecurityService {
+  rpc SanitizeContent(SanitizeContentRequest) returns (SanitizeContentResponse);
+}

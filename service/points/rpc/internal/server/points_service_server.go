@@ -14,7 +14,7 @@ import (
 
 type PointsServiceServer struct {
 	svcCtx *svc.ServiceContext
-	__.UnimplementedPointsServiceServer
+	pb.UnimplementedPointsServiceServer
 }
 
 func NewPointsServiceServer(svcCtx *svc.ServiceContext) *PointsServiceServer {
@@ -23,12 +23,12 @@ func NewPointsServiceServer(svcCtx *svc.ServiceContext) *PointsServiceServer {
 	}
 }
 
-func (s *PointsServiceServer) AddPoints(ctx context.Context, in *__.AddPointsReq) (*__.AddPointsResp, error) {
+func (s *PointsServiceServer) AddPoints(ctx context.Context, in *pb.AddPointsReq) (*pb.AddPointsResp, error) {
 	l := logic.NewAddPointsLogic(ctx, s.svcCtx)
 	return l.AddPoints(in)
 }
 
-func (s *PointsServiceServer) DecPoints(ctx context.Context, in *__.DecPointsReq) (*__.DecPointsResp, error) {
+func (s *PointsServiceServer) DecPoints(ctx context.Context, in *pb.DecPointsReq) (*pb.DecPointsResp, error) {
 	l := logic.NewDecPointsLogic(ctx, s.svcCtx)
 	return l.DecPoints(in)
 }

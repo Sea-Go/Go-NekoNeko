@@ -1,0 +1,11 @@
+Name: task-api
+Host: 0.0.0.0
+Port: 8888
+
+TaskRpc:
+  Target: 127.0.0.1:8080
+  NonBlock: true
+
+Auth:
+  AccessSecret: "replace-with-a-long-random-secret"
+  AccessExpire: 1800

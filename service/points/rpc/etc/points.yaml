@@ -1,6 +1,50 @@
 Name: points.rpc
-ListenOn: 0.0.0.0:8080
+ListenOn: 0.0.0.0:8081
+
+Postgres:
+  Host: "127.0.0.1"
+  Port: "35432"
+  User: "admin"
+  Password: "Sea-TryGo"
+  DBName: "first_db"
+  Mode: "disable"
+
 Etcd:
   Hosts:
-  - 127.0.0.1:2379
+  - 127.0.0.1:32379
   Key: points.rpc
+
+RetryDqConf:
+  Beanstalks:
+    - Endpoint: 127.0.0.1:41300
+      Tube: points_retry_tube
+    - Endpoint: 127.0.0.1:41301
+      Tube: points_retry_tube2
+  Redis:
+    Host: 127.0.0.1:36379
+    Type: node
+
+DqConf:
+  Beanstalks:
+    - Endpoint: 127.0.0.1:41300
+      Tube: points_retry_tube
+    - Endpoint: 127.0.0.1:41301
+      Tube: points_retry_tube2
+  Redis:
+    Host: 127.0.0.1:36379
+    Type: node
+
+KqPusherConf:
+  Brokers:
+    - 127.0.0.1:39092
+  Topic: points_topic
+
+KqConsumerConf:
+  Name: kqConsumer
+  Brokers:
+    - 127.0.0.1:39092
+  Group: kqConsumer
+  Topic:  points_topic
+  Offset: first
+  Consumers: 8
+  Processors: 8

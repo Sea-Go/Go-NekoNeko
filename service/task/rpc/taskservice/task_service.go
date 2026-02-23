@@ -14,21 +14,12 @@ import (
 )
 
 type (
-	CreateTaskReq  = __.CreateTaskReq
-	CreateTaskResp = __.CreateTaskResp
-	DeleteTaskReq  = __.DeleteTaskReq
-	DeleteTaskResp = __.DeleteTaskResp
-	GetTaskReq     = __.GetTaskReq
-	GetTaskResp    = __.GetTaskResp
-	Task           = __.Task
-	UpdateTaskReq  = __.UpdateTaskReq
-	UpdateTaskResp = __.UpdateTaskResp
+	GetTaskReq  = __.GetTaskReq
+	GetTaskResp = __.GetTaskResp
+	Task        = __.Task
 
 	TaskService interface {
 		GetTask(ctx context.Context, in *GetTaskReq, opts ...grpc.CallOption) (*GetTaskResp, error)
-		CreateTask(ctx context.Context, in *CreateTaskReq, opts ...grpc.CallOption) (*CreateTaskResp, error)
-		UpdateTask(ctx context.Context, in *UpdateTaskReq, opts ...grpc.CallOption) (*UpdateTaskResp, error)
-		DeleteTask(ctx context.Context, in *DeleteTaskReq, opts ...grpc.CallOption) (*DeleteTaskResp, error)
 	}
 
 	defaultTaskService struct {
@@ -45,19 +36,4 @@ func NewTaskService(cli zrpc.Client) TaskService {
 func (m *defaultTaskService) GetTask(ctx context.Context, in *GetTaskReq, opts ...grpc.CallOption) (*GetTaskResp, error) {
 	client := __.NewTaskServiceClient(m.cli.Conn())
 	return client.GetTask(ctx, in, opts...)
-}
-
-func (m *defaultTaskService) CreateTask(ctx context.Context, in *CreateTaskReq, opts ...grpc.CallOption) (*CreateTaskResp, error) {
-	client := __.NewTaskServiceClient(m.cli.Conn())
-	return client.CreateTask(ctx, in, opts...)
-}
-
-func (m *defaultTaskService) UpdateTask(ctx context.Context, in *UpdateTaskReq, opts ...grpc.CallOption) (*UpdateTaskResp, error) {
-	client := __.NewTaskServiceClient(m.cli.Conn())
-	return client.UpdateTask(ctx, in, opts...)
-}
-
-func (m *defaultTaskService) DeleteTask(ctx context.Context, in *DeleteTaskReq, opts ...grpc.CallOption) (*DeleteTaskResp, error) {
-	client := __.NewTaskServiceClient(m.cli.Conn())
-	return client.DeleteTask(ctx, in, opts...)
 }

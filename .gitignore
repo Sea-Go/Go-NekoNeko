@@ -5,3 +5,5 @@
 .env
 
 *.exe
+
+.gocache

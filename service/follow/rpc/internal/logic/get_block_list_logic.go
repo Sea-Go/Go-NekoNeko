@@ -2,7 +2,12 @@ package logic
 
 import (
 	"context"
+	"fmt"
+	"time"
 
+	"sea-try-go/service/common/logger"
+	"sea-try-go/service/follow/common/errmsg"
+	"sea-try-go/service/follow/rpc/internal/metrics"
 	"sea-try-go/service/follow/rpc/internal/svc"
 	"sea-try-go/service/follow/rpc/pb"
 
@@ -20,10 +25,20 @@ func NewGetBlockListLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetB
 }
 
 func (l *GetBlockListLogic) GetBlockList(in *pb.ListReq) (*pb.UserListResp, error) {
+	start := time.Now()
+	resultLabel := "ok"
+	defer func() {
+		metrics.FollowRequestCounterMetric.WithLabelValues("follow_rpc", "GetBlockList", resultLabel).Inc()
+		metrics.FollowRequestSecondsCounterMetric.WithLabelValues("follow_rpc", "GetBlockList").Add(time.Since(start).Seconds())
+	}()
+
 	ids, err := l.svcCtx.FollowModel.GetBlockList(l.ctx, in.UserId, in.Offset, in.Limit)
 	if err != nil {
-		l.Logger.Errorf("GetBlockList db err: %v", err)
-		return &pb.UserListResp{Code: 500, Msg: "DB Error"}, err
+		resultLabel = "sys_fail"
+		logger.LogBusinessErr(l.ctx, errmsg.ErrorDbRead, fmt.Errorf("GetBlockList db err: %w", err))
+		return &pb.UserListResp{Code: errmsg.ErrorDbRead, Msg: errmsg.GetErrMsg(errmsg.ErrorDbRead)}, err
 	}
-	return &pb.UserListResp{Code: 0, Msg: "success", UserIds: ids}, nil
+
+	metrics.FollowListSizeGaugeMetric.WithLabelValues("follow_list", "blocked").Set(float64(len(ids)))
+	return &pb.UserListResp{Code: errmsg.Success, Msg: errmsg.GetErrMsg(errmsg.Success), UserIds: ids}, nil
 }

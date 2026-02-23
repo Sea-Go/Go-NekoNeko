@@ -2,7 +2,12 @@ package logic
 
 import (
 	"context"
+	"fmt"
+	"time"
 
+	"sea-try-go/service/common/logger"
+	"sea-try-go/service/follow/common/errmsg"
+	"sea-try-go/service/follow/rpc/internal/metrics"
 	"sea-try-go/service/follow/rpc/internal/svc"
 	"sea-try-go/service/follow/rpc/pb"
 
@@ -20,10 +25,20 @@ func NewUnblockLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UnblockLo
 }
 
 func (l *UnblockLogic) Unblock(in *pb.RelationReq) (*pb.BaseResp, error) {
+	start := time.Now()
+	resultLabel := "ok"
+	defer func() {
+		metrics.FollowRequestCounterMetric.WithLabelValues("follow_rpc", "Unblock", resultLabel).Inc()
+		metrics.FollowRequestSecondsCounterMetric.WithLabelValues("follow_rpc", "Unblock").Add(time.Since(start).Seconds())
+	}()
+
 	err := l.svcCtx.FollowModel.UnblockUser(l.ctx, in.UserId, in.TargetId)
 	if err != nil {
-		l.Logger.Errorf("UnblockUser db err: %v", err)
-		return &pb.BaseResp{Code: 500, Msg: "DB Error"}, err
+		resultLabel = "sys_fail"
+		metrics.FollowRelationCounterMetric.WithLabelValues("follow_relation", "unblock", "fail").Inc()
+		logger.LogBusinessErr(l.ctx, errmsg.ErrorDbWrite, fmt.Errorf("UnblockUser db err: %w", err))
+		return &pb.BaseResp{Code: errmsg.ErrorDbWrite, Msg: errmsg.GetErrMsg(errmsg.ErrorDbWrite)}, err
 	}
-	return &pb.BaseResp{Code: 0, Msg: "success"}, nil
+	metrics.FollowRelationCounterMetric.WithLabelValues("follow_relation", "unblock", "ok").Inc()
+	return &pb.BaseResp{Code: errmsg.Success, Msg: errmsg.GetErrMsg(errmsg.Success)}, nil
 }

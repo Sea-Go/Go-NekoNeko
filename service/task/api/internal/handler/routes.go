@@ -17,26 +17,10 @@ func RegisterHandlers(server *rest.Server, serverCtx *svc.ServiceContext) {
 		[]rest.Route{
 			{
 				Method:  http.MethodPost,
-				Path:    "/task/create",
-				Handler: task.CreateHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/task/delete",
-				Handler: task.DeleteTaskHandler(serverCtx),
-			},
-			{
-				Method:  http.MethodPost,
 				Path:    "/task/get",
 				Handler: task.GetTaskHandler(serverCtx),
 			},
-			{
-				Method:  http.MethodPost,
-				Path:    "/task/update",
-				Handler: task.UpdateTaskHandler(serverCtx),
-			},
 		},
-		rest.WithJwt(serverCtx.Config.Auth.AccessSecret),
 		rest.WithPrefix("/taskcenter/v1"),
 	)
 }

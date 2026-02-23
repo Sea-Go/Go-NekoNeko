@@ -30,21 +30,21 @@ const (
 )
 
 type ArticleLikeTaskProgress struct {
-	UserID    int64 `gorm:"primary_key;column:user_id"`
-	TaskID    int64 `gorm:"primary_key;column:task_id"`
-	ArticleID int64 `gorm:"primary_key;column:article_id"`
+	UserID int64 `gorm:"primary_key;column:user_id"`
+	TaskID int64 `gorm:"primary_key;column:task_id"`
+	//ArticleID int64 `gorm:"primary_key;column:article_id"`
 
 	Status   string `gorm:"column:status"`
 	Progress int64  `gorm:"column:progress"`
 	Target   int64  `gorm:"column:target"`
 
-	DoneAt    *time.Time `gorm:"column:done_at"`
-	CreatedAt time.Time  `gorm:"column:created_at"`
-	UpdatedAt time.Time  `gorm:"column:updated_at"`
+	/*	DoneAt    *time.Time `gorm:"column:done_at"`
+		CreatedAt time.Time  `gorm:"column:created_at"`
+		UpdatedAt time.Time  `gorm:"column:updated_at"`*/
 }
 
 func (ArticleLikeTaskProgress) TableName() string {
-	return "article_like_task_progress"
+	return "task_progress"
 }
 
 type ArticleLikeSinkConsumer struct {
@@ -305,17 +305,17 @@ func (c *ArticleLikeSinkConsumer) lazyInitTaskIfNeeded(ctx context.Context, batc
 	records := make([]ArticleLikeTaskProgress, 0, len(newOnes))
 	for _, p := range newOnes {
 		records = append(records, ArticleLikeTaskProgress{
-			UserID:    p.userID,
-			TaskID:    articleTaskID,
-			ArticleID: p.articleID,
-			Status:    "doing",
-			Progress:  0,
-			Target:    articleTarget,
+			UserID: p.userID,
+			TaskID: articleTaskID,
+			/*	ArticleID: p.articleID,*/
+			Status:   "doing",
+			Progress: 0,
+			Target:   articleTarget,
 		})
 	}
 
 	return c.gdb.Clauses(clause.OnConflict{
-		Columns:   []clause.Column{{Name: "user_id"}, {Name: "task_id"}, {Name: "article_id"}},
+		Columns:   []clause.Column{{Name: "user_id"}, {Name: "task_id"}},
 		DoNothing: true,
 	}).Create(&records).Error
 }
@@ -417,26 +417,27 @@ func (c *ArticleLikeSinkConsumer) markTaskDoneInDB(userID int64, articleID int64
 		return err
 	}*/
 	res := ArticleLikeTaskProgress{
-		UserID:    userID,
-		TaskID:    articleTaskID,
-		ArticleID: articleID,
-		Status:    "done",
-		Progress:  articleTarget,
-		Target:    articleTarget,
-		DoneAt:    &doneAt,
+		UserID: userID,
+		TaskID: articleTaskID,
+		//ArticleID: articleID,
+		Status:   "done",
+		Progress: articleTarget,
+		Target:   articleTarget,
+		//DoneAt:    &doneAt,
 	}
 
 	return c.gdb.Clauses(clause.OnConflict{
 		Columns: []clause.Column{
 			{Name: "user_id"},
 			{Name: "task_id"},
-			{Name: "article_id"},
+			//{Name: "article_id"},
 		},
 		DoUpdates: clause.Assignments(map[string]interface{}{
-			"status":   "done",
-			"progress": articleTarget,
-			"target":   articleTarget,
-			"done_at":  gorm.Expr("COALESCE(article_like_task_progress.done_at, EXCLUDED.done_at)"),
+			"status":     "done",
+			"progress":   articleTarget,
+			"target":     articleTarget,
+			"done_at":    gorm.Expr("COALESCE(task_progress.done_at, now())"),
+			"updated_at": gorm.Expr("now()"),
 		}),
 	}).Create(&res).Error
 }

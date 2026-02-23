@@ -23,17 +23,17 @@ func (UserLikeCount) TableName() string {
 }
 
 func (UserTaskProgress) TableName() string {
-	return "user_total_like_task_progress"
+	return "task_progress"
 }
 
 const (
-	taskID = "test"
+	taskID = int64(1902)
 	target = 5
 )
 
 type UserTaskProgress struct {
-	UserID   string `gorm:"primary_key;column:user_id"`
-	TaskID   string `gorm:"primary_key;column:task_id"`
+	UserID   int64  `gorm:"primary_key;column:user_id"`
+	TaskID   int64  `gorm:"primary_key;column:task_id"`
 	Status   string `gorm:"column:status"`
 	Progress int64  `gorm:"column:progress"`
 	Target   int64  `gorm:"column:target"`
@@ -44,7 +44,7 @@ type LikeSinkConsumer struct {
 	gdb *gorm.DB
 
 	mu    sync.Mutex
-	delta map[string]int64
+	delta map[int64]int64
 
 	flushEvery   time.Duration
 	redisPipeMax int
@@ -55,7 +55,7 @@ type LikeSinkConsumer struct {
 }
 
 type row struct {
-	uid   string
+	uid   int64
 	delta int64
 }
 
@@ -63,7 +63,7 @@ func NewUserLikeSinkConsumer(rdb *redis.Client, gdb *gorm.DB) *LikeSinkConsumer 
 	return &LikeSinkConsumer{
 		rdb:           rdb,
 		gdb:           gdb,
-		delta:         make(map[string]int64, 1<<16),
+		delta:         make(map[int64]int64, 1<<16),
 		flushEvery:    1 * time.Second,
 		redisPipeMax:  5000,
 		pgBatchMax:    2000,
@@ -77,8 +77,11 @@ func (c *LikeSinkConsumer) Start(ctx context.Context) {
 }
 
 func (c *LikeSinkConsumer) Consume(ctx context.Context, key string, val string) error {
-	userID := key
-	if userID == "" {
+	userID, err := strconv.ParseInt(key, 10, 63)
+	if err != nil {
+		return err
+	}
+	if userID <= 0 {
 		return nil
 	}
 
@@ -133,11 +136,11 @@ func (c *LikeSinkConsumer) flushOnce(ctx context.Context) error {
 	return nil
 }
 
-func (c *LikeSinkConsumer) lazyInitTaskIfNeeded(ctx context.Context, batch map[string]int64) error {
+func (c *LikeSinkConsumer) lazyInitTaskIfNeeded(ctx context.Context, batch map[int64]int64) error {
 
 	pipe := c.rdb.Pipeline()
 	type item struct {
-		uid string
+		uid int64
 		cmd *redis.BoolCmd
 	}
 	size := 0
@@ -152,10 +155,11 @@ func (c *LikeSinkConsumer) lazyInitTaskIfNeeded(ctx context.Context, batch map[s
 	}
 
 	items := make([]item, 0, len(batch))
-	for uid := range batch {
-		k := "task:init:" + uid + ":" + taskID
+	for _uid := range batch {
+		uid := strconv.FormatInt(_uid, 10)
+		k := "task:init:" + uid + ":" + strconv.FormatInt(taskID, 10)
 		size++
-		items = append(items, item{uid: uid, cmd: pipe.SetNX(ctx, k, "1", 90*24*time.Hour)})
+		items = append(items, item{uid: _uid, cmd: pipe.SetNX(ctx, k, "1", 90*24*time.Hour)})
 		if size >= c.redisPipeMax {
 			if err := exec(); err != nil {
 				return err
@@ -166,7 +170,7 @@ func (c *LikeSinkConsumer) lazyInitTaskIfNeeded(ctx context.Context, batch map[s
 		return err
 	}
 
-	newUsers := make([]string, 0)
+	newUsers := make([]int64, 0)
 	for _, it := range items {
 		ok, err := it.cmd.Result()
 		if err == nil && ok {
@@ -179,8 +183,9 @@ func (c *LikeSinkConsumer) lazyInitTaskIfNeeded(ctx context.Context, batch map[s
 
 	pipe2 := c.rdb.Pipeline()
 	now := time.Now().Unix()
-	for _, uid := range newUsers {
-		pk := "task:progress:" + uid + ":" + taskID
+	for _, _uid := range newUsers {
+		uid := strconv.FormatInt(_uid, 10)
+		pk := "task:progress:" + uid + ":" + strconv.FormatInt(taskID, 10)
 		pipe2.HSet(ctx, pk,
 			"status", "doing",
 			"progress", 0,
@@ -209,7 +214,7 @@ func (c *LikeSinkConsumer) lazyInitTaskIfNeeded(ctx context.Context, batch map[s
 	}).Create(&records).Error
 }
 
-func (c *LikeSinkConsumer) swap() map[string]int64 {
+func (c *LikeSinkConsumer) swap() map[int64]int64 {
 
 	c.mu.Lock()
 	defer c.mu.Unlock()
@@ -218,16 +223,16 @@ func (c *LikeSinkConsumer) swap() map[string]int64 {
 		return nil
 	}
 	b := c.delta
-	c.delta = make(map[string]int64, 1<<16)
+	c.delta = make(map[int64]int64, 1<<16)
 	return b
 }
 
-func (c *LikeSinkConsumer) flushRedis(ctx context.Context, batch map[string]int64) error {
+func (c *LikeSinkConsumer) flushRedis(ctx context.Context, batch map[int64]int64) error {
 	pipe := c.rdb.Pipeline()
 	n := 0
 
 	lens := min(len(batch), c.redisPipeMax+1)
-	cmds := make(map[string]*redis.IntCmd, lens)
+	cmds := make(map[int64]*redis.IntCmd, lens)
 
 	exec := func() error {
 		if n == 0 {
@@ -237,7 +242,7 @@ func (c *LikeSinkConsumer) flushRedis(ctx context.Context, batch map[string]int6
 		if err != nil {
 			pipe = c.rdb.Pipeline()
 			n = 0
-			cmds = make(map[string]*redis.IntCmd, lens)
+			cmds = make(map[int64]*redis.IntCmd, lens)
 			return err
 		}
 		for uid, cmd := range cmds {
@@ -252,12 +257,12 @@ func (c *LikeSinkConsumer) flushRedis(ctx context.Context, batch map[string]int6
 
 		pipe = c.rdb.Pipeline()
 		n = 0
-		cmds = make(map[string]*redis.IntCmd, lens)
+		cmds = make(map[int64]*redis.IntCmd, lens)
 		return nil
 	}
 
 	for uid, d := range batch {
-		cmds[uid] = pipe.IncrBy(ctx, "like:total:"+uid, d)
+		cmds[uid] = pipe.IncrBy(ctx, "like:total:"+strconv.FormatInt(uid, 10), d)
 		n++
 		if n > c.redisPipeMax {
 			if err := exec(); err != nil {
@@ -268,15 +273,16 @@ func (c *LikeSinkConsumer) flushRedis(ctx context.Context, batch map[string]int6
 	return exec()
 }
 
-func (c *LikeSinkConsumer) completeLikeGT5(ctx context.Context, uid string, total int64) error {
-	doneKey := "task:done:" + uid + ":" + taskID
+func (c *LikeSinkConsumer) completeLikeGT5(ctx context.Context, _uid, total int64) error {
+	uid := strconv.FormatInt(_uid, 10)
+	doneKey := "task:done:" + uid + ":" + strconv.FormatInt(taskID, 10)
 	ok, err := c.rdb.SetNX(ctx, doneKey, "1", 90*24*time.Hour).Result()
 	if err != nil || !ok {
 		return err
 	}
 
 	now := time.Now().Unix()
-	pk := "task:progress:" + uid + ":" + taskID
+	pk := "task:progress:" + uid + ":" + strconv.FormatInt(taskID, 10)
 	_, err = c.rdb.HSet(ctx, pk,
 		"status", "done",
 		"doneAt", now,
@@ -286,18 +292,18 @@ func (c *LikeSinkConsumer) completeLikeGT5(ctx context.Context, uid string, tota
 	if err != nil {
 		return err
 	}
-	ev := reward.NewEvent(uid, taskID, 5)
+	ev := reward.NewEvent(uid, strconv.FormatInt(taskID, 10), 5)
 	if err := c.rewardProduct.Enqueue(ctx, ev); err != nil {
 		return err
 	}
-	if err := c.markTaskDoneInDB(uid, total); err != nil {
+	if err := c.markTaskDoneInDB(_uid, total); err != nil {
 		// 这里建议记录日志即可，不要让整个 sink 挂掉（看你容错策略）
 		return err
 	}
 	return nil
 }
 
-func (c *LikeSinkConsumer) markTaskDoneInDB(uid string, progress int64) error {
+func (c *LikeSinkConsumer) markTaskDoneInDB(uid, progress int64) error {
 	rec := UserTaskProgress{
 		UserID:   uid,
 		TaskID:   taskID,
@@ -312,13 +318,13 @@ func (c *LikeSinkConsumer) markTaskDoneInDB(uid string, progress int64) error {
 			"status":     "done",
 			"progress":   target,
 			"target":     target,
-			"done_at":    gorm.Expr("COALESCE(user_total_like_task_progress.done_at, now())"),
+			"done_at":    gorm.Expr("COALESCE(task_progress.done_at, now())"),
 			"updated_at": gorm.Expr("now()"),
 		}),
 	}).Create(&rec).Error
 }
 
-func (c *LikeSinkConsumer) flushPostgres(ctx context.Context, batch map[string]int64) error {
+func (c *LikeSinkConsumer) flushPostgres(ctx context.Context, batch map[int64]int64) error {
 
 	rows := make([]row, 0, len(batch))
 	for uid, d := range batch {
@@ -341,7 +347,7 @@ func (c *LikeSinkConsumer) upsertChunk(rows []row) error {
 	records := make([]UserLikeCount, 0, len(rows))
 	for _, row := range rows {
 		records = append(records, UserLikeCount{
-			UserID:    row.uid,
+			UserID:    strconv.FormatInt(row.uid, 10),
 			LikeCount: row.delta,
 		})
 	}

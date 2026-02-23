@@ -3,26 +3,6 @@
 
 package types
 
-type CreateTaskReq struct {
-	Task   TaskInfo `json:"task"`
-	UserId int      `json:"userId"`
-}
-
-type CreateTaskResp struct {
-	Success bool   `json:"success"`
-	Msg     string `json:"msg"`
-}
-
-type DeleteTaskReq struct {
-	TaskId int `json:"taskId"`
-	UserId int `json:"userId"`
-}
-
-type DeleteTaskResp struct {
-	Success bool   `json:"success"`
-	Msg     string `json:"msg"`
-}
-
 type GetTaskReq struct {
 	Userid uint `json:"id"`
 }
@@ -37,13 +17,4 @@ type TaskInfo struct {
 	Task_id             int64  `json:"taskId"`
 	Completion_progress int64  `json:"completionProgress"`
 	Required_progress   int64  `json:"requiredProgress"`
-}
-
-type UpdateTaskReq struct {
-	Task TaskInfo `json:"task"`
-}
-
-type UpdateTaskResp struct {
-	Success bool   `json:"success"`
-	Msg     string `json:"msg"`
 }

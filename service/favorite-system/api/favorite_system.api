@@ -1,0 +1,103 @@
+syntax = "v1"
+
+info (
+	title:   "Favorite System API"
+	desc:    "收藏系统 HTTP 网关, 对接收藏服务"
+	version: "1.0.0"
+)
+
+type Folder {
+	Id       int64  `json:"id,string"`
+	UserId   int64  `json:"user_id,string"`
+	Name     string `json:"name"`
+	IsPublic bool   `json:"is_public"`
+	Deleted  bool   `json:"deleted"`
+}
+
+type Article {
+	Id         int64  `json:"id,string"`
+	ObjectType string `json:"object_type"`
+	ObjectId   int64  `json:"object_id,string"`
+	Title      string `json:"title"`
+}
+
+// 创建收藏夹
+service FavoriteApi {
+	@handler createFolder
+	post /api/folder/create (CreateFolderReq) returns (CreateFolderResp)
+
+	@handler updateFolder
+	post /api/folder/update (UpdateFolderReq) returns (BaseResp)
+
+	@handler deleteFolder
+	post /api/folder/delete (DeleteFolderReq) returns (BaseResp)
+
+	@handler listFolders
+	get /api/folder/list (ListFoldersReq) returns (ListFoldersResp)
+
+	@handler addArticleToFolder
+	post /api/folder/article/add (AddArticleReq) returns (BaseResp)
+
+	@handler removeArticleFromFolder
+	post /api/folder/article/remove (RemoveArticleReq) returns (BaseResp)
+
+	@handler listArticlesInFolder
+	get /api/folder/article/list (ListArticlesReq) returns (ListArticlesResp)
+}
+
+type CreateFolderReq {
+	UserId   int64  `json:"user_id,string"`
+	Name     string `json:"name"`
+	IsPublic bool   `json:"is_public"`
+}
+
+type CreateFolderResp {
+	Id int64 `json:"id,string"`
+}
+
+type UpdateFolderReq {
+	Id       int64  `json:"id,string"`
+	Name     string `json:"name"`
+	IsPublic bool   `json:"is_public"`
+}
+
+type DeleteFolderReq {
+	Id int64 `json:"id,string"`
+}
+
+type ListFoldersReq {
+	UserId int64 `json:"user_id,string"`
+}
+
+type ListFoldersResp {
+	Folders []Folder `json:"folders"`
+}
+
+type AddArticleReq {
+	FolderId   int64  `json:"folder_id,string"`
+	UserId     int64  `json:"user_id,string"`
+	ObjectType string `json:"object_type"`
+	ObjectId   int64  `json:"object_id,string"`
+	Title      string `json:"title"`
+}
+
+type RemoveArticleReq {
+	FolderId   int64  `json:"folder_id,string"`
+	UserId     int64  `json:"user_id,string"`
+	ObjectType string `json:"object_type"`
+	ObjectId   int64  `json:"object_id,string"`
+}
+
+type ListArticlesReq {
+	FolderId int64 `json:"folder_id,string"`
+}
+
+type ListArticlesResp {
+	Articles []Article `json:"articles"`
+}
+
+type BaseResp {
+	Code    int32  `json:"code"`
+	Message string `json:"message"`
+}
+

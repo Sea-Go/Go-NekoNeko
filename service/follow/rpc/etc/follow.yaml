@@ -6,3 +6,17 @@ Neo4j:
   Uri: "neo4j://127.0.0.1:7687"
   Username: "neo4j"
   Password: "12345678"
+
+Log:
+  ServiceName: user-rpc
+  Mode: file
+  Path: ../../../../log/follow
+
+DevServer:
+  Enabled: true
+  Host: 0.0.0.0
+  Port: 16060
+  MetricsPath: /metrics
+  HealthPath: /healthz
+  EnableMetrics: true
+  EnablePprof: true

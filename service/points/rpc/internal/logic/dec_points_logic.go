@@ -2,7 +2,9 @@ package logic
 
 import (
 	"context"
+	"time"
 
+	"sea-try-go/service/points/rpc/internal/metrics"
 	"sea-try-go/service/points/rpc/internal/svc"
 	pb "sea-try-go/service/points/rpc/pb"
 
@@ -24,9 +26,16 @@ func NewDecPointsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DecPoin
 }
 
 func (l *DecPointsLogic) DecPoints(in *pb.DecPointsReq) (*pb.DecPointsResp, error) {
-	// 扣积分使用负数
+	start := time.Now()
+	resultLabel := "ok"
+	defer func() {
+		metrics.PointsRequestCounterMetric.WithLabelValues("points_rpc", "DecPoints", resultLabel).Inc()
+		metrics.PointsRequestSecondsCounterMetric.WithLabelValues("points_rpc", "DecPoints").Add(time.Since(start).Seconds())
+	}()
+
 	result, err := ProcessPoints(l.ctx, l.svcCtx, in.UserId, in.RequestId, -in.DecPoints)
 	if err != nil {
+		resultLabel = "sys_fail"
 		return nil, err
 	}
 	return &pb.DecPointsResp{Success: result.Success, Message: result.Message}, nil

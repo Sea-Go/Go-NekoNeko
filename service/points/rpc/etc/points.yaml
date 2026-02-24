@@ -1,5 +1,5 @@
 Name: points.rpc
-ListenOn: 0.0.0.0:8081
+ListenOn: 0.0.0.0:8082
 
 Postgres:
   Host: "127.0.0.1"
@@ -44,7 +44,21 @@ KqConsumerConf:
   Brokers:
     - 127.0.0.1:39092
   Group: kqConsumer
-  Topic:  points_topic
+  Topic: points_topic
   Offset: first
   Consumers: 8
   Processors: 8
+
+Log:
+  ServiceName: points-rpc
+  Mode: file
+  Path: ../../../log/points
+
+DevServer:
+  Enabled: true
+  Host: 0.0.0.0
+  Port: 16061
+  MetricsPath: /metrics
+  HealthPath: /healthz
+  EnableMetrics: true
+  EnablePprof: true

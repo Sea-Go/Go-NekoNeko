@@ -4,10 +4,12 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"sea-try-go/service/common/errmsg"
+
 	"sea-try-go/service/common/logger"
+	"sea-try-go/service/points/rpc/internal/metrics"
 	"sea-try-go/service/points/rpc/internal/model"
 	"sea-try-go/service/points/rpc/internal/svc"
+	"sea-try-go/service/user/common/errmsg"
 )
 
 type DelayHandler struct {
@@ -22,6 +24,7 @@ func (h *DelayHandler) Consume(body []byte) {
 	ctx := context.Background()
 	var uid int64
 	if err := json.Unmarshal(body, &uid); err != nil {
+		metrics.PointsKafkaErrorCounterMetric.WithLabelValues("points_mq", "delay_consume", "json_unmarshal").Inc()
 		logger.LogBusinessErr(ctx, errmsg.ErrorJsonUnmarshal, err)
 		return
 	}
@@ -29,6 +32,7 @@ func (h *DelayHandler) Consume(body []byte) {
 	points, err := h.svcCtx.PointsModel.FindOneByUid(ctx, uid)
 	if err != nil || points == nil {
 		if err != nil {
+			metrics.PointsKafkaErrorCounterMetric.WithLabelValues("points_mq", "delay_consume", "db_select").Inc()
 			logger.LogBusinessErr(ctx, errmsg.ErrorDbSelect, err)
 		}
 		return
@@ -36,10 +40,14 @@ func (h *DelayHandler) Consume(body []byte) {
 	if points.Status == model.StatusSuccess || points.Status == model.StatusFailed {
 		return
 	}
-	// 15分钟延时到达仍未完成，标记为超时失败
+
+	metrics.PointsKafkaErrorCounterMetric.WithLabelValues("points_mq", "delay_consume", "timeout").Inc()
 	logger.LogBusinessErr(ctx, errmsg.ErrorPointsTimeout,
-		fmt.Errorf("uid=%d 积分处理超时，已超过15分钟", uid),
+		fmt.Errorf("uid=%d points process timeout after 15 minutes", uid),
 		logger.WithUserID(fmt.Sprintf("%d", points.UserId)),
 	)
-	h.svcCtx.PointsModel.UpdateStatusByUid(ctx, uid, model.StatusFailed)
+	if err = h.svcCtx.PointsModel.UpdateStatusByUid(ctx, uid, model.StatusFailed); err != nil {
+		metrics.PointsKafkaErrorCounterMetric.WithLabelValues("points_mq", "delay_consume", "status_update").Inc()
+		logger.LogBusinessErr(ctx, errmsg.ErrorDbUpdate, err, logger.WithUserID(fmt.Sprintf("%d", points.UserId)))
+	}
 }

@@ -60,7 +60,7 @@ message CommentItem {
     //评论Id
     int64 id = 1;
     //发布者Id
-    string user_id = 2;
+    int64 user_id = 2;
     //评论内容
     string content = 3;
     //评论结构部分参考了B站的那篇文章
@@ -105,7 +105,7 @@ message SubjectInfo {
 
 message CreateCommentReq {
   //发布者id
-  string user_id = 1;
+  int64 user_id = 1;
   //该评论区所属内容的类型,包括article,vedio等
   string target_type = 2;
   //所属内容的ID,例如B站的BV号
@@ -153,7 +153,7 @@ message GetCommentResp {
 
 message LikeCommentReq {
   //点赞者id
-  string user_id = 1;
+  int64 user_id = 1;
   //评论所属内容类型
   string target_type = 2;
   //内容id
@@ -173,7 +173,7 @@ message LikeCommentResp {
 
 message DeleteCommentReq {
   //操作人id,用于检测是否为本人或up主操作防止出现安全问题
-  string user_id = 1;
+  int64 user_id = 1;
   //评论id
   int64 comment_id = 2;
   //同上
@@ -191,7 +191,7 @@ message DeleteCommentResp {
 //置顶评论
 message ManageCommentReq {
   //参数含义同Delete部分
-  string user_id = 1;
+  int64 user_id = 1;
   int64 comment_id = 2;
   string target_type = 3;
   string target_id = 4;
@@ -205,7 +205,7 @@ message ManageCommentResp {
 
 //举报评论
 message ReportCommentReq {
-  string user_id = 1;
+  int64 user_id = 1;
   int64 comment_id = 2;
   string target_type = 3;
   string target_id = 4;
@@ -221,7 +221,7 @@ message ReportCommentResp {
 
 message UpdateSubjectStateReq {
   //只有up主或管理员才有权关闭评论区
-  string user_id = 1;
+  int64 user_id = 1;
   string target_type = 2;
   string target_id = 3;
   //目标状态

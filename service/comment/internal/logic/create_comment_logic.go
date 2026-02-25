@@ -35,6 +35,11 @@ func (l *CreateCommentLogic) CreateComment(in *pb.CreateCommentReq) (*pb.CreateC
 	if in.Content == "" {
 		return nil, fmt.Errorf("参数错误:内容不能为空")
 	}
+	//查询owner还有bug
+	ownerId, err := l.svcCtx.CommentModel.GetOwnerId(l.ctx, in.TargetType, in.TargetId)
+	if err != nil {
+		return nil, fmt.Errorf("查询Owner失败")
+	}
 	commentId, err := snowflake.GetID()
 	if err != nil {
 		return nil, fmt.Errorf("雪花算法生成ID出错")
@@ -48,6 +53,7 @@ func (l *CreateCommentLogic) CreateComment(in *pb.CreateCommentReq) (*pb.CreateC
 		RootId:     in.RootId,
 		ParentId:   in.ParentId,
 		Content:    in.Content,
+		OwnerId:    int64(ownerId),
 		Meta:       in.Meta,
 		Attribute:  0,
 		CreateTime: now.Unix(),

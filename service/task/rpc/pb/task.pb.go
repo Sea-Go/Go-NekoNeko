@@ -185,318 +185,6 @@ func (x *GetTaskResp) GetTask() []*Task {
 	return nil
 }
 
-type CreateTaskReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Task          *Task                  `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
-	RequestId     int64                  `protobuf:"varint,2,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateTaskReq) Reset() {
-	*x = CreateTaskReq{}
-	mi := &file_proto_task_proto_msgTypes[3]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateTaskReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateTaskReq) ProtoMessage() {}
-
-func (x *CreateTaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_task_proto_msgTypes[3]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateTaskReq.ProtoReflect.Descriptor instead.
-func (*CreateTaskReq) Descriptor() ([]byte, []int) {
-	return file_proto_task_proto_rawDescGZIP(), []int{3}
-}
-
-func (x *CreateTaskReq) GetTask() *Task {
-	if x != nil {
-		return x.Task
-	}
-	return nil
-}
-
-func (x *CreateTaskReq) GetRequestId() int64 {
-	if x != nil {
-		return x.RequestId
-	}
-	return 0
-}
-
-type CreateTaskResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *CreateTaskResp) Reset() {
-	*x = CreateTaskResp{}
-	mi := &file_proto_task_proto_msgTypes[4]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *CreateTaskResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*CreateTaskResp) ProtoMessage() {}
-
-func (x *CreateTaskResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_task_proto_msgTypes[4]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use CreateTaskResp.ProtoReflect.Descriptor instead.
-func (*CreateTaskResp) Descriptor() ([]byte, []int) {
-	return file_proto_task_proto_rawDescGZIP(), []int{4}
-}
-
-func (x *CreateTaskResp) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *CreateTaskResp) GetMsg() string {
-	if x != nil {
-		return x.Msg
-	}
-	return ""
-}
-
-type UpdateTaskReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Task          *Task                  `protobuf:"bytes,1,opt,name=task,proto3" json:"task,omitempty"`
-	RequestId     int64                  `protobuf:"varint,2,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateTaskReq) Reset() {
-	*x = UpdateTaskReq{}
-	mi := &file_proto_task_proto_msgTypes[5]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateTaskReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateTaskReq) ProtoMessage() {}
-
-func (x *UpdateTaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_task_proto_msgTypes[5]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateTaskReq.ProtoReflect.Descriptor instead.
-func (*UpdateTaskReq) Descriptor() ([]byte, []int) {
-	return file_proto_task_proto_rawDescGZIP(), []int{5}
-}
-
-func (x *UpdateTaskReq) GetTask() *Task {
-	if x != nil {
-		return x.Task
-	}
-	return nil
-}
-
-func (x *UpdateTaskReq) GetRequestId() int64 {
-	if x != nil {
-		return x.RequestId
-	}
-	return 0
-}
-
-type UpdateTaskResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *UpdateTaskResp) Reset() {
-	*x = UpdateTaskResp{}
-	mi := &file_proto_task_proto_msgTypes[6]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *UpdateTaskResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*UpdateTaskResp) ProtoMessage() {}
-
-func (x *UpdateTaskResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_task_proto_msgTypes[6]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use UpdateTaskResp.ProtoReflect.Descriptor instead.
-func (*UpdateTaskResp) Descriptor() ([]byte, []int) {
-	return file_proto_task_proto_rawDescGZIP(), []int{6}
-}
-
-func (x *UpdateTaskResp) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *UpdateTaskResp) GetMsg() string {
-	if x != nil {
-		return x.Msg
-	}
-	return ""
-}
-
-type DeleteTaskReq struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	TaskId        int64                  `protobuf:"varint,1,opt,name=task_id,json=taskId,proto3" json:"task_id,omitempty"`
-	RequestId     int64                  `protobuf:"varint,2,opt,name=request_id,json=requestId,proto3" json:"request_id,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteTaskReq) Reset() {
-	*x = DeleteTaskReq{}
-	mi := &file_proto_task_proto_msgTypes[7]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteTaskReq) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteTaskReq) ProtoMessage() {}
-
-func (x *DeleteTaskReq) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_task_proto_msgTypes[7]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteTaskReq.ProtoReflect.Descriptor instead.
-func (*DeleteTaskReq) Descriptor() ([]byte, []int) {
-	return file_proto_task_proto_rawDescGZIP(), []int{7}
-}
-
-func (x *DeleteTaskReq) GetTaskId() int64 {
-	if x != nil {
-		return x.TaskId
-	}
-	return 0
-}
-
-func (x *DeleteTaskReq) GetRequestId() int64 {
-	if x != nil {
-		return x.RequestId
-	}
-	return 0
-}
-
-type DeleteTaskResp struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Success       bool                   `protobuf:"varint,1,opt,name=success,proto3" json:"success,omitempty"`
-	Msg           string                 `protobuf:"bytes,2,opt,name=msg,proto3" json:"msg,omitempty"`
-	unknownFields protoimpl.UnknownFields
-	sizeCache     protoimpl.SizeCache
-}
-
-func (x *DeleteTaskResp) Reset() {
-	*x = DeleteTaskResp{}
-	mi := &file_proto_task_proto_msgTypes[8]
-	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-	ms.StoreMessageInfo(mi)
-}
-
-func (x *DeleteTaskResp) String() string {
-	return protoimpl.X.MessageStringOf(x)
-}
-
-func (*DeleteTaskResp) ProtoMessage() {}
-
-func (x *DeleteTaskResp) ProtoReflect() protoreflect.Message {
-	mi := &file_proto_task_proto_msgTypes[8]
-	if x != nil {
-		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
-		if ms.LoadMessageInfo() == nil {
-			ms.StoreMessageInfo(mi)
-		}
-		return ms
-	}
-	return mi.MessageOf(x)
-}
-
-// Deprecated: Use DeleteTaskResp.ProtoReflect.Descriptor instead.
-func (*DeleteTaskResp) Descriptor() ([]byte, []int) {
-	return file_proto_task_proto_rawDescGZIP(), []int{8}
-}
-
-func (x *DeleteTaskResp) GetSuccess() bool {
-	if x != nil {
-		return x.Success
-	}
-	return false
-}
-
-func (x *DeleteTaskResp) GetMsg() string {
-	if x != nil {
-		return x.Msg
-	}
-	return ""
-}
-
 var File_proto_task_proto protoreflect.FileDescriptor
 
 const file_proto_task_proto_rawDesc = "" +
@@ -513,38 +201,9 @@ const file_proto_task_proto_rawDesc = "" +
 	"\auser_id\x18\x01 \x01(\x03R\x06userId\"-\n" +
 	"\vGetTaskResp\x12\x1e\n" +
 	"\x04task\x18\x01 \x03(\v2\n" +
-	".task.TaskR\x04task\"N\n" +
-	"\rCreateTaskReq\x12\x1e\n" +
-	"\x04task\x18\x01 \x01(\v2\n" +
-	".task.TaskR\x04task\x12\x1d\n" +
-	"\n" +
-	"request_id\x18\x02 \x01(\x03R\trequestId\"<\n" +
-	"\x0eCreateTaskResp\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x10\n" +
-	"\x03msg\x18\x02 \x01(\tR\x03msg\"N\n" +
-	"\rUpdateTaskReq\x12\x1e\n" +
-	"\x04task\x18\x01 \x01(\v2\n" +
-	".task.TaskR\x04task\x12\x1d\n" +
-	"\n" +
-	"request_id\x18\x02 \x01(\x03R\trequestId\"<\n" +
-	"\x0eUpdateTaskResp\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x10\n" +
-	"\x03msg\x18\x02 \x01(\tR\x03msg\"G\n" +
-	"\rDeleteTaskReq\x12\x17\n" +
-	"\atask_id\x18\x01 \x01(\x03R\x06taskId\x12\x1d\n" +
-	"\n" +
-	"request_id\x18\x02 \x01(\x03R\trequestId\"<\n" +
-	"\x0eDeleteTaskResp\x12\x18\n" +
-	"\asuccess\x18\x01 \x01(\bR\asuccess\x12\x10\n" +
-	"\x03msg\x18\x02 \x01(\tR\x03msg2\xe8\x01\n" +
+	".task.TaskR\x04task2=\n" +
 	"\vTaskService\x12.\n" +
-	"\aGetTask\x12\x10.task.GetTaskReq\x1a\x11.task.GetTaskResp\x127\n" +
-	"\n" +
-	"CreateTask\x12\x13.task.CreateTaskReq\x1a\x14.task.CreateTaskResp\x127\n" +
-	"\n" +
-	"UpdateTask\x12\x13.task.UpdateTaskReq\x1a\x14.task.UpdateTaskResp\x127\n" +
-	"\n" +
-	"DeleteTask\x12\x13.task.DeleteTaskReq\x1a\x14.task.DeleteTaskRespB\x03Z\x01.b\x06proto3"
+	"\aGetTask\x12\x10.task.GetTaskReq\x1a\x11.task.GetTaskRespB\x03Z\x01.b\x06proto3"
 
 var (
 	file_proto_task_proto_rawDescOnce sync.Once
@@ -558,35 +217,21 @@ func file_proto_task_proto_rawDescGZIP() []byte {
 	return file_proto_task_proto_rawDescData
 }
 
-var file_proto_task_proto_msgTypes = make([]protoimpl.MessageInfo, 9)
+var file_proto_task_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
 var file_proto_task_proto_goTypes = []any{
-	(*Task)(nil),           // 0: task.Task
-	(*GetTaskReq)(nil),     // 1: task.GetTaskReq
-	(*GetTaskResp)(nil),    // 2: task.GetTaskResp
-	(*CreateTaskReq)(nil),  // 3: task.CreateTaskReq
-	(*CreateTaskResp)(nil), // 4: task.CreateTaskResp
-	(*UpdateTaskReq)(nil),  // 5: task.UpdateTaskReq
-	(*UpdateTaskResp)(nil), // 6: task.UpdateTaskResp
-	(*DeleteTaskReq)(nil),  // 7: task.DeleteTaskReq
-	(*DeleteTaskResp)(nil), // 8: task.DeleteTaskResp
+	(*Task)(nil),        // 0: task.Task
+	(*GetTaskReq)(nil),  // 1: task.GetTaskReq
+	(*GetTaskResp)(nil), // 2: task.GetTaskResp
 }
 var file_proto_task_proto_depIdxs = []int32{
 	0, // 0: task.GetTaskResp.task:type_name -> task.Task
-	0, // 1: task.CreateTaskReq.task:type_name -> task.Task
-	0, // 2: task.UpdateTaskReq.task:type_name -> task.Task
-	1, // 3: task.TaskService.GetTask:input_type -> task.GetTaskReq
-	3, // 4: task.TaskService.CreateTask:input_type -> task.CreateTaskReq
-	5, // 5: task.TaskService.UpdateTask:input_type -> task.UpdateTaskReq
-	7, // 6: task.TaskService.DeleteTask:input_type -> task.DeleteTaskReq
-	2, // 7: task.TaskService.GetTask:output_type -> task.GetTaskResp
-	4, // 8: task.TaskService.CreateTask:output_type -> task.CreateTaskResp
-	6, // 9: task.TaskService.UpdateTask:output_type -> task.UpdateTaskResp
-	8, // 10: task.TaskService.DeleteTask:output_type -> task.DeleteTaskResp
-	7, // [7:11] is the sub-list for method output_type
-	3, // [3:7] is the sub-list for method input_type
-	3, // [3:3] is the sub-list for extension type_name
-	3, // [3:3] is the sub-list for extension extendee
-	0, // [0:3] is the sub-list for field type_name
+	1, // 1: task.TaskService.GetTask:input_type -> task.GetTaskReq
+	2, // 2: task.TaskService.GetTask:output_type -> task.GetTaskResp
+	2, // [2:3] is the sub-list for method output_type
+	1, // [1:2] is the sub-list for method input_type
+	1, // [1:1] is the sub-list for extension type_name
+	1, // [1:1] is the sub-list for extension extendee
+	0, // [0:1] is the sub-list for field type_name
 }
 
 func init() { file_proto_task_proto_init() }
@@ -600,7 +245,7 @@ func file_proto_task_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_task_proto_rawDesc), len(file_proto_task_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   9,
+			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

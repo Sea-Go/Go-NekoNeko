@@ -1,7 +1,7 @@
 version: "3.8"
 
 services:
-  # --- 服务发现 & 配置中心 ---`
+  # --- 服务发现 & 配置中心 ---
   etcd:
     container_name: etcd
     image: quay.io/coreos/etcd:v3.5.25
@@ -14,7 +14,7 @@ services:
       - ${DOCKER_VOLUME_DIRECTORY:-.}/volumes/etcd:/etcd
     command: >
       etcd
-      -advertise-client-urls=http://etcd:2379
+      -advertise-client-urls=http://127.0.0.1:32379
       -listen-client-urls http://0.0.0.0:2379
       --data-dir /etcd
     ports:
@@ -58,6 +58,20 @@ services:
       - redis
     restart: unless-stopped
 
+  # --- Beanstalkd ---
+  beanstalkd1:
+    image: schickling/beanstalkd
+    container_name: beanstalkd1
+    ports:
+      - "41300:11300"
+    restart: unless-stopped
+  beanstalkd2:
+    image: schickling/beanstalkd
+    container_name: beanstalkd2
+    ports:
+      - "41301:11300"
+    restart: unless-stopped  
+
   # --- 图数据库 (Neo4j) ---
   neo4j:
     image: neo4j:latest
@@ -86,24 +100,27 @@ services:
       - neo4j
     restart: unless-stopped
   # --- Kafka ---
+  # --- Kafka ---
   kafka:
-    image: apache/kafka:latest
+    image: apache/kafka:3.7.2
     container_name: kafka
     ports:
-      - "39092:9092"
+      - "39092:9093"
     environment:
       - KAFKA_NODE_ID=1
       - KAFKA_PROCESS_ROLES=broker,controller
-      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093
-      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:39092
+      - KAFKA_LISTENERS=PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9094,EXTERNAL://0.0.0.0:9093
+      - KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://kafka:9092,EXTERNAL://127.0.0.1:39092
       - KAFKA_CONTROLLER_LISTENER_NAMES=CONTROLLER
-      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
-      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9093
+      - KAFKA_LISTENER_SECURITY_PROTOCOL_MAP=CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT,EXTERNAL:PLAINTEXT
+      - KAFKA_INTER_BROKER_LISTENER_NAME=PLAINTEXT
+      - KAFKA_CONTROLLER_QUORUM_VOTERS=1@kafka:9094
       - KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR=1
       - KAFKA_TRANSACTION_STATE_LOG_MIN_ISR=1
       - KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS=0
     restart: unless-stopped
+
 
   # --- Kafka UI ---
   kafka-ui:
@@ -167,7 +184,7 @@ services:
       - minio
     restart: unless-stopped
 
-  # --- 日志收集 (Elasticsearch) ---
+  # --- 日志检索引擎 (elasticsearch) ---
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.2.3
     container_name: elasticsearch
@@ -180,6 +197,7 @@ services:
       - "39200:9200"
     restart: unless-stopped
 
+  # --- 日志UI (kibana) ---
   kibana:
     image: docker.elastic.co/kibana/kibana:9.2.3
     container_name: kibana
@@ -190,6 +208,20 @@ services:
     depends_on:
       - elasticsearch
     restart: unless-stopped
+
+  # --- 日志收集 (filebeat) ---
+  filebeat:
+    image: elastic/filebeat:8.13.4
+    container_name: filebeat
+    user: root
+    depends_on:
+      - kafka
+      - elasticsearch
+    volumes:
+      - ./service/task/filebeat.yml:/usr/share/filebeat/filebeat.yml:ro
+      - ./log:/var/logs:ro
+    command: [ "-e", "--strict.perms=false" ]
+
 
   # --- 大数据处理 (Flink) ---
   flink-jobmanager:
@@ -337,6 +369,7 @@ services:
     depends_on:
       - elasticsearch
     restart: unless-stopped
+
 volumes:
   prometheus_data:
   grafana_data:

@@ -73,9 +73,11 @@ type (
 		Page     int32     `json:"page"`
 		PageSize int32     `json:"page_size"`
 	}
+	UploadImageReq {
+	}
 	UploadImageResp {
-        ImageUrl string `json:"imageUrl"`
-    }
+		ImageUrl string `json:"image_url"`
+	}
 )
 
 @server (
@@ -104,14 +106,8 @@ service article-api {
 
 	@handler ListArticles
 	get /articles (ListArticlesReq) returns (ListArticlesResp)
-}
 
-@server(
-    prefix: v1
-    group: article
-)
-service article {
-    @handler UploadImage
-    post /upload (UploadImageReq) returns (UploadImageResp)
+	@handler UploadImage
+	post /upload (UploadImageReq) returns (UploadImageResp)
 }
 

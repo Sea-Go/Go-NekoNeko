@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"fmt"
 
 	"sea-try-go/service/comment/internal/svc"
 	"sea-try-go/service/comment/pb"
@@ -24,7 +25,14 @@ func NewUpdateSubjectStateLogic(ctx context.Context, svcCtx *svc.ServiceContext)
 }
 
 func (l *UpdateSubjectStateLogic) UpdateSubjectState(in *pb.UpdateSubjectStateReq) (*pb.UpdateSubjectStateResp, error) {
-	// todo: add your logic here and delete this line
-
-	return &pb.UpdateSubjectStateResp{}, nil
+	if in.TargetType == "" || in.TargetId == "" {
+		return nil, fmt.Errorf("Type和Id不能为空")
+	}
+	err := l.svcCtx.CommentModel.UpdateSubjectState(l.ctx, in.TargetType, in.TargetId, int32(in.State))
+	if err != nil {
+		return nil, err
+	}
+	return &pb.UpdateSubjectStateResp{
+		Success: true,
+	}, nil
 }

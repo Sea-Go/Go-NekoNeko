@@ -1,6 +1,27 @@
 Name: comment.rpc
-ListenOn: 0.0.0.0:8080
+ListenOn: 0.0.0.0:9001
 Etcd:
   Hosts:
-  - 127.0.0.1:2379
+    - 127.0.0.1:32379
   Key: comment.rpc
+
+DB:
+  DataSource: "host=127.0.0.1 user=admin password=Sea-TryGo dbname=first_db port=35432 sslmode=disable TimeZone=Asia/Shanghai"
+
+KqPusherConf:
+  Brokers:
+    - 127.0.0.1:39092
+  Topic: comment-audit-topic
+
+KqConsumerConf:
+  Brokers:
+    - 127.0.0.1:39092
+  Group: comment-audit-group
+  Topic: comment-audit-topic
+  Offset: last
+  Consumers: 8
+
+BizRedis:
+  Host: 127.0.0.1:36379
+  Type: node
+  Pass: ""

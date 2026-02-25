@@ -10,6 +10,7 @@ type Subject struct {
 	RootCount  int64     `gorm:"column:root_count;not null;default:0;comment:根评论数"`
 	State      int32     `gorm:"column:state;not null;default:0;comment:状态:0正常,1关闭,2仅粉丝"`
 	Attribute  int64     `gorm:"column:attribute;not null;default:0;comment:属性位图"`
+	OwnerId    int64     `gorm:"column:owner_id;not null;comment:作者ID"`
 	CreatedAt  time.Time `gorm:"column:created_at;autoCreateTime;comment:创建时间"`
 	UpdatedAt  time.Time `gorm:"column:updated_at;autoUpdateTime;comment:更新时间"`
 }

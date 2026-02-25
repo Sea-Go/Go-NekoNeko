@@ -9,6 +9,7 @@ type CommentKafkaMsg struct {
 	ParentId   int64  `json:"parent_id"`
 	Content    string `json:"content"`
 	Meta       string `json:"meta"`
+	OwnerId    int64  `json:"owner_id"`
 	Attribute  int64  `json:"attribute"`
 	CreateTime int64  `json:"create_time"`
 }

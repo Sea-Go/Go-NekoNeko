@@ -60,6 +60,7 @@ func (m *CommentModel) InsertCommentTx(ctx context.Context, msg kqtypes.CommentK
 			RootCount:  0,
 			State:      0,
 			Attribute:  0,
+			OwnerId:    msg.OwnerId,
 		}
 		if msg.RootId == 0 {
 			newSubject.RootCount = 1
@@ -68,10 +69,10 @@ func (m *CommentModel) InsertCommentTx(ctx context.Context, msg kqtypes.CommentK
 			"total_count": gorm.Expr("total_count + 1"),
 		}
 		if msg.RootId == 0 {
-			updateCols["root_count"] = gorm.Expr("subject.root_count + 1")
+			updateCols["root_count"] = gorm.Expr("root_count + 1")
 		}
 		err := tx.Clauses(clause.OnConflict{
-			Columns:   []clause.Column{{Name: "target_type"}, {Name: "subject.target_id"}},
+			Columns:   []clause.Column{{Name: "target_type"}, {Name: "target_id"}},
 			DoUpdates: clause.Assignments(updateCols),
 		}).Create(&newSubject).Error
 		if err != nil {
@@ -80,11 +81,41 @@ func (m *CommentModel) InsertCommentTx(ctx context.Context, msg kqtypes.CommentK
 
 		//4.更新父评论的回复数
 		if msg.ParentId != 0 {
-			err := tx.Model(&CommentIndex{}).Where("id = ?", msg.ParentId).Update("reply_count", gorm.Expr("reply_count + 1")).Error
+			updateCols := map[string]interface{}{
+				"reply_count": gorm.Expr("reply_count + 1"),
+			}
+			if msg.UserId == msg.OwnerId {
+				updateCols["attribute"] = gorm.Expr("attribute | ?", (1 << 1))
+			}
+			err := tx.Model(&CommentIndex{}).Where("id = ?", msg.ParentId).Updates(updateCols).Error
 			if err != nil {
 				return err
 			}
 		}
 		return nil
 	})
+}
+
+func (m *CommentModel) ManageCommentAttribute(ctx context.Context, commentId int64, bitOffset uint, isSet bool) error {
+	val := (1 << bitOffset)
+	var expr clause.Expr
+	if isSet {
+		expr = gorm.Expr("attribute | ?", val)
+	} else {
+		expr = gorm.Expr("attribute & ~?", val)
+	}
+	return m.conn.WithContext(ctx).Model(&CommentIndex{}).Where("id = ?", commentId).Update("attribute", expr).Error
+}
+
+func (m *CommentModel) UpdateSubjectState(ctx context.Context, targetType, targetId string, state int32) error {
+	return m.conn.WithContext(ctx).Model(&Subject{}).
+		Where("target_type = ? AND target_id = ?", targetType, targetId).
+		Update("state", state).Error
+}
+
+func (m *CommentModel) GetOwnerId(ctx context.Context, targetType, targetId string) (ownerId int, err error) {
+	err = m.conn.WithContext(ctx).Model(&Subject{}).
+		Where("target_type = ? AND target_id = ?", targetType, targetId).
+		Select("owner_id").Scan(&ownerId).Error
+	return ownerId, err
 }

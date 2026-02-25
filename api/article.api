@@ -73,8 +73,7 @@ type (
 		Page     int32     `json:"page"`
 		PageSize int32     `json:"page_size"`
 	}
-	UploadImageReq {
-	}
+	UploadImageReq  {}
 	UploadImageResp {
 		ImageUrl string `json:"image_url"`
 	}

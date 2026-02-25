@@ -84,3 +84,10 @@ type UpdateArticleReq struct {
 type UpdateArticleResp struct {
 	Success bool `json:"success"`
 }
+
+type UploadImageReq struct {
+}
+
+type UploadImageResp struct {
+	ImageUrl string `json:"image_url"`
+}

@@ -101,6 +101,8 @@ message SubjectInfo {
   SubjectState state = 5;
   //评论区属性,比如第0位为0表示按热度排序,1表示按照时间排序,第1位表示能否附带图片,...
   int64 attribute = 6;
+  //作者
+  int64 owner_id = 7;
 }
 
 message CreateCommentReq {

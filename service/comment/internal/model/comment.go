@@ -22,6 +22,17 @@ func NewCommentModel(db *gorm.DB) *CommentModel {
 func (m *CommentModel) InsertCommentTx(ctx context.Context, msg kqtypes.CommentKafkaMsg, status int) error {
 	//事务
 	return m.conn.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+
+		var existCount int64
+		err := tx.Model(&CommentIndex{}).Where("id = ?", msg.CommentId).Count(&existCount).Error
+		if err != nil {
+			return err
+		}
+		if existCount > 0 {
+			//发现是重复消息,直接吞掉
+			return nil
+		}
+
 		//时间校准
 		createTime := time.Unix(msg.CreateTime, 0)
 
@@ -71,7 +82,7 @@ func (m *CommentModel) InsertCommentTx(ctx context.Context, msg kqtypes.CommentK
 		if msg.RootId == 0 {
 			updateCols["root_count"] = gorm.Expr("root_count + 1")
 		}
-		err := tx.Clauses(clause.OnConflict{
+		err = tx.Clauses(clause.OnConflict{
 			Columns:   []clause.Column{{Name: "target_type"}, {Name: "target_id"}},
 			DoUpdates: clause.Assignments(updateCols),
 		}).Create(&newSubject).Error
@@ -118,4 +129,10 @@ func (m *CommentModel) GetOwnerId(ctx context.Context, targetType, targetId stri
 		Where("target_type = ? AND target_id = ?", targetType, targetId).
 		Select("owner_id").Scan(&ownerId).Error
 	return ownerId, err
+}
+
+func (m *CommentModel) InsertReport(ctx context.Context, report *ReportRecord) error {
+	return m.conn.WithContext(ctx).Clauses(clause.OnConflict{
+		DoNothing: true,
+	}).Create(report).Error
 }

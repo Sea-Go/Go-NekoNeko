@@ -184,6 +184,13 @@ services:
       - minio
     restart: unless-stopped
 
+  milvus-attu:
+    image: zilliz/attu:latest
+    container_name: milvus-attu
+    ports:
+      - "38700:3000"
+    environment:
+      MILVUS_URL: milvus-standalone:19530
   # --- 日志检索引擎 (elasticsearch) ---
   elasticsearch:
     image: docker.elastic.co/elasticsearch/elasticsearch:9.2.3

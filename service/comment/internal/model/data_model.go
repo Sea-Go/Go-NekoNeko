@@ -51,3 +51,18 @@ type CommentContent struct {
 func (CommentContent) TableName() string {
 	return "comment_content"
 }
+
+type ReportRecord struct {
+	Id         int64     `gorm:"column:id;primaryKey;autoIncrement;comment:举报主键ID"`
+	UserId     int64     `gorm:"column:user_id;not null;uniqueIndex:idx_user_comment_report;comment:举报人ID"`
+	CommentId  int64     `gorm:"column:comment_id;not null;uniqueIndex:idx_user_comment_report;comment:被举报评论ID"`
+	TargetType string    `gorm:"column:target_type;type:varchar(32);not null;comment:内容类型"`
+	TargetId   string    `gorm:"column:target_id;type:varchar(64);not null;comment:内容ID"`
+	Reason     int32     `gorm:"column:reason;not null;comment:举报原因枚举"`
+	Detail     string    `gorm:"column:detail;type:varchar(255);comment:举报详情"`
+	CreatedAt  time.Time `gorm:"column:created_at;autoCreateTime;comment:创建时间"`
+}
+
+func (ReportRecord) TableName() string {
+	return "report_record"
+}

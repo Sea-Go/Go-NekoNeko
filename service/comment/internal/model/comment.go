@@ -2,6 +2,7 @@ package model
 
 import (
 	"context"
+	"fmt"
 	kqtypes "sea-try-go/service/comment/common/types"
 	"time"
 
@@ -135,4 +136,49 @@ func (m *CommentModel) InsertReport(ctx context.Context, report *ReportRecord) e
 	return m.conn.WithContext(ctx).Clauses(clause.OnConflict{
 		DoNothing: true,
 	}).Create(report).Error
+}
+
+func (m *CommentModel) DeleteCommentTx(ctx context.Context, commentId, userId int64, targetType, targetId string) (int64, error) {
+	var remainCount int64
+	err := m.conn.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var comment CommentIndex
+		if err := tx.Where("id = ?", commentId).First(&comment).Error; err != nil {
+			if err == gorm.ErrRecordNotFound {
+				return fmt.Errorf("评论不存在")
+			}
+			return err
+		}
+		var sub Subject
+		if err := tx.Where("target_type = ? AND target_id = ?", targetType, targetId).First(&sub).Error; err != nil {
+			return err
+		}
+		if comment.State == 2 {
+			remainCount = sub.TotalCount
+			return nil
+		}
+		if userId != comment.UserId && userId != sub.OwnerId {
+			return fmt.Errorf("无权删除他人评论")
+		}
+		if err := tx.Model(&CommentIndex{}).Where("id = ?", commentId).Update("state", 2).Error; err != nil {
+			return err
+		}
+		updateSub := map[string]interface{}{
+			"total_count": gorm.Expr("total_count - 1"),
+		}
+		if comment.RootId == 0 {
+			updateSub["root_count"] = gorm.Expr("root_count - 1")
+		}
+		if err := tx.Model(&Subject{}).Where("target_type = ? AND target_id = ?", targetType, targetId).Updates(updateSub).Error; err != nil {
+			return err
+		}
+		tx.Where("target_type = ? AND target_id = ?", targetType, targetId).First(&sub)
+		remainCount = sub.TotalCount
+		if comment.ParentId != 0 {
+			if err := tx.Model(&CommentIndex{}).Where("id = ?", comment.ParentId).Update("reply_count", gorm.Expr("reply_count - 1")).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+	return remainCount, err
 }

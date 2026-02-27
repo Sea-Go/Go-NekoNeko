@@ -51,12 +51,43 @@ func (l *GetCommentLogic) GetComment(in *pb.GetCommentReq) (*pb.GetCommentResp, 
 	if err != nil {
 		return nil, err
 	}
+	index, err := l.svcCtx.CommentCache.GetCommentIndexCache(ctx, ids, conn)
+	if err != nil {
+		return nil, err
+	}
 	content, err := l.svcCtx.CommentCache.BatchGetContentCache(ctx, ids, conn)
 	if err != nil {
 		return nil, err
 	}
+	comment := make([]*pb.CommentItem, 0, len(content))
+	for i, _ := range index {
+		u := index[i]
+		v := content[i]
+		comment = append(comment, &pb.CommentItem{
+			Id:           u.Id,
+			UserId:       u.UserId,
+			Content:      v.Content,
+			RootId:       u.RootId,
+			ParentId:     u.ParentId,
+			LikeCount:    u.LikeCount,
+			DislikeCount: u.DislikeCount,
+			ReplyCount:   u.ReplyCount,
+			Attribute:    u.Attribute,
+			State:        pb.CommentState(u.State),
+			CreatedAt:    u.CreatedAt.Format("2006-01-02 15:04:05"),
+			Meta:         v.Meta,
+			Children:     nil, //日后再说
+		})
+	}
 	return &pb.GetCommentResp{
-		Comment: content,
-		Subject: subject,
+		Comment: comment,
+		Subject: &pb.SubjectInfo{
+			TargetType: subject.TargetType,
+			TargetId:   subject.TargetId,
+			TotalCount: subject.TotalCount,
+			RootCount:  subject.RootCount,
+			State:      pb.SubjectState(subject.State),
+			Attribute:  subject.Attribute,
+		},
 	}, nil
 }

@@ -415,3 +415,36 @@ func (m *CommentModel) LikeCommentTx(ctx context.Context, userId, commentId int6
 		return nil
 	})
 }
+
+func (m *CommentModel) BatchGetReplyIndexByIDs(ctx context.Context, ids []int64) ([]CommentIndex, error) {
+	if len(ids) == 0 {
+		return []CommentIndex{}, nil
+	}
+
+	uniq := make(map[int64]struct{}, len(ids))
+	filtered := make([]int64, 0, len(ids))
+	for _, id := range ids {
+		if id <= 0 {
+			continue
+		}
+		if _, ok := uniq[id]; ok {
+			continue
+		}
+		uniq[id] = struct{}{}
+		filtered = append(filtered, id)
+	}
+	if len(filtered) == 0 {
+		return []CommentIndex{}, nil
+	}
+
+	var list []CommentIndex
+	err := m.conn.WithContext(ctx).
+		Model(&CommentIndex{}).
+		Where("id IN ?", filtered).
+		Find(&list).Error
+	if err != nil {
+		return nil, fmt.Errorf("BatchGetReplyIndexByIDs query failed: %w", err)
+	}
+
+	return list, nil
+}

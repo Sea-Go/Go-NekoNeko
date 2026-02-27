@@ -4,123 +4,108 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"sea-try-go/service/comment/internal/model"
 	"time"
 
-	"github.com/redis/go-redis/v9"
+	"sea-try-go/service/comment/internal/model" // 按你的实际路径改
 )
 
-const defaultReplyIDsPageTTL = 3 * time.Minute
+const defaultCommentIndexTTL = 10 * time.Minute
 
-func (c *CommentCache) GetReplyIDsPageCache(ctx context.Context, req model.GetReplyIDsPageReq, conn *model.CommentModel) ([]int64, error) {
+func (c *CommentCache) GetCommentIndexCache(ctx context.Context, ids []int64, conn *model.CommentModel) ([]model.CommentIndex, error) {
 	if c == nil || c.rdb == nil {
 		return nil, fmt.Errorf("comment cache is nil")
 	}
 	if conn == nil {
 		return nil, fmt.Errorf("comment model conn is nil")
 	}
-
-	pageKey := ReplyIndexPageKey(
-		req.TargetType,
-		req.TargetId,
-		req.RootId,
-		string(req.Sort),
-		req.Offset,
-		req.Limit,
-	)
-
-	if val, err := c.rdb.Get(ctx, pageKey).Result(); err == nil {
-		var ids []int64
-		if err := json.Unmarshal([]byte(val), &ids); err == nil {
-			return ids, nil
-		}
-	} else if err != redis.Nil {
-		return nil, fmt.Errorf("redis get page cache failed, key=%s: %w", pageKey, err)
+	if len(ids) == 0 {
+		return []model.CommentIndex{}, nil
 	}
 
-	sfKey := "reply_ids_page:" + pageKey
-
-	v, err, _ := c.sf.Do(sfKey, func() (interface{}, error) {
-		if val, err := c.rdb.Get(ctx, pageKey).Result(); err == nil {
-			var ids []int64
-			if err := json.Unmarshal([]byte(val), &ids); err == nil {
-				return ids, nil
-			}
-		} else if err != redis.Nil {
-			// 双检 redis 异常不拦截，继续回源DB
+	validIDs := make([]int64, 0, len(ids))
+	for _, id := range ids {
+		if id > 0 {
+			validIDs = append(validIDs, id)
 		}
+	}
+	if len(validIDs) == 0 {
+		return []model.CommentIndex{}, nil
+	}
 
-		ids, err := conn.GetReplyIDsByPage(ctx, req)
-		if err != nil {
-			return nil, fmt.Errorf("db GetReplyIDsByPage failed: %w", err)
-		}
+	keys := make([]string, 0, len(validIDs))
+	for _, id := range validIDs {
+		keys = append(keys, CommentIndexKey(id))
+	}
 
-		if b, err := json.Marshal(ids); err == nil {
-			_ = c.rdb.Set(ctx, pageKey, b, defaultReplyIDsPageTTL).Err()
-		}
-
-		//预加载下一页
-		//go c.preloadNextReplyIDsPage(context.Background(), req, conn)
-
-		return ids, nil
-	})
+	values, err := c.rdb.MGet(ctx, keys...).Result()
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("redis MGet comment index cache failed: %w", err)
 	}
 
-	ids, ok := v.([]int64)
-	if !ok {
-		return nil, fmt.Errorf("singleflight result type assert failed for key=%s", sfKey)
-	}
-	return ids, nil
-}
+	indexMap := make(map[int64]model.CommentIndex, len(validIDs))
+	missIDs := make([]int64, 0)
 
-func (c *CommentCache) preloadNextReplyIDsPage(
-	ctx context.Context,
-	req model.GetReplyIDsPageReq,
-	conn *model.CommentModel,
-) {
-	// 基础保护
-	if c == nil || c.rdb == nil || conn == nil {
-		return
-	}
-	if req.Limit <= 0 {
-		return
-	}
+	for i, v := range values {
+		id := validIDs[i]
 
-	nextReq := req
-	nextReq.Offset = req.Offset + req.Limit
-
-	nextKey := ReplyIndexPageKey(
-		nextReq.TargetType,
-		nextReq.TargetId,
-		nextReq.RootId,
-		string(nextReq.Sort),
-		nextReq.Offset,
-		nextReq.Limit,
-	)
-
-	// 已存在就不预加载
-	exists, err := c.rdb.Exists(ctx, nextKey).Result()
-	if err == nil && exists > 0 {
-		return
-	}
-
-	// 为避免多个 goroutine 同时预加载，给 nextKey 也走一次 singleflight
-	sfKey := "reply_ids_page_preload:" + nextKey
-	_, _, _ = c.sf.Do(sfKey, func() (interface{}, error) {
-		// 双检
-		if val, err := c.rdb.Get(ctx, nextKey).Result(); err == nil && val != "" {
-			return nil, nil
+		if v == nil {
+			missIDs = append(missIDs, id)
+			continue
 		}
 
-		ids, err := conn.GetReplyIDsByPage(ctx, nextReq)
+		var raw []byte
+		switch vv := v.(type) {
+		case string:
+			raw = []byte(vv)
+		case []byte:
+			raw = vv
+		default:
+			missIDs = append(missIDs, id)
+			continue
+		}
+
+		var idx model.CommentIndex
+		if err := json.Unmarshal(raw, &idx); err != nil {
+			missIDs = append(missIDs, id)
+			continue
+		}
+		indexMap[id] = idx
+	}
+
+	if len(missIDs) > 0 {
+		dbIndexes, err := conn.BatchGetReplyIndexByIDs(ctx, missIDs)
 		if err != nil {
-			return nil, err
+			return nil, fmt.Errorf("db fallback BatchGetReplyIndexByIDs failed: %w", err)
 		}
-		if b, err := json.Marshal(ids); err == nil {
-			_ = c.rdb.Set(ctx, nextKey, b, defaultReplyIDsPageTTL).Err()
+
+		for _, idx := range dbIndexes {
+			indexMap[idx.Id] = idx
 		}
-		return nil, nil
-	})
+
+		// 6) 回填 Redis（pipeline）
+		if len(dbIndexes) > 0 {
+			pipe := c.rdb.Pipeline()
+			for _, idx := range dbIndexes {
+				b, err := json.Marshal(idx)
+				if err != nil {
+					continue
+				}
+				pipe.Set(ctx, CommentIndexKey(idx.Id), b, defaultCommentIndexTTL)
+			}
+			_, _ = pipe.Exec(ctx) // 缓存回填失败不阻断主流程（打日志）
+		}
+	}
+
+	// 7) 按输入 ids 顺序重排输出（关键）
+	result := make([]model.CommentIndex, 0, len(ids))
+	for _, id := range ids {
+		if id <= 0 {
+			continue
+		}
+		if idx, ok := indexMap[id]; ok {
+			result = append(result, idx)
+		}
+	}
+
+	return result, nil
 }

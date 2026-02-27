@@ -319,3 +319,99 @@ func (m *CommentModel) BatchGetReplyContent(ctx context.Context, commentIDs []in
 	}
 	return result, nil
 }
+
+func (m *CommentModel) LikeCommentTx(ctx context.Context, userId, commentId int64, targetType, targetId string, actionType int32, ownerId int64) error {
+	return m.conn.WithContext(ctx).Transaction(func(tx *gorm.DB) error {
+		var likeRecord CommentLike
+		var needInsert bool
+		//1.悲观锁查询:锁住记录防止连点器并发刷状态
+		err := tx.Clauses(clause.Locking{Strength: "UPDATE"}).Where("user_id = ? AND comment_id = ?", userId, commentId).First(&likeRecord).Error
+		if err != nil {
+			if err == gorm.ErrRecordNotFound {
+				needInsert = true
+				likeRecord = CommentLike{
+					UserId:     userId,
+					CommentId:  commentId,
+					TargetType: targetType,
+					TargetId:   targetId,
+					State:      0,
+				}
+			} else {
+				return err
+			}
+		}
+
+		//2.计算差值
+		oldState := likeRecord.State
+		var newState int32
+		var likeDiff, dislikeDiff int64
+		switch actionType {
+		case 1:
+			if oldState == 1 {
+				return nil
+			}
+			newState = 1
+			likeDiff = 1
+			if oldState == 2 {
+				dislikeDiff = -1
+			}
+		case 2:
+			if oldState != 1 {
+				return nil
+			}
+			newState = 0
+			likeDiff = -1
+		case 3:
+			if oldState == 2 {
+				return nil
+			}
+			newState = 2
+			dislikeDiff = 1
+			if oldState == 1 {
+				likeDiff = -1
+			}
+		case 4:
+			if oldState != 2 {
+				return nil
+			}
+			newState = 0
+			dislikeDiff = -1
+		default:
+			return fmt.Errorf("未知的操作类型")
+		}
+		//3.更新
+		likeRecord.State = newState
+		if needInsert {
+			if err := tx.Create(&likeRecord).Error; err != nil {
+				return err
+			}
+		} else {
+			if err := tx.Model(&likeRecord).Update("state", newState).Error; err != nil {
+				return err
+			}
+		}
+		//4.CommentIndex字段更新
+		updateCols := make(map[string]interface{})
+		if likeDiff != 0 {
+			updateCols["like_count"] = gorm.Expr("like_count + ?", likeDiff)
+		}
+		if dislikeDiff != 0 {
+			updateCols["dislike_count"] = gorm.Expr("dislike_count + ?", dislikeDiff)
+		}
+		//5.作者赞过,第0位, 2^0 = 1
+		if userId == ownerId {
+			if newState == 1 {
+				updateCols["attribute"] = gorm.Expr("attribute | ?", 1)
+			} else {
+				updateCols["attribute"] = gorm.Expr("attribute & ~?", 1)
+			}
+		}
+		//6.更新
+		if len(updateCols) > 0 {
+			if err := tx.Model(&CommentIndex{}).Where("id = ?", commentId).Updates(updateCols).Error; err != nil {
+				return err
+			}
+		}
+		return nil
+	})
+}

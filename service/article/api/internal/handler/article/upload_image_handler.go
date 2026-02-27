@@ -20,7 +20,7 @@ func UploadImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 			return
 		}
 
-		l := article.NewUploadImageLogic(r.Context(), svcCtx)
+		l := article.NewUploadImageLogic(r.Context(), svcCtx, r)
 		resp, err := l.UploadImage(&req)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)

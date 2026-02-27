@@ -83,3 +83,19 @@ type GetReplyIDsPageReq struct {
 	Sort       ReplySort // time/hot
 	OnlyNormal bool      // true=仅查正常状态(state=0)
 }
+
+type CommentLike struct {
+	Id         int64  `gorm:"column:id;primaryKey;autoIncrement"`
+	UserId     int64  `gorm:"column:user_id;not null;uniqueIndex:idx_user_comment_like"`
+	CommentId  int64  `gorm:"column:comment_id;not null;uniqueIndex:idx_user_comment_like"`
+	TargetType string `gorm:"column:target_type;type:varchar(32);not null"`
+	TargetId   string `gorm:"column:target_id;type:varchar(64);not null"`
+	//0无状态,1已点赞,2已点踩
+	State     int32     `gorm:"column:state;not null;default:0"`
+	CreatedAt time.Time `gorm:"column:created_at;autoCreateTime"`
+	UpdatedAt time.Time `gorm:"column:updated_at;autoUpdateTime"`
+}
+
+func (CommentLike) TableName() string {
+	return "comment_like"
+}

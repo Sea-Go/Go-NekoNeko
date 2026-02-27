@@ -47,3 +47,8 @@ func (s *ArticleServiceServer) ListArticles(ctx context.Context, in *__.ListArti
 	l := logic.NewListArticlesLogic(ctx, s.svcCtx)
 	return l.ListArticles(in)
 }
+
+func (s *ArticleServiceServer) UploadFile(ctx context.Context, in *__.UploadFileRequest) (*__.UploadFileResponse, error) {
+	l := logic.NewUploadFileLogic(ctx, s.svcCtx)
+	return l.UploadFile(in)
+}

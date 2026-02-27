@@ -109,6 +109,16 @@ message ListArticlesResponse {
   int32 page_size = 4;                // 每页数量
 }
 
+//图片上传
+message UploadFileRequest {
+  bytes content = 1;
+  string fileName = 2;
+}
+
+message UploadFileResponse {
+  string fileUrl = 1;
+}
+
 // 文章核心服务定义
 service ArticleService {
   rpc CreateArticle(CreateArticleRequest) returns (CreateArticleResponse);
@@ -116,4 +126,5 @@ service ArticleService {
   rpc UpdateArticle(UpdateArticleRequest) returns (UpdateArticleResponse);
   rpc DeleteArticle(DeleteArticleRequest) returns (DeleteArticleResponse);
   rpc ListArticles(ListArticlesRequest) returns (ListArticlesResponse);
+  rpc UploadFile(UploadFileRequest) returns (UploadFileResponse);
 }

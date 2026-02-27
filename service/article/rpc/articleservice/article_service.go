@@ -25,6 +25,8 @@ type (
 	ListArticlesResponse  = __.ListArticlesResponse
 	UpdateArticleRequest  = __.UpdateArticleRequest
 	UpdateArticleResponse = __.UpdateArticleResponse
+	UploadFileRequest     = __.UploadFileRequest
+	UploadFileResponse    = __.UploadFileResponse
 
 	ArticleService interface {
 		CreateArticle(ctx context.Context, in *CreateArticleRequest, opts ...grpc.CallOption) (*CreateArticleResponse, error)
@@ -32,6 +34,7 @@ type (
 		UpdateArticle(ctx context.Context, in *UpdateArticleRequest, opts ...grpc.CallOption) (*UpdateArticleResponse, error)
 		DeleteArticle(ctx context.Context, in *DeleteArticleRequest, opts ...grpc.CallOption) (*DeleteArticleResponse, error)
 		ListArticles(ctx context.Context, in *ListArticlesRequest, opts ...grpc.CallOption) (*ListArticlesResponse, error)
+		UploadFile(ctx context.Context, in *UploadFileRequest, opts ...grpc.CallOption) (*UploadFileResponse, error)
 	}
 
 	defaultArticleService struct {
@@ -68,4 +71,9 @@ func (m *defaultArticleService) DeleteArticle(ctx context.Context, in *DeleteArt
 func (m *defaultArticleService) ListArticles(ctx context.Context, in *ListArticlesRequest, opts ...grpc.CallOption) (*ListArticlesResponse, error) {
 	client := __.NewArticleServiceClient(m.cli.Conn())
 	return client.ListArticles(ctx, in, opts...)
+}
+
+func (m *defaultArticleService) UploadFile(ctx context.Context, in *UploadFileRequest, opts ...grpc.CallOption) (*UploadFileResponse, error) {
+	client := __.NewArticleServiceClient(m.cli.Conn())
+	return client.UploadFile(ctx, in, opts...)
 }

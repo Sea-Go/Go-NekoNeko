@@ -896,6 +896,103 @@ func (x *ListArticlesResponse) GetPageSize() int32 {
 	return 0
 }
 
+// 图片上传
+type UploadFileRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Content       []byte                 `protobuf:"bytes,1,opt,name=content,proto3" json:"content,omitempty"`
+	FileName      string                 `protobuf:"bytes,2,opt,name=fileName,proto3" json:"fileName,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadFileRequest) Reset() {
+	*x = UploadFileRequest{}
+	mi := &file_proto_article_proto_msgTypes[11]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadFileRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadFileRequest) ProtoMessage() {}
+
+func (x *UploadFileRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_article_proto_msgTypes[11]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadFileRequest.ProtoReflect.Descriptor instead.
+func (*UploadFileRequest) Descriptor() ([]byte, []int) {
+	return file_proto_article_proto_rawDescGZIP(), []int{11}
+}
+
+func (x *UploadFileRequest) GetContent() []byte {
+	if x != nil {
+		return x.Content
+	}
+	return nil
+}
+
+func (x *UploadFileRequest) GetFileName() string {
+	if x != nil {
+		return x.FileName
+	}
+	return ""
+}
+
+type UploadFileResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	FileUrl       string                 `protobuf:"bytes,1,opt,name=fileUrl,proto3" json:"fileUrl,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *UploadFileResponse) Reset() {
+	*x = UploadFileResponse{}
+	mi := &file_proto_article_proto_msgTypes[12]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *UploadFileResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*UploadFileResponse) ProtoMessage() {}
+
+func (x *UploadFileResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_proto_article_proto_msgTypes[12]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use UploadFileResponse.ProtoReflect.Descriptor instead.
+func (*UploadFileResponse) Descriptor() ([]byte, []int) {
+	return file_proto_article_proto_rawDescGZIP(), []int{12}
+}
+
+func (x *UploadFileResponse) GetFileUrl() string {
+	if x != nil {
+		return x.FileUrl
+	}
+	return ""
+}
+
 var File_proto_article_proto protoreflect.FileDescriptor
 
 const file_proto_article_proto_rawDesc = "" +
@@ -989,21 +1086,28 @@ const file_proto_article_proto_rawDesc = "" +
 	"\barticles\x18\x01 \x03(\v2\x10.article.ArticleR\barticles\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x03R\x05total\x12\x12\n" +
 	"\x04page\x18\x03 \x01(\x05R\x04page\x12\x1b\n" +
-	"\tpage_size\x18\x04 \x01(\x05R\bpageSize*s\n" +
+	"\tpage_size\x18\x04 \x01(\x05R\bpageSize\"I\n" +
+	"\x11UploadFileRequest\x12\x18\n" +
+	"\acontent\x18\x01 \x01(\fR\acontent\x12\x1a\n" +
+	"\bfileName\x18\x02 \x01(\tR\bfileName\".\n" +
+	"\x12UploadFileResponse\x12\x18\n" +
+	"\afileUrl\x18\x01 \x01(\tR\afileUrl*s\n" +
 	"\rArticleStatus\x12\x1e\n" +
 	"\x1aARTICLE_STATUS_UNSPECIFIED\x10\x00\x12\t\n" +
 	"\x05DRAFT\x10\x01\x12\r\n" +
 	"\tPUBLISHED\x10\x02\x12\r\n" +
 	"\tREVIEWING\x10\x03\x12\f\n" +
 	"\bREJECTED\x10\x04\x12\v\n" +
-	"\aDELETED\x10\x052\x94\x03\n" +
+	"\aDELETED\x10\x052\xdb\x03\n" +
 	"\x0eArticleService\x12N\n" +
 	"\rCreateArticle\x12\x1d.article.CreateArticleRequest\x1a\x1e.article.CreateArticleResponse\x12E\n" +
 	"\n" +
 	"GetArticle\x12\x1a.article.GetArticleRequest\x1a\x1b.article.GetArticleResponse\x12N\n" +
 	"\rUpdateArticle\x12\x1d.article.UpdateArticleRequest\x1a\x1e.article.UpdateArticleResponse\x12N\n" +
 	"\rDeleteArticle\x12\x1d.article.DeleteArticleRequest\x1a\x1e.article.DeleteArticleResponse\x12K\n" +
-	"\fListArticles\x12\x1c.article.ListArticlesRequest\x1a\x1d.article.ListArticlesResponseB\x03Z\x01.b\x06proto3"
+	"\fListArticles\x12\x1c.article.ListArticlesRequest\x1a\x1d.article.ListArticlesResponse\x12E\n" +
+	"\n" +
+	"UploadFile\x12\x1a.article.UploadFileRequest\x1a\x1b.article.UploadFileResponseB\x03Z\x01.b\x06proto3"
 
 var (
 	file_proto_article_proto_rawDescOnce sync.Once
@@ -1018,7 +1122,7 @@ func file_proto_article_proto_rawDescGZIP() []byte {
 }
 
 var file_proto_article_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_proto_article_proto_msgTypes = make([]protoimpl.MessageInfo, 12)
+var file_proto_article_proto_msgTypes = make([]protoimpl.MessageInfo, 14)
 var file_proto_article_proto_goTypes = []any{
 	(ArticleStatus)(0),            // 0: article.ArticleStatus
 	(*Article)(nil),               // 1: article.Article
@@ -1032,11 +1136,13 @@ var file_proto_article_proto_goTypes = []any{
 	(*DeleteArticleResponse)(nil), // 9: article.DeleteArticleResponse
 	(*ListArticlesRequest)(nil),   // 10: article.ListArticlesRequest
 	(*ListArticlesResponse)(nil),  // 11: article.ListArticlesResponse
-	nil,                           // 12: article.Article.ExtInfoEntry
+	(*UploadFileRequest)(nil),     // 12: article.UploadFileRequest
+	(*UploadFileResponse)(nil),    // 13: article.UploadFileResponse
+	nil,                           // 14: article.Article.ExtInfoEntry
 }
 var file_proto_article_proto_depIdxs = []int32{
 	0,  // 0: article.Article.status:type_name -> article.ArticleStatus
-	12, // 1: article.Article.ext_info:type_name -> article.Article.ExtInfoEntry
+	14, // 1: article.Article.ext_info:type_name -> article.Article.ExtInfoEntry
 	1,  // 2: article.GetArticleResponse.article:type_name -> article.Article
 	0,  // 3: article.UpdateArticleRequest.status:type_name -> article.ArticleStatus
 	1,  // 4: article.ListArticlesResponse.articles:type_name -> article.Article
@@ -1045,13 +1151,15 @@ var file_proto_article_proto_depIdxs = []int32{
 	6,  // 7: article.ArticleService.UpdateArticle:input_type -> article.UpdateArticleRequest
 	8,  // 8: article.ArticleService.DeleteArticle:input_type -> article.DeleteArticleRequest
 	10, // 9: article.ArticleService.ListArticles:input_type -> article.ListArticlesRequest
-	3,  // 10: article.ArticleService.CreateArticle:output_type -> article.CreateArticleResponse
-	5,  // 11: article.ArticleService.GetArticle:output_type -> article.GetArticleResponse
-	7,  // 12: article.ArticleService.UpdateArticle:output_type -> article.UpdateArticleResponse
-	9,  // 13: article.ArticleService.DeleteArticle:output_type -> article.DeleteArticleResponse
-	11, // 14: article.ArticleService.ListArticles:output_type -> article.ListArticlesResponse
-	10, // [10:15] is the sub-list for method output_type
-	5,  // [5:10] is the sub-list for method input_type
+	12, // 10: article.ArticleService.UploadFile:input_type -> article.UploadFileRequest
+	3,  // 11: article.ArticleService.CreateArticle:output_type -> article.CreateArticleResponse
+	5,  // 12: article.ArticleService.GetArticle:output_type -> article.GetArticleResponse
+	7,  // 13: article.ArticleService.UpdateArticle:output_type -> article.UpdateArticleResponse
+	9,  // 14: article.ArticleService.DeleteArticle:output_type -> article.DeleteArticleResponse
+	11, // 15: article.ArticleService.ListArticles:output_type -> article.ListArticlesResponse
+	13, // 16: article.ArticleService.UploadFile:output_type -> article.UploadFileResponse
+	11, // [11:17] is the sub-list for method output_type
+	5,  // [5:11] is the sub-list for method input_type
 	5,  // [5:5] is the sub-list for extension type_name
 	5,  // [5:5] is the sub-list for extension extendee
 	0,  // [0:5] is the sub-list for field type_name
@@ -1071,7 +1179,7 @@ func file_proto_article_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_article_proto_rawDesc), len(file_proto_article_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   12,
+			NumMessages:   14,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

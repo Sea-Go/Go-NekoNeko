@@ -4,11 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"sea-try-go/service/common/errmsg"
+	"time"
+
 	"sea-try-go/service/common/logger"
+	"sea-try-go/service/points/rpc/internal/metrics"
 	"sea-try-go/service/points/rpc/internal/model"
 	"sea-try-go/service/points/rpc/internal/svc"
-	"time"
+	"sea-try-go/service/user/common/errmsg"
 )
 
 type UserPointsMsg struct {
@@ -30,12 +32,15 @@ func NewPointsHandler(svcCtx *svc.ServiceContext) *PointsHandler {
 func (p *PointsHandler) Consume(ctx context.Context, key, value string) error {
 	msg := &UserPointsMsg{}
 	if err := json.Unmarshal([]byte(value), &msg); err != nil {
+		metrics.PointsKafkaErrorCounterMetric.WithLabelValues("points_mq", "kafka_consume", "json_unmarshal").Inc()
 		logger.LogBusinessErr(ctx, errmsg.ErrorJsonUnmarshal, err)
 		return err
 	}
+
 	points, err := p.svcCtx.PointsModel.FindByAccountIdAndUserId(ctx, msg.AccountId, msg.UserId)
 	if err != nil || points == nil {
 		if err != nil {
+			metrics.PointsKafkaErrorCounterMetric.WithLabelValues("points_mq", "kafka_consume", "db_select").Inc()
 			logger.LogBusinessErr(ctx, errmsg.ErrorDbSelect, err)
 		}
 		return err
@@ -43,23 +48,28 @@ func (p *PointsHandler) Consume(ctx context.Context, key, value string) error {
 	if points.Status == model.StatusSuccess || points.Status == model.StatusFailed {
 		return nil
 	}
+
 	ok, err := p.svcCtx.PointsModel.UpdateUserPoints(ctx, msg.UserId, msg.Amount)
 	if err != nil {
+		metrics.PointsKafkaErrorCounterMetric.WithLabelValues("points_mq", "kafka_consume", "db_update").Inc()
 		logger.LogBusinessErr(ctx, errmsg.ErrorDbUpdate, err, logger.WithUserID(fmt.Sprintf("%d", msg.UserId)))
 		_, err := p.svcCtx.RetryDqPusherClient.Delay([]byte(value), time.Second*3)
 		if err != nil {
+			metrics.PointsKafkaErrorCounterMetric.WithLabelValues("points_mq", "retry_delay", "delay_push").Inc()
 			logger.LogBusinessErr(ctx, errmsg.ErrorDelayMsg, err)
 			return err
 		}
 		return nil
 	}
+
 	if !ok {
-		// 积分余量不足，标记为失败
 		err = p.svcCtx.PointsModel.UpdateStatusByUid(ctx, msg.Uid, model.StatusFailed)
 		if err != nil {
+			metrics.PointsKafkaErrorCounterMetric.WithLabelValues("points_mq", "kafka_consume", "status_update").Inc()
 			logger.LogBusinessErr(ctx, errmsg.ErrorDbUpdate, err, logger.WithUserID(fmt.Sprintf("%d", msg.UserId)))
 			return err
 		}
 	}
+
 	return nil
 }

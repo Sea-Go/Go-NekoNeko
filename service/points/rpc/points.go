@@ -3,9 +3,9 @@ package main
 import (
 	"flag"
 	"sea-try-go/service/common/logger"
-	"sea-try-go/service/points/rpc/internal/mqs"
-
 	"sea-try-go/service/points/rpc/internal/config"
+	"sea-try-go/service/points/rpc/internal/metrics"
+	"sea-try-go/service/points/rpc/internal/mqs"
 	"sea-try-go/service/points/rpc/internal/server"
 	"sea-try-go/service/points/rpc/internal/svc"
 	__ "sea-try-go/service/points/rpc/pb"
@@ -25,8 +25,9 @@ func main() {
 
 	var c config.Config
 	conf.MustLoad(*configFile, &c)
-	logger.Init("points-rpc")
 	ctx := svc.NewServiceContext(c)
+	logger.Init("points-rpc")
+	metrics.InitMetrics(&c)
 	serviceGroup := service.NewServiceGroup()
 	s := zrpc.MustNewServer(c.RpcServerConf, func(grpcServer *grpc.Server) {
 		__.RegisterPointsServiceServer(grpcServer, server.NewPointsServiceServer(ctx))

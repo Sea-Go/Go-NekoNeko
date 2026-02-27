@@ -25,6 +25,6 @@ func NewGetCommentLogic(ctx context.Context, svcCtx *svc.ServiceContext) *GetCom
 
 func (l *GetCommentLogic) GetComment(in *pb.GetCommentReq) (*pb.GetCommentResp, error) {
 	// todo: add your logic here and delete this line
-
+	
 	return &pb.GetCommentResp{}, nil
 }

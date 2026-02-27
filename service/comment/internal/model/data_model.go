@@ -66,3 +66,20 @@ type ReportRecord struct {
 func (ReportRecord) TableName() string {
 	return "report_record"
 }
+
+type ReplySort string
+
+const (
+	ReplySortTime ReplySort = "time" // 时间序
+	ReplySortHot  ReplySort = "hot"  // 热度序
+)
+
+type GetReplyIDsPageReq struct {
+	TargetType string    // 内容类型
+	TargetId   string    // 内容ID
+	RootId     int64     // 根评论
+	Offset     int       // 分页偏移
+	Limit      int       // 分页大小
+	Sort       ReplySort // time/hot
+	OnlyNormal bool      // true=仅查正常状态(state=0)
+}

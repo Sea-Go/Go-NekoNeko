@@ -12,29 +12,30 @@ import (
 
 const defaultSubjectTTL = 5 * time.Minute
 
-func (c *CommentCache) GetSubjectWithCache(ctx context.Context, subjectID int64, conn *model.CommentModel) (model.Subject, error) {
+func (c *CommentCache) GetSubjectWithCache(ctx context.Context, subjectID string, conn *model.CommentModel) (model.Subject, error) {
 	if c == nil || c.rdb == nil {
 		return model.Subject{}, fmt.Errorf("comment cache is nil")
 	}
 	if conn == nil {
 		return model.Subject{}, fmt.Errorf("comment model conn is nil")
 	}
-	if subjectID <= 0 {
-		return model.Subject{}, fmt.Errorf("invalid subjectID: %d", subjectID)
+	if subjectID == "" {
+		return model.Subject{}, fmt.Errorf("invalid subjectID: empty")
 	}
 
 	if cached, err := c.GetSubjectCache(ctx, subjectID); err == nil && cached != nil {
 		return *cached, nil
+	} else if err != nil {
+		// Redis异常记日志
 	}
 
-	sfKey := fmt.Sprintf("subject:%d", subjectID)
+	sfKey := fmt.Sprintf("subject:%s", subjectID)
 
 	v, err, _ := c.sf.Do(sfKey, func() (interface{}, error) {
 		if cached, err := c.GetSubjectCache(ctx, subjectID); err == nil && cached != nil {
 			return *cached, nil
 		}
 
-		//DB回源
 		subject, dbErr := conn.GetSubjectByID(ctx, subjectID)
 		if dbErr != nil {
 			return model.Subject{}, dbErr
@@ -56,12 +57,12 @@ func (c *CommentCache) GetSubjectWithCache(ctx context.Context, subjectID int64,
 	return subject, nil
 }
 
-func (c *CommentCache) GetSubjectCache(ctx context.Context, subjectID int64) (*model.Subject, error) {
+func (c *CommentCache) GetSubjectCache(ctx context.Context, subjectID string) (*model.Subject, error) {
 	if c == nil || c.rdb == nil {
 		return nil, fmt.Errorf("comment cache is nil")
 	}
-	if subjectID <= 0 {
-		return nil, fmt.Errorf("invalid subjectID: %d", subjectID)
+	if subjectID == "" {
+		return nil, fmt.Errorf("invalid subjectID: empty")
 	}
 
 	val, err := c.rdb.Get(ctx, SubjectKey(subjectID)).Result()
@@ -79,12 +80,12 @@ func (c *CommentCache) GetSubjectCache(ctx context.Context, subjectID int64) (*m
 	return &s, nil
 }
 
-func (c *CommentCache) SetSubjectCache(ctx context.Context, subjectID int64, subject *model.Subject, ttl time.Duration) error {
+func (c *CommentCache) SetSubjectCache(ctx context.Context, subjectID string, subject *model.Subject, ttl time.Duration) error {
 	if c == nil || c.rdb == nil {
 		return fmt.Errorf("comment cache is nil")
 	}
-	if subjectID <= 0 {
-		return fmt.Errorf("invalid subjectID: %d", subjectID)
+	if subjectID == "" {
+		return fmt.Errorf("invalid subjectID: empty")
 	}
 	if subject == nil {
 		return fmt.Errorf("subject is nil")
@@ -97,7 +98,7 @@ func (c *CommentCache) SetSubjectCache(ctx context.Context, subjectID int64, sub
 
 	b, err := json.Marshal(subject)
 	if err != nil {
-		return fmt.Errorf("marshal subject cache failed, subjectID=%d: %w", subjectID, err)
+		return fmt.Errorf("marshal subject cache failed, subjectID=%s: %w", subjectID, err)
 	}
 
 	if err := c.rdb.Set(ctx, key, b, ttl).Err(); err != nil {

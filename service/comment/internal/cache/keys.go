@@ -2,7 +2,7 @@ package cache
 
 import "fmt"
 
-func SubjectKey(subjectID int64) string {
+func SubjectKey(subjectID string) string {
 	return fmt.Sprintf("comment:subject:%d", subjectID)
 }
 

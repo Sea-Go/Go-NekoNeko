@@ -184,10 +184,10 @@ func (m *CommentModel) DeleteCommentTx(ctx context.Context, commentId, userId in
 	return remainCount, err
 }
 
-func (m *CommentModel) GetSubjectByID(ctx context.Context, subjectId int64) (Subject, error) {
+func (m *CommentModel) GetSubjectByID(ctx context.Context, subjectId string) (Subject, error) {
 	var subject Subject
-	if subjectId <= 0 {
-		return subject, fmt.Errorf("invalid subjectId: %d", subjectId)
+	if subjectId == "" {
+		return subject, fmt.Errorf("invalid subjectId empty")
 	}
 
 	err := m.conn.WithContext(ctx).

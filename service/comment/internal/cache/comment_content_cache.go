@@ -10,7 +10,7 @@ import (
 
 const defaultReplyContentTTL = 24 * time.Hour
 
-func (cache *CommentCache) batchGetContentCache(ctx context.Context, ids []int64, conn *model.CommentModel) ([]model.CommentContent, error) {
+func (cache *CommentCache) BatchGetContentCache(ctx context.Context, ids []int64, conn *model.CommentModel) ([]model.CommentContent, error) {
 	if cache == nil || cache.rdb == nil {
 		return nil, fmt.Errorf("comment cache is nil")
 	}

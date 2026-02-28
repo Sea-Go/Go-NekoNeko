@@ -1,0 +1,132 @@
+syntax = "v1"
+
+info (
+	title:   "Favorite System API"
+	desc:    "收藏系统服务接口"
+	author:  "Neko Team"
+	version: "v1"
+)
+
+type (
+	// Folder Models
+	CreateFolderReq {
+		Name     string `json:"name"`
+		IsPublic bool   `json:"is_public"`
+	}
+	CreateFolderResp {
+		Id int64 `json:"id,string"`
+	}
+	UpdateFolderReq {
+		Id       int64  `json:"id,string"`
+		Name     string `json:"name"`
+		IsPublic bool   `json:"is_public"`
+	}
+	DeleteFolderReq {
+		Id int64 `json:"id,string"`
+	}
+	ListFoldersReq {
+		UserId int64 `form:"user_id,string"` // 查询指定用户的收藏夹
+	}
+	FolderInfo {
+		Id        int64  `json:"id,string"`
+		UserId    int64  `json:"user_id,string"`
+		Name      string `json:"name"`
+		IsPublic  bool   `json:"is_public"`
+		CreatedAt int64  `json:"created_at"`
+	}
+	ListFoldersResp {
+		Folders []FolderInfo `json:"folders"`
+	}
+	GetFolderReq {
+		FolderId int64 `form:"folder_id,string"`
+	}
+	GetFolderResp {
+		Folder FolderInfo `json:"folder"`
+	}
+	// Favorite Item Models
+	AddFavoriteItemReq {
+		FolderId   int64  `json:"folder_id,string"`
+		ObjectType string `json:"object_type"` // article, video, etc.
+		ObjectId   int64  `json:"object_id,string"`
+		Title      string `json:"title"` // 快照标题
+	}
+	RemoveFavoriteItemReq {
+		FolderId   int64  `json:"folder_id,string"`
+		ObjectType string `json:"object_type"`
+		ObjectId   int64  `json:"object_id,string"`
+	}
+	ListFavoriteItemsReq {
+		FolderId int64 `form:"folder_id,string"`
+		Page     int32 `form:"page,default=1"`
+		PageSize int32 `form:"page_size,default=20"`
+	}
+	FavoriteItemInfo {
+		Id         int64  `json:"id,string"`
+		FolderId   int64  `json:"folder_id,string"`
+		UserId     int64  `json:"user_id,string"`
+		ObjectType string `json:"object_type"`
+		ObjectId   int64  `json:"object_id,string"`
+		Title      string `json:"title"`
+		CreatedAt  int64  `json:"created_at"`
+	}
+	ListFavoriteItemsResp {
+		Items    []FavoriteItemInfo `json:"items"`
+		Total    int64              `json:"total"`
+		Page     int32              `json:"page"`
+		PageSize int32              `json:"page_size"`
+	}
+	CheckFavoriteReq {
+		ObjectType string `form:"object_type"`
+		ObjectId   int64  `form:"object_id,string"`
+	}
+	CheckFavoriteResp {
+		IsFavorited bool  `json:"is_favorited"`
+		FolderId    int64 `json:"folder_id,string"` // If favorited, return folder id
+	}
+	BaseResp {
+		Code    int32  `json:"code"`
+		Message string `json:"message"`
+	}
+)
+
+@server (
+	prefix: api/v1/favorite
+	group:  folder
+	jwt:    Auth
+)
+service favorite-api {
+	@handler CreateFolder
+	post /folder/create (CreateFolderReq) returns (CreateFolderResp)
+
+	@handler UpdateFolder
+	post /folder/update (UpdateFolderReq) returns (BaseResp)
+
+	@handler DeleteFolder
+	post /folder/delete (DeleteFolderReq) returns (BaseResp)
+
+	@handler ListFolders
+	get /folder/list (ListFoldersReq) returns (ListFoldersResp)
+
+	@handler GetFolder
+	get /folder/detail (GetFolderReq) returns (GetFolderResp)
+}
+
+@server (
+	prefix: api/v1/favorite
+	group:  item
+	jwt:    Auth
+)
+service favorite-api {
+	@handler AddFavoriteItem
+	post /item/add (AddFavoriteItemReq) returns (BaseResp)
+
+	@handler RemoveFavoriteItem
+	post /item/remove (RemoveFavoriteItemReq) returns (BaseResp)
+
+	@handler ListFavoriteItems
+	get /item/list (ListFavoriteItemsReq) returns (ListFavoriteItemsResp)
+
+	@handler CheckFavorite
+	get /item/check (CheckFavoriteReq) returns (CheckFavoriteResp)
+}
+

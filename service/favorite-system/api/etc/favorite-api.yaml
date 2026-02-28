@@ -1,0 +1,10 @@
+Name: favorite-api
+Host: 0.0.0.0
+Port: 8890
+Auth:
+  AccessSecret: neko-secret
+  AccessExpire: 3600
+Postgres:
+  DataSource: postgres://admin:Sea-TryGo@127.0.0.1:35432/first_db?sslmode=disable
+Redis:
+  Addr: 127.0.0.1:36379

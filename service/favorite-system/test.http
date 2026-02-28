@@ -1,0 +1,29 @@
+### 1. Create Folder
+POST http://localhost:8890/api/v1/favorite/folder/create
+Content-Type: application/json
+Authorization: Bearer test_token
+
+{
+    "name": "GoLangStudy",
+    "is_public": true
+}
+
+### 2. Add Favorite Item (Assuming Folder ID is 1)
+POST http://localhost:8890/api/v1/favorite/item/add
+Content-Type: application/json
+Authorization: Bearer test_token
+
+{
+    "folder_id": "1",
+    "object_type": "article",
+    "object_id": "10086",
+    "title": "Go Microservices"
+}
+
+### 3. Check Favorite
+GET http://localhost:8890/api/v1/favorite/item/check?object_type=article&object_id=10086
+Authorization: Bearer test_token
+
+### 4. List Items
+GET http://localhost:8890/api/v1/favorite/item/list?folder_id=1
+Authorization: Bearer test_token

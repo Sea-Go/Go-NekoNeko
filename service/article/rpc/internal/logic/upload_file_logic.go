@@ -4,13 +4,13 @@ import (
 	"bytes"
 	"context"
 	"fmt"
-	"github.com/google/uuid"
 	"github.com/minio/minio-go/v7"
-	"mime" // 引入 mime 包
+	"mime"
 	"path/filepath"
 
 	"sea-try-go/service/article/rpc/internal/svc"
 	"sea-try-go/service/article/rpc/pb"
+	"sea-try-go/service/common/snowflake" // 引入 snowflake
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -30,15 +30,20 @@ func NewUploadFileLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Upload
 }
 
 func (l *UploadFileLogic) UploadFile(in *__.UploadFileRequest) (*__.UploadFileResponse, error) {
+	id, err := snowflake.GetID()
+	if err != nil {
+		return nil, err
+	}
+
 	ext := filepath.Ext(in.FileName)
-	objectName := fmt.Sprintf("%s%s%s", l.svcCtx.Config.MinIO.ImagePath, uuid.New().String(), ext)
+	objectName := fmt.Sprintf("%s%d%s", l.svcCtx.Config.MinIO.ImagePath, id, ext)
 
 	contentType := mime.TypeByExtension(ext)
 	if contentType == "" {
 		contentType = "application/octet-stream"
 	}
 
-	_, err := l.svcCtx.MinioClient.PutObject(l.ctx, l.svcCtx.Config.MinIO.BucketName, objectName,
+	_, err = l.svcCtx.MinioClient.PutObject(l.ctx, l.svcCtx.Config.MinIO.BucketName, objectName,
 		bytes.NewReader(in.Content), int64(len(in.Content)),
 		minio.PutObjectOptions{ContentType: contentType})
 

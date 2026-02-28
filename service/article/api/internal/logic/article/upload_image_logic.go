@@ -5,9 +5,11 @@ package article
 
 import (
 	"context"
-	"net/http"
+	"io"
+	"mime/multipart"
 	"sea-try-go/service/article/api/internal/svc"
 	"sea-try-go/service/article/api/internal/types"
+	"sea-try-go/service/article/rpc/articleservice"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -16,18 +18,31 @@ type UploadImageLogic struct {
 	logx.Logger
 	ctx    context.Context
 	svcCtx *svc.ServiceContext
-	r      *http.Request
 }
 
-func NewUploadImageLogic(ctx context.Context, svcCtx *svc.ServiceContext, r *http.Request) *UploadImageLogic {
+func NewUploadImageLogic(ctx context.Context, svcCtx *svc.ServiceContext) *UploadImageLogic {
 	return &UploadImageLogic{
 		Logger: logx.WithContext(ctx),
 		ctx:    ctx,
 		svcCtx: svcCtx,
-		r:      r,
 	}
 }
 
-func (l *UploadImageLogic) UploadImage(req *types.UploadImageReq) (resp *types.UploadImageResp, err error) {
-	return
+func (l *UploadImageLogic) UploadImage(file multipart.File, header *multipart.FileHeader) (resp *types.UploadImageResp, err error) {
+	content, err := io.ReadAll(file)
+	if err != nil {
+		return nil, err
+	}
+
+	rpcResp, err := l.svcCtx.ArticleRpc.UploadFile(l.ctx, &articleservice.UploadFileRequest{
+		Content:  content,
+		FileName: header.Filename,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return &types.UploadImageResp{
+		ImageUrl: rpcResp.FileUrl,
+	}, nil
 }

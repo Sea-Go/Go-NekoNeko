@@ -31,5 +31,7 @@ type Config struct {
 		SecretAccessKey string
 		UseSSL          bool
 		BucketName      string
+		ImagePath       string
+		ArticlePath     string
 	}
 }

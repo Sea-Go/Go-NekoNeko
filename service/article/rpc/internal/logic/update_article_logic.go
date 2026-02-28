@@ -2,12 +2,14 @@ package logic
 
 import (
 	"context"
+	"strings"
 
 	"fmt"
 
 	"sea-try-go/service/article/rpc/internal/svc"
 	"sea-try-go/service/article/rpc/pb"
 
+	"github.com/minio/minio-go/v7"
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
@@ -42,7 +44,20 @@ func (l *UpdateArticleLogic) UpdateArticle(in *__.UpdateArticleRequest) (*__.Upd
 		article.Brief = *in.Brief
 	}
 	if in.MarkdownContent != nil {
-		article.Content = *in.MarkdownContent
+		objectName := article.Content
+		if objectName == "" {
+			objectName = fmt.Sprintf("%s%s.md", l.svcCtx.Config.MinIO.ArticlePath, article.ID)
+			article.Content = objectName
+		}
+
+		contentType := "text/markdown"
+		reader := strings.NewReader(*in.MarkdownContent)
+		_, err = l.svcCtx.MinioClient.PutObject(l.ctx, l.svcCtx.Config.MinIO.BucketName, objectName,
+			reader, int64(len(*in.MarkdownContent)), minio.PutObjectOptions{ContentType: contentType})
+		if err != nil {
+			l.Logger.Errorf("UpdateArticle Upload to MinIO error: %v", err)
+			return nil, err
+		}
 	}
 	if in.CoverImageUrl != nil {
 		article.CoverImageURL = *in.CoverImageUrl

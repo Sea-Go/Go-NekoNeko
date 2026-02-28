@@ -30,6 +30,8 @@ MinIO:
   SecretAccessKey: "minioadmin"
   BucketName: "articles"
   UseSSL: false
+  ImagePath: "articles/images/"
+  ArticlePath: "articles/content/"
 
 KqConsumerConf:
   Name: dataclean-consumer

@@ -9,19 +9,19 @@ import (
 	"github.com/zeromicro/go-zero/rest/httpx"
 	"sea-try-go/service/article/api/internal/logic/article"
 	"sea-try-go/service/article/api/internal/svc"
-	"sea-try-go/service/article/api/internal/types"
 )
 
 func UploadImageHandler(svcCtx *svc.ServiceContext) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		var req types.UploadImageReq
-		if err := httpx.Parse(r, &req); err != nil {
+		file, header, err := r.FormFile("image")
+		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 			return
 		}
+		defer file.Close()
 
-		l := article.NewUploadImageLogic(r.Context(), svcCtx, r)
-		resp, err := l.UploadImage(&req)
+		l := article.NewUploadImageLogic(r.Context(), svcCtx)
+		resp, err := l.UploadImage(file, header)
 		if err != nil {
 			httpx.ErrorCtx(r.Context(), w, err)
 		} else {

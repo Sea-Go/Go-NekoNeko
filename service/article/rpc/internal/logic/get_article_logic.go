@@ -2,10 +2,12 @@ package logic
 
 import (
 	"context"
+	"io"
 
 	"sea-try-go/service/article/rpc/internal/svc"
 	"sea-try-go/service/article/rpc/pb"
 
+	"github.com/minio/minio-go/v7"
 	"github.com/zeromicro/go-zero/core/logx"
 	"gorm.io/gorm"
 )
@@ -41,12 +43,25 @@ func (l *GetArticleLogic) GetArticle(in *__.GetArticleRequest) (*__.GetArticleRe
 		article.ViewCount++
 	}
 
+	object, err := l.svcCtx.MinioClient.GetObject(l.ctx, l.svcCtx.Config.MinIO.BucketName, article.Content, minio.GetObjectOptions{})
+	if err != nil {
+		l.Logger.Errorf("MinIO GetObject error: %v", err)
+		return nil, err
+	}
+	defer object.Close()
+
+	contentBytes, err := io.ReadAll(object)
+	if err != nil {
+		l.Logger.Errorf("Read MinIO object error: %v", err)
+		return nil, err
+	}
+
 	return &__.GetArticleResponse{
 		Article: &__.Article{
 			Id:              article.ID,
 			Title:           article.Title,
 			Brief:           article.Brief,
-			MarkdownContent: article.Content,
+			MarkdownContent: string(contentBytes),
 			CoverImageUrl:   article.CoverImageURL,
 			ManualTypeTag:   article.ManualTypeTag,
 			SecondaryTags:   article.SecondaryTags,

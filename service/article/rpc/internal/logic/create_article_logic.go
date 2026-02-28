@@ -11,6 +11,9 @@ import (
 	"sea-try-go/service/article/rpc/pb"
 	"sea-try-go/service/common/logger"
 	"sea-try-go/service/common/snowflake"
+	"strings"
+
+	"github.com/minio/minio-go/v7"
 )
 
 type CreateArticleLogic struct {
@@ -34,11 +37,21 @@ func (l *CreateArticleLogic) CreateArticle(in *__.CreateArticleRequest) (*__.Cre
 	}
 	articleId := fmt.Sprintf("%d", idInt)
 
+	objectName := fmt.Sprintf("%s%s.md", l.svcCtx.Config.MinIO.ArticlePath, articleId)
+	contentType := "text/markdown"
+	reader := strings.NewReader(in.MarkdownContent)
+	_, err = l.svcCtx.MinioClient.PutObject(l.ctx, l.svcCtx.Config.MinIO.BucketName, objectName,
+		reader, int64(len(in.MarkdownContent)), minio.PutObjectOptions{ContentType: contentType})
+	if err != nil {
+		logger.LogBusinessErr(l.ctx, errmsg.Error, err, logger.WithArticleID(articleId))
+		return nil, err
+	}
+
 	newArticle := &model.Article{
 		ID:            articleId,
 		Title:         in.Title,
 		Brief:         *in.Brief,
-		Content:       in.MarkdownContent,
+		Content:       objectName, // 这里存的是 MinIO 的路径，而不是原文
 		CoverImageURL: *in.CoverImageUrl,
 		ManualTypeTag: in.ManualTypeTag,
 		SecondaryTags: model.StringArray(in.SecondaryTags),
@@ -52,13 +65,13 @@ func (l *CreateArticleLogic) CreateArticle(in *__.CreateArticleRequest) (*__.Cre
 	}
 
 	msg := struct {
-		ArticleId string `json:"article_id"`
-		AuthorId  string `json:"author_id"`
-		Content   string `json:"content"`
+		ArticleId   string `json:"article_id"`
+		AuthorId    string `json:"author_id"`
+		ContentPath string `json:"content_path"`
 	}{
-		ArticleId: articleId,
-		AuthorId:  in.AuthorId,
-		Content:   in.MarkdownContent,
+		ArticleId:   articleId,
+		AuthorId:    in.AuthorId,
+		ContentPath: objectName,
 	}
 
 	msgBytes, _ := json.Marshal(msg)

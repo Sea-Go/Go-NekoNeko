@@ -8,6 +8,18 @@ import (
 	"github.com/jackc/pgx/v5/pgtype"
 )
 
+type FavoriteItem struct {
+	ID         int64            `json:"id"`
+	FolderID   int64            `json:"folder_id"`
+	UserID     int64            `json:"user_id"`
+	ObjectType string           `json:"object_type"`
+	ObjectID   int64            `json:"object_id"`
+	Title      string           `json:"title"`
+	CreatedAt  pgtype.Timestamp `json:"created_at"`
+	UpdatedAt  pgtype.Timestamp `json:"updated_at"`
+	DeletedAt  pgtype.Timestamp `json:"deleted_at"`
+}
+
 type Folder struct {
 	ID        int64            `json:"id"`
 	UserID    int64            `json:"user_id"`

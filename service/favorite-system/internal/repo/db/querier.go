@@ -9,10 +9,18 @@ import (
 )
 
 type Querier interface {
+	AddFavoriteItem(ctx context.Context, arg AddFavoriteItemParams) (FavoriteItem, error)
+	CountFavoriteItems(ctx context.Context, folderID int64) (int64, error)
 	CreateFolder(ctx context.Context, arg CreateFolderParams) (Folder, error)
+	GetFavoriteItem(ctx context.Context, arg GetFavoriteItemParams) (FavoriteItem, error)
 	GetFolderByID(ctx context.Context, id int64) (Folder, error)
+	ListAllFavoriteItems(ctx context.Context, folderID int64) ([]FavoriteItem, error)
+	ListFavoriteItems(ctx context.Context, arg ListFavoriteItemsParams) ([]FavoriteItem, error)
 	ListFoldersByUser(ctx context.Context, userID int64) ([]Folder, error)
+	SoftDeleteFavoriteItem(ctx context.Context, arg SoftDeleteFavoriteItemParams) error
+	SoftDeleteFavoriteItemsByFolder(ctx context.Context, folderID int64) error
 	SoftDeleteFolder(ctx context.Context, id int64) error
+	UpdateFolder(ctx context.Context, arg UpdateFolderParams) error
 }
 
 var _ Querier = (*Queries)(nil)

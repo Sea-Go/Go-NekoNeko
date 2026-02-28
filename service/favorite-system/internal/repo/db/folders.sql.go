@@ -105,3 +105,21 @@ func (q *Queries) SoftDeleteFolder(ctx context.Context, id int64) error {
 	_, err := q.db.Exec(ctx, softDeleteFolder, id)
 	return err
 }
+
+const updateFolder = `-- name: UpdateFolder :exec
+UPDATE folders
+SET name = $2, is_public = $3, updated_at = NOW()
+WHERE id = $1
+  AND deleted_at IS NULL
+`
+
+type UpdateFolderParams struct {
+	ID       int64  `json:"id"`
+	Name     string `json:"name"`
+	IsPublic bool   `json:"is_public"`
+}
+
+func (q *Queries) UpdateFolder(ctx context.Context, arg UpdateFolderParams) error {
+	_, err := q.db.Exec(ctx, updateFolder, arg.ID, arg.Name, arg.IsPublic)
+	return err
+}

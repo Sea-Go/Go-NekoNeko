@@ -21,3 +21,9 @@ UPDATE folders
 SET deleted_at = NOW()
 WHERE id = $1
   AND deleted_at IS NULL;
+
+-- name: UpdateFolder :exec
+UPDATE folders
+SET name = $2, is_public = $3, updated_at = NOW()
+WHERE id = $1
+  AND deleted_at IS NULL;

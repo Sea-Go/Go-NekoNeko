@@ -27,18 +27,3 @@ func (s *TaskServiceServer) GetTask(ctx context.Context, in *__.GetTaskReq) (*__
 	l := logic.NewGetTaskLogic(ctx, s.svcCtx)
 	return l.GetTask(in)
 }
-
-func (s *TaskServiceServer) CreateTask(ctx context.Context, in *__.CreateTaskReq) (*__.CreateTaskResp, error) {
-	l := logic.NewCreateTaskLogic(ctx, s.svcCtx)
-	return l.CreateTask(in)
-}
-
-func (s *TaskServiceServer) UpdateTask(ctx context.Context, in *__.UpdateTaskReq) (*__.UpdateTaskResp, error) {
-	l := logic.NewUpdateTaskLogic(ctx, s.svcCtx)
-	return l.UpdateTask(in)
-}
-
-func (s *TaskServiceServer) DeleteTask(ctx context.Context, in *__.DeleteTaskReq) (*__.DeleteTaskResp, error) {
-	l := logic.NewDeleteTaskLogic(ctx, s.svcCtx)
-	return l.DeleteTask(in)
-}

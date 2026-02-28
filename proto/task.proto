@@ -19,40 +19,6 @@ message GetTaskResp{
   repeated Task task = 1;
 }
 
-message CreateTaskReq{
-  Task task = 1;
-  int64 request_id = 2;
-}
-
-message CreateTaskResp{
-  bool success = 1;
-  string msg = 2;
-}
-
-message UpdateTaskReq{
-  Task task = 1;
-  int64 request_id = 2;
-}
-
-message UpdateTaskResp{
-  bool success = 1;
-  string msg = 2;
-}
-
-message DeleteTaskReq{
-  int64 task_id = 1;
-  int64 request_id = 2;
-}
-
-message DeleteTaskResp{
-  bool success = 1;
-  string msg = 2;
-}
-
-
 service TaskService{
   rpc GetTask(GetTaskReq) returns (GetTaskResp); //获取用户的任务进度
-  rpc CreateTask(CreateTaskReq) returns (CreateTaskResp);
-  rpc UpdateTask(UpdateTaskReq) returns (UpdateTaskResp);
-  rpc DeleteTask(DeleteTaskReq) returns (DeleteTaskResp);
 }

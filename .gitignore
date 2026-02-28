@@ -1,7 +1,9 @@
-/Data
+/data
 /volumes
 /log
 
 .env
 
 *.exe
+
+.gocache

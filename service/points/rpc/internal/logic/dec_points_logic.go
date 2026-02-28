@@ -2,9 +2,11 @@ package logic
 
 import (
 	"context"
+	"time"
 
+	"sea-try-go/service/points/rpc/internal/metrics"
 	"sea-try-go/service/points/rpc/internal/svc"
-	"sea-try-go/service/points/rpc/pb"
+	pb "sea-try-go/service/points/rpc/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -23,8 +25,18 @@ func NewDecPointsLogic(ctx context.Context, svcCtx *svc.ServiceContext) *DecPoin
 	}
 }
 
-func (l *DecPointsLogic) DecPoints(in *__.DecPointsReq) (*__.DecPointsResp, error) {
-	// todo: add your logic here and delete this line
+func (l *DecPointsLogic) DecPoints(in *pb.DecPointsReq) (*pb.DecPointsResp, error) {
+	start := time.Now()
+	resultLabel := "ok"
+	defer func() {
+		metrics.PointsRequestCounterMetric.WithLabelValues("points_rpc", "DecPoints", resultLabel).Inc()
+		metrics.PointsRequestSecondsCounterMetric.WithLabelValues("points_rpc", "DecPoints").Add(time.Since(start).Seconds())
+	}()
 
-	return &__.DecPointsResp{}, nil
+	result, err := ProcessPoints(l.ctx, l.svcCtx, in.UserId, in.RequestId, -in.DecPoints)
+	if err != nil {
+		resultLabel = "sys_fail"
+		return nil, err
+	}
+	return &pb.DecPointsResp{Success: result.Success, Message: result.Message}, nil
 }

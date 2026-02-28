@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package pb;
 
+option go_package = "./pb";
+
 //操作类型枚举
 enum ActionType {
     ACTION_UNSPECIFIED = 0;

@@ -1,0 +1,142 @@
+syntax = "proto3";
+
+package pb;
+
+//操作类型枚举
+enum ActionType {
+    ACTION_UNSPECIFIED = 0;
+    //点赞
+    ACTION_LIKE = 1;
+    //取消点赞
+    ACTION_UNLIKE = 2;
+    //点踩
+    ACTION_DISLIKE = 3;
+    //取消点踩
+    ACTION_UNDISLIKE = 4;
+}
+
+message LikeActionReq {
+  //目标对象类型,例如article,video等
+  string target_type = 1;
+  //目标对象id,和type联合起来使用
+  //target_type = article && target_id = 1 表示文章中id为1的那个对象
+  string target_id = 2;
+  //点赞者ID
+  int64 user_id = 3;
+  //操作类型
+  ActionType action_type = 4;
+  //作者ID
+  int64 author_id = 5;
+  //点赞权重,用于推广系统计算
+  float weight = 6;
+  //客户端IP,防刷机制AntiBrush中使用
+  string client_ip = 7;
+  //推广任务ID,对接 Kafka 推广系统结算
+  string promotion_id = 8;
+}
+
+message LikeActionResp {
+  bool success = 1;
+  //相关信息,成功为Success,失败则返回失败信息
+  string message = 2;
+  //操作后的点赞数
+  int64 like_count = 3;
+}
+
+//对稿件的点赞数查询
+message GetLikeCountReq {
+  string target_type = 1;
+  //支持单个稿件的点赞查询,也支持批量查询(Feed流列表页刚需)
+  repeated string target_ids = 2;
+}
+
+//点赞数结构,包括赞和踩
+message LikeCountItem {
+  //点赞数
+  int64 like_count = 1;
+  //点踩数
+  int64 dislike_count = 2;
+}
+
+message GetLikeCountResp {
+  //Key为target_id,Value为对应的点赞点踩数
+  map<string,LikeCountItem> counts = 1;
+}
+
+//查询某人的点赞状态
+message GetLikeStateReq {
+  string target_type = 1;
+  //用户ID
+  int64 user_id = 2;
+  repeated string target_ids = 3;
+}
+
+message GetLikeStateResp {
+  map<string,int32> states = 1;
+}
+
+//获取某人的点赞列表
+message GetUserLikeListReq {
+  string target_type = 1;
+  int64 user_id = 2;
+  //上一页最后一条记录的时间戳
+  int64 cursor = 3;
+  //每一页的大小
+  int32 page_size = 4;
+}
+
+
+//点赞记录结构
+message LikeRecordItem {
+  string target_id = 1;
+  //时间戳
+  int64 timestamp = 2;
+}
+
+message GetUserLikeListResp {
+  repeated LikeRecordItem list = 1;
+  //是否到头了
+  bool is_end = 2;
+  //返回接下来查询的游标位置
+  int64 next_cursor = 3;
+}
+
+//查询某个稿件的点赞人列表
+message GetTargetLikerListReq {
+  string target_type = 1;
+  string target_id = 2;
+  //cursor含义同上
+  int64 cursor = 3;
+  int32 page_size = 4;
+}
+
+//点赞人结构
+message LikeItem {
+  int64 user_id = 1;
+  int64 timestamp = 2;
+}
+
+message GetTargetLikerListResp {
+  repeated LikeItem list = 1;
+  bool is_end = 2;
+  int64 next_cursor = 3;
+}
+
+//获取某人的总获赞数
+message GetUserTotalLikeReq {
+  int64 user_id = 1;
+}
+
+message GetUserTotalLikeResp {
+  int64 total_like_count = 1;
+}
+
+service LikeService {
+  rpc LikeAction (LikeActionReq) returns (LikeActionResp);
+  rpc GetLikeCount (GetLikeCountReq) returns (GetLikeCountResp);
+  rpc GetLikeState (GetLikeStateReq) returns (GetLikeStateResp);
+  rpc GetUserLikeList (GetUserLikeListReq) returns (GetUserLikeListResp);
+  rpc GetTargetLikerList (GetTargetLikerListReq) returns (GetTargetLikerListResp);
+  rpc GetUserTotalLike (GetUserTotalLikeReq) returns (GetUserTotalLikeResp);
+  
+}

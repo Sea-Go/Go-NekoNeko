@@ -9,7 +9,9 @@ import (
 	"mime/multipart"
 	"sea-try-go/service/article/api/internal/svc"
 	"sea-try-go/service/article/api/internal/types"
+	"sea-try-go/service/article/common/errmsg"
 	"sea-try-go/service/article/rpc/articleservice"
+	"sea-try-go/service/common/logger"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -31,6 +33,7 @@ func NewUploadImageLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Uploa
 func (l *UploadImageLogic) UploadImage(file multipart.File, header *multipart.FileHeader) (resp *types.UploadImageResp, err error) {
 	content, err := io.ReadAll(file)
 	if err != nil {
+		logger.LogBusinessErr(l.ctx, errmsg.Error, err)
 		return nil, err
 	}
 
@@ -39,6 +42,7 @@ func (l *UploadImageLogic) UploadImage(file multipart.File, header *multipart.Fi
 		FileName: header.Filename,
 	})
 	if err != nil {
+		logger.LogBusinessErr(l.ctx, errmsg.Error, err)
 		return nil, err
 	}
 

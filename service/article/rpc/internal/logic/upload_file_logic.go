@@ -8,9 +8,11 @@ import (
 	"mime"
 	"path/filepath"
 
+	"sea-try-go/service/article/common/errmsg"
 	"sea-try-go/service/article/rpc/internal/svc"
 	"sea-try-go/service/article/rpc/pb"
-	"sea-try-go/service/common/snowflake" // 引入 snowflake
+	"sea-try-go/service/common/logger"
+	"sea-try-go/service/common/snowflake"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )
@@ -32,6 +34,7 @@ func NewUploadFileLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Upload
 func (l *UploadFileLogic) UploadFile(in *__.UploadFileRequest) (*__.UploadFileResponse, error) {
 	id, err := snowflake.GetID()
 	if err != nil {
+		logger.LogBusinessErr(l.ctx, errmsg.Error, fmt.Errorf("generate snowflake id failed: %w", err))
 		return nil, err
 	}
 
@@ -48,6 +51,7 @@ func (l *UploadFileLogic) UploadFile(in *__.UploadFileRequest) (*__.UploadFileRe
 		minio.PutObjectOptions{ContentType: contentType})
 
 	if err != nil {
+		logger.LogBusinessErr(l.ctx, errmsg.Error, fmt.Errorf("minio put object failed: %w", err))
 		return nil, err
 	}
 

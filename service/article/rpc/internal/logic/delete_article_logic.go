@@ -4,8 +4,10 @@ import (
 	"context"
 	"fmt"
 
+	"sea-try-go/service/article/common/errmsg"
 	"sea-try-go/service/article/rpc/internal/svc"
 	"sea-try-go/service/article/rpc/pb"
+	"sea-try-go/service/common/logger"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -28,7 +30,7 @@ func NewDeleteArticleLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Del
 func (l *DeleteArticleLogic) DeleteArticle(in *__.DeleteArticleRequest) (*__.DeleteArticleResponse, error) {
 	article, err := l.svcCtx.ArticleRepo.FindOne(l.ctx, in.ArticleId)
 	if err != nil {
-		l.Logger.Errorf("DeleteArticle FindOne error: %v", err)
+		logger.LogBusinessErr(l.ctx, errmsg.ErrorDbSelect, err, logger.WithArticleID(in.ArticleId))
 		return nil, err
 	}
 	if article == nil {
@@ -38,13 +40,13 @@ func (l *DeleteArticleLogic) DeleteArticle(in *__.DeleteArticleRequest) (*__.Del
 	if article.Content != "" {
 		err = l.svcCtx.MinioClient.RemoveObject(l.ctx, l.svcCtx.Config.MinIO.BucketName, article.Content, minio.RemoveObjectOptions{})
 		if err != nil {
-			l.Logger.Errorf("DeleteArticle RemoveObject from MinIO error: %v, object: %s", err, article.Content)
+			logger.LogBusinessErr(l.ctx, errmsg.Error, fmt.Errorf("remove minio object failed: %w", err), logger.WithArticleID(in.ArticleId))
 			return nil, err
 		}
 	}
 
 	if err := l.svcCtx.ArticleRepo.Delete(l.ctx, in.ArticleId); err != nil {
-		l.Logger.Errorf("DeleteArticle Delete error: %v", err)
+		logger.LogBusinessErr(l.ctx, errmsg.ErrorDbUpdate, err, logger.WithArticleID(in.ArticleId))
 		return nil, err
 	}
 

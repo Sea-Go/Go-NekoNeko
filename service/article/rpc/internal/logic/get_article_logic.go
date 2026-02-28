@@ -2,10 +2,13 @@ package logic
 
 import (
 	"context"
+	"fmt"
 	"io"
 
+	"sea-try-go/service/article/common/errmsg"
 	"sea-try-go/service/article/rpc/internal/svc"
 	"sea-try-go/service/article/rpc/pb"
+	"sea-try-go/service/common/logger"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -32,27 +35,27 @@ func (l *GetArticleLogic) GetArticle(in *__.GetArticleRequest) (*__.GetArticleRe
 		if err == gorm.ErrRecordNotFound {
 			return nil, nil
 		}
-		l.Logger.Errorf("GetArticle db error: %v", err)
+		logger.LogBusinessErr(l.ctx, errmsg.ErrorDbSelect, err, logger.WithArticleID(in.ArticleId))
 		return nil, err
 	}
 
 	if in.IncrView {
 		if err := l.svcCtx.ArticleRepo.IncrViewCount(l.ctx, in.ArticleId); err != nil {
-			l.Logger.Errorf("IncrViewCount error: %v", err)
+			logger.LogBusinessErr(l.ctx, errmsg.ErrorDbUpdate, err, logger.WithArticleID(in.ArticleId))
 		}
 		article.ViewCount++
 	}
 
 	object, err := l.svcCtx.MinioClient.GetObject(l.ctx, l.svcCtx.Config.MinIO.BucketName, article.Content, minio.GetObjectOptions{})
 	if err != nil {
-		l.Logger.Errorf("MinIO GetObject error: %v", err)
+		logger.LogBusinessErr(l.ctx, errmsg.Error, fmt.Errorf("minio get object failed: %w", err), logger.WithArticleID(in.ArticleId))
 		return nil, err
 	}
 	defer object.Close()
 
 	contentBytes, err := io.ReadAll(object)
 	if err != nil {
-		l.Logger.Errorf("Read MinIO object error: %v", err)
+		logger.LogBusinessErr(l.ctx, errmsg.Error, fmt.Errorf("read minio content failed: %w", err), logger.WithArticleID(in.ArticleId))
 		return nil, err
 	}
 

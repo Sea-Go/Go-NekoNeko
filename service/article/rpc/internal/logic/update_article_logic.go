@@ -6,8 +6,10 @@ import (
 
 	"fmt"
 
+	"sea-try-go/service/article/common/errmsg"
 	"sea-try-go/service/article/rpc/internal/svc"
 	"sea-try-go/service/article/rpc/pb"
+	"sea-try-go/service/common/logger"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/zeromicro/go-zero/core/logx"
@@ -30,7 +32,7 @@ func NewUpdateArticleLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Upd
 func (l *UpdateArticleLogic) UpdateArticle(in *__.UpdateArticleRequest) (*__.UpdateArticleResponse, error) {
 	article, err := l.svcCtx.ArticleRepo.FindOne(l.ctx, in.ArticleId)
 	if err != nil {
-		l.Logger.Errorf("UpdateArticle FindOne error: %v", err)
+		logger.LogBusinessErr(l.ctx, errmsg.ErrorDbSelect, err, logger.WithArticleID(in.ArticleId))
 		return nil, err
 	}
 	if article == nil {
@@ -55,7 +57,7 @@ func (l *UpdateArticleLogic) UpdateArticle(in *__.UpdateArticleRequest) (*__.Upd
 		_, err = l.svcCtx.MinioClient.PutObject(l.ctx, l.svcCtx.Config.MinIO.BucketName, objectName,
 			reader, int64(len(*in.MarkdownContent)), minio.PutObjectOptions{ContentType: contentType})
 		if err != nil {
-			l.Logger.Errorf("UpdateArticle Upload to MinIO error: %v", err)
+			logger.LogBusinessErr(l.ctx, errmsg.Error, fmt.Errorf("update minio content failed: %w", err), logger.WithArticleID(in.ArticleId))
 			return nil, err
 		}
 	}
@@ -73,7 +75,7 @@ func (l *UpdateArticleLogic) UpdateArticle(in *__.UpdateArticleRequest) (*__.Upd
 	}
 
 	if err := l.svcCtx.ArticleRepo.Update(l.ctx, article); err != nil {
-		l.Logger.Errorf("UpdateArticle Update error: %v", err)
+		logger.LogBusinessErr(l.ctx, errmsg.ErrorDbUpdate, err, logger.WithArticleID(in.ArticleId))
 		return nil, err
 	}
 

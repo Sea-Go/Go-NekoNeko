@@ -48,14 +48,14 @@ func (l *GetArticleLogic) GetArticle(in *__.GetArticleRequest) (*__.GetArticleRe
 
 	object, err := l.svcCtx.MinioClient.GetObject(l.ctx, l.svcCtx.Config.MinIO.BucketName, article.Content, minio.GetObjectOptions{})
 	if err != nil {
-		logger.LogBusinessErr(l.ctx, errmsg.Error, fmt.Errorf("minio get object failed: %w", err), logger.WithArticleID(in.ArticleId))
+		logger.LogBusinessErr(l.ctx, errmsg.ErrorMinioDownload, fmt.Errorf("minio get object failed: %w", err), logger.WithArticleID(in.ArticleId))
 		return nil, err
 	}
 	defer object.Close()
 
 	contentBytes, err := io.ReadAll(object)
 	if err != nil {
-		logger.LogBusinessErr(l.ctx, errmsg.Error, fmt.Errorf("read minio content failed: %w", err), logger.WithArticleID(in.ArticleId))
+		logger.LogBusinessErr(l.ctx, errmsg.ErrorMinioDownload, fmt.Errorf("read minio object failed: %w", err), logger.WithArticleID(in.ArticleId))
 		return nil, err
 	}
 

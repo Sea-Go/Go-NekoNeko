@@ -52,7 +52,6 @@ func (l *ArticleConsumer) Consume(ctx context.Context, key, val string) error {
 		return err
 	}
 
-	// Idempotency check: skip if not in pending status (3)
 	if article.Status != int32(pb.ArticleStatus_REVIEWING) {
 		logger.LogInfo(ctx, fmt.Sprintf("Article %s status is %d, skipping duplicate processing.", msg.ArticleId, article.Status))
 		return nil
@@ -108,7 +107,7 @@ func (l *ArticleConsumer) Consume(ctx context.Context, key, val string) error {
 					logger.LogBusinessErr(ctx, errmsg.ErrorServerCommon, fmt.Errorf("failed to upload to MinIO: %w", err), logger.WithArticleID(msg.ArticleId), logger.WithUserID(msg.AuthorId))
 					return err
 				}
-				
+
 				logger.LogInfo(ctx, fmt.Sprintf("Article %s uploaded to MinIO bucket %s", msg.ArticleId, bucketName), logger.WithArticleID(msg.ArticleId), logger.WithUserID(msg.AuthorId))
 
 				article.Status = int32(pb.ArticleStatus_PUBLISHED)

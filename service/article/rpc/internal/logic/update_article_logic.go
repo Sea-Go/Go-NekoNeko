@@ -57,7 +57,7 @@ func (l *UpdateArticleLogic) UpdateArticle(in *__.UpdateArticleRequest) (*__.Upd
 		_, err = l.svcCtx.MinioClient.PutObject(l.ctx, l.svcCtx.Config.MinIO.BucketName, objectName,
 			reader, int64(len(*in.MarkdownContent)), minio.PutObjectOptions{ContentType: contentType})
 		if err != nil {
-			logger.LogBusinessErr(l.ctx, errmsg.Error, fmt.Errorf("update minio content failed: %w", err), logger.WithArticleID(in.ArticleId))
+			logger.LogBusinessErr(l.ctx, errmsg.ErrorMinioUpload, fmt.Errorf("update minio content failed: %w", err), logger.WithArticleID(in.ArticleId))
 			return nil, err
 		}
 	}

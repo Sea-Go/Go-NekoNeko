@@ -40,7 +40,7 @@ func (l *DeleteArticleLogic) DeleteArticle(in *__.DeleteArticleRequest) (*__.Del
 	if article.Content != "" {
 		err = l.svcCtx.MinioClient.RemoveObject(l.ctx, l.svcCtx.Config.MinIO.BucketName, article.Content, minio.RemoveObjectOptions{})
 		if err != nil {
-			logger.LogBusinessErr(l.ctx, errmsg.Error, fmt.Errorf("remove minio object failed: %w", err), logger.WithArticleID(in.ArticleId))
+			logger.LogBusinessErr(l.ctx, errmsg.ErrorMinioDelete, fmt.Errorf("remove minio object failed: %w", err), logger.WithArticleID(in.ArticleId))
 			return nil, err
 		}
 	}

@@ -33,7 +33,7 @@ func NewUploadImageLogic(ctx context.Context, svcCtx *svc.ServiceContext) *Uploa
 func (l *UploadImageLogic) UploadImage(file multipart.File, header *multipart.FileHeader) (resp *types.UploadImageResp, err error) {
 	content, err := io.ReadAll(file)
 	if err != nil {
-		logger.LogBusinessErr(l.ctx, errmsg.Error, err)
+		logger.LogBusinessErr(l.ctx, errmsg.ErrorMinioUpload, fmt.Errorf("read uploaded file failed: %w", err))
 		return nil, err
 	}
 
@@ -42,7 +42,7 @@ func (l *UploadImageLogic) UploadImage(file multipart.File, header *multipart.Fi
 		FileName: header.Filename,
 	})
 	if err != nil {
-		logger.LogBusinessErr(l.ctx, errmsg.Error, err)
+		logger.LogBusinessErr(l.ctx, errmsg.ErrorMinioUpload, fmt.Errorf("rpc call UploadFile failed: %w", err))
 		return nil, err
 	}
 

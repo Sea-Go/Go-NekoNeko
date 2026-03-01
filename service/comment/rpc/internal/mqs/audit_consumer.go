@@ -3,8 +3,8 @@ package mqs
 import (
 	"context"
 	"encoding/json"
-	kqtypes "sea-try-go/service/comment/common/types"
-	"sea-try-go/service/comment/internal/svc"
+	"sea-try-go/service/comment/rpc/common/types"
+	"sea-try-go/service/comment/rpc/internal/svc"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

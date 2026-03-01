@@ -6,30 +6,29 @@ package commentservice
 
 import (
 	"context"
-
-	"sea-try-go/service/comment/pb"
+	pb2 "sea-try-go/service/comment/rpc/pb"
 
 	"github.com/zeromicro/go-zero/zrpc"
 	"google.golang.org/grpc"
 )
 
 type (
-	CommentItem            = pb.CommentItem
-	CreateCommentReq       = pb.CreateCommentReq
-	CreateCommentResp      = pb.CreateCommentResp
-	DeleteCommentReq       = pb.DeleteCommentReq
-	DeleteCommentResp      = pb.DeleteCommentResp
-	GetCommentReq          = pb.GetCommentReq
-	GetCommentResp         = pb.GetCommentResp
-	LikeCommentReq         = pb.LikeCommentReq
-	LikeCommentResp        = pb.LikeCommentResp
-	ManageCommentReq       = pb.ManageCommentReq
-	ManageCommentResp      = pb.ManageCommentResp
-	ReportCommentReq       = pb.ReportCommentReq
-	ReportCommentResp      = pb.ReportCommentResp
-	SubjectInfo            = pb.SubjectInfo
-	UpdateSubjectStateReq  = pb.UpdateSubjectStateReq
-	UpdateSubjectStateResp = pb.UpdateSubjectStateResp
+	CommentItem            = pb2.CommentItem
+	CreateCommentReq       = pb2.CreateCommentReq
+	CreateCommentResp      = pb2.CreateCommentResp
+	DeleteCommentReq       = pb2.DeleteCommentReq
+	DeleteCommentResp      = pb2.DeleteCommentResp
+	GetCommentReq          = pb2.GetCommentReq
+	GetCommentResp         = pb2.GetCommentResp
+	LikeCommentReq         = pb2.LikeCommentReq
+	LikeCommentResp        = pb2.LikeCommentResp
+	ManageCommentReq       = pb2.ManageCommentReq
+	ManageCommentResp      = pb2.ManageCommentResp
+	ReportCommentReq       = pb2.ReportCommentReq
+	ReportCommentResp      = pb2.ReportCommentResp
+	SubjectInfo            = pb2.SubjectInfo
+	UpdateSubjectStateReq  = pb2.UpdateSubjectStateReq
+	UpdateSubjectStateResp = pb2.UpdateSubjectStateResp
 
 	CommentService interface {
 		CreateComment(ctx context.Context, in *CreateCommentReq, opts ...grpc.CallOption) (*CreateCommentResp, error)
@@ -53,36 +52,36 @@ func NewCommentService(cli zrpc.Client) CommentService {
 }
 
 func (m *defaultCommentService) CreateComment(ctx context.Context, in *CreateCommentReq, opts ...grpc.CallOption) (*CreateCommentResp, error) {
-	client := pb.NewCommentServiceClient(m.cli.Conn())
+	client := pb2.NewCommentServiceClient(m.cli.Conn())
 	return client.CreateComment(ctx, in, opts...)
 }
 
 func (m *defaultCommentService) GetComment(ctx context.Context, in *GetCommentReq, opts ...grpc.CallOption) (*GetCommentResp, error) {
-	client := pb.NewCommentServiceClient(m.cli.Conn())
+	client := pb2.NewCommentServiceClient(m.cli.Conn())
 	return client.GetComment(ctx, in, opts...)
 }
 
 func (m *defaultCommentService) DeleteComment(ctx context.Context, in *DeleteCommentReq, opts ...grpc.CallOption) (*DeleteCommentResp, error) {
-	client := pb.NewCommentServiceClient(m.cli.Conn())
+	client := pb2.NewCommentServiceClient(m.cli.Conn())
 	return client.DeleteComment(ctx, in, opts...)
 }
 
 func (m *defaultCommentService) LikeComment(ctx context.Context, in *LikeCommentReq, opts ...grpc.CallOption) (*LikeCommentResp, error) {
-	client := pb.NewCommentServiceClient(m.cli.Conn())
+	client := pb2.NewCommentServiceClient(m.cli.Conn())
 	return client.LikeComment(ctx, in, opts...)
 }
 
 func (m *defaultCommentService) ReportComment(ctx context.Context, in *ReportCommentReq, opts ...grpc.CallOption) (*ReportCommentResp, error) {
-	client := pb.NewCommentServiceClient(m.cli.Conn())
+	client := pb2.NewCommentServiceClient(m.cli.Conn())
 	return client.ReportComment(ctx, in, opts...)
 }
 
 func (m *defaultCommentService) ManageComment(ctx context.Context, in *ManageCommentReq, opts ...grpc.CallOption) (*ManageCommentResp, error) {
-	client := pb.NewCommentServiceClient(m.cli.Conn())
+	client := pb2.NewCommentServiceClient(m.cli.Conn())
 	return client.ManageComment(ctx, in, opts...)
 }
 
 func (m *defaultCommentService) UpdateSubjectState(ctx context.Context, in *UpdateSubjectStateReq, opts ...grpc.CallOption) (*UpdateSubjectStateResp, error) {
-	client := pb.NewCommentServiceClient(m.cli.Conn())
+	client := pb2.NewCommentServiceClient(m.cli.Conn())
 	return client.UpdateSubjectState(ctx, in, opts...)
 }

@@ -4,12 +4,11 @@ import (
 	"context"
 	"flag"
 	"fmt"
-
-	"sea-try-go/service/comment/internal/config"
-	"sea-try-go/service/comment/internal/mqs"
-	"sea-try-go/service/comment/internal/server"
-	"sea-try-go/service/comment/internal/svc"
-	"sea-try-go/service/comment/pb"
+	"sea-try-go/service/comment/rpc/internal/config"
+	"sea-try-go/service/comment/rpc/internal/mqs"
+	"sea-try-go/service/comment/rpc/internal/server"
+	"sea-try-go/service/comment/rpc/internal/svc"
+	"sea-try-go/service/comment/rpc/pb"
 
 	"github.com/zeromicro/go-queue/kq"
 	"github.com/zeromicro/go-zero/core/conf"

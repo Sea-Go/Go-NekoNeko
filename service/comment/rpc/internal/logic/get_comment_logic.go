@@ -2,11 +2,10 @@ package logic
 
 import (
 	"context"
-	"sea-try-go/service/comment/internal/model"
+	"sea-try-go/service/comment/rpc/internal/model"
+	"sea-try-go/service/comment/rpc/internal/svc"
+	"sea-try-go/service/comment/rpc/pb"
 	"time"
-
-	"sea-try-go/service/comment/internal/svc"
-	"sea-try-go/service/comment/pb"
 
 	"github.com/zeromicro/go-zero/core/logx"
 )

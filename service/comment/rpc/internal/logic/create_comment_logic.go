@@ -4,11 +4,11 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"sea-try-go/service/comment/rpc/common/types"
+	"sea-try-go/service/comment/rpc/internal/svc"
+	"sea-try-go/service/comment/rpc/pb"
 	"time"
 
-	kqtypes "sea-try-go/service/comment/common/types"
-	"sea-try-go/service/comment/internal/svc"
-	"sea-try-go/service/comment/pb"
 	"sea-try-go/service/common/snowflake"
 
 	"github.com/zeromicro/go-zero/core/logx"

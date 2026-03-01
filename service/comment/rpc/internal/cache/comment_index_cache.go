@@ -4,14 +4,13 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	model2 "sea-try-go/service/comment/rpc/internal/model"
 	"time"
-
-	"sea-try-go/service/comment/internal/model" // 按你的实际路径改
 )
 
 const defaultCommentIndexTTL = 10 * time.Minute
 
-func (c *CommentCache) GetCommentIndexCache(ctx context.Context, ids []int64, conn *model.CommentModel) ([]model.CommentIndex, error) {
+func (c *CommentCache) GetCommentIndexCache(ctx context.Context, ids []int64, conn *model2.CommentModel) ([]model2.CommentIndex, error) {
 	if c == nil || c.rdb == nil {
 		return nil, fmt.Errorf("comment cache is nil")
 	}
@@ -19,7 +18,7 @@ func (c *CommentCache) GetCommentIndexCache(ctx context.Context, ids []int64, co
 		return nil, fmt.Errorf("comment model conn is nil")
 	}
 	if len(ids) == 0 {
-		return []model.CommentIndex{}, nil
+		return []model2.CommentIndex{}, nil
 	}
 
 	validIDs := make([]int64, 0, len(ids))
@@ -29,7 +28,7 @@ func (c *CommentCache) GetCommentIndexCache(ctx context.Context, ids []int64, co
 		}
 	}
 	if len(validIDs) == 0 {
-		return []model.CommentIndex{}, nil
+		return []model2.CommentIndex{}, nil
 	}
 
 	keys := make([]string, 0, len(validIDs))
@@ -42,7 +41,7 @@ func (c *CommentCache) GetCommentIndexCache(ctx context.Context, ids []int64, co
 		return nil, fmt.Errorf("redis MGet comment index cache failed: %w", err)
 	}
 
-	indexMap := make(map[int64]model.CommentIndex, len(validIDs))
+	indexMap := make(map[int64]model2.CommentIndex, len(validIDs))
 	missIDs := make([]int64, 0)
 
 	for i, v := range values {
@@ -64,7 +63,7 @@ func (c *CommentCache) GetCommentIndexCache(ctx context.Context, ids []int64, co
 			continue
 		}
 
-		var idx model.CommentIndex
+		var idx model2.CommentIndex
 		if err := json.Unmarshal(raw, &idx); err != nil {
 			missIDs = append(missIDs, id)
 			continue
@@ -97,7 +96,7 @@ func (c *CommentCache) GetCommentIndexCache(ctx context.Context, ids []int64, co
 	}
 
 	// 7) 按输入 ids 顺序重排输出（关键）
-	result := make([]model.CommentIndex, 0, len(ids))
+	result := make([]model2.CommentIndex, 0, len(ids))
 	for _, id := range ids {
 		if id <= 0 {
 			continue

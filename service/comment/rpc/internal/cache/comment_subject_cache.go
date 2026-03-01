@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"sea-try-go/service/comment/internal/model"
+	model2 "sea-try-go/service/comment/rpc/internal/model"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -12,15 +12,15 @@ import (
 
 const defaultSubjectTTL = 5 * time.Minute
 
-func (c *CommentCache) GetSubjectWithCache(ctx context.Context, subjectID string, conn *model.CommentModel) (model.Subject, error) {
+func (c *CommentCache) GetSubjectWithCache(ctx context.Context, subjectID string, conn *model2.CommentModel) (model2.Subject, error) {
 	if c == nil || c.rdb == nil {
-		return model.Subject{}, fmt.Errorf("comment cache is nil")
+		return model2.Subject{}, fmt.Errorf("comment cache is nil")
 	}
 	if conn == nil {
-		return model.Subject{}, fmt.Errorf("comment model conn is nil")
+		return model2.Subject{}, fmt.Errorf("comment model conn is nil")
 	}
 	if subjectID == "" {
-		return model.Subject{}, fmt.Errorf("invalid subjectID: empty")
+		return model2.Subject{}, fmt.Errorf("invalid subjectID: empty")
 	}
 
 	if cached, err := c.GetSubjectCache(ctx, subjectID); err == nil && cached != nil {
@@ -38,7 +38,7 @@ func (c *CommentCache) GetSubjectWithCache(ctx context.Context, subjectID string
 
 		subject, dbErr := conn.GetSubjectByID(ctx, subjectID)
 		if dbErr != nil {
-			return model.Subject{}, dbErr
+			return model2.Subject{}, dbErr
 		}
 
 		_ = c.SetSubjectCache(ctx, subjectID, &subject, 5*time.Minute)
@@ -46,18 +46,18 @@ func (c *CommentCache) GetSubjectWithCache(ctx context.Context, subjectID string
 		return subject, nil
 	})
 	if err != nil {
-		return model.Subject{}, err
+		return model2.Subject{}, err
 	}
 
-	subject, ok := v.(model.Subject)
+	subject, ok := v.(model2.Subject)
 	if !ok {
-		return model.Subject{}, fmt.Errorf("singleflight result type assert failed")
+		return model2.Subject{}, fmt.Errorf("singleflight result type assert failed")
 	}
 
 	return subject, nil
 }
 
-func (c *CommentCache) GetSubjectCache(ctx context.Context, subjectID string) (*model.Subject, error) {
+func (c *CommentCache) GetSubjectCache(ctx context.Context, subjectID string) (*model2.Subject, error) {
 	if c == nil || c.rdb == nil {
 		return nil, fmt.Errorf("comment cache is nil")
 	}
@@ -73,14 +73,14 @@ func (c *CommentCache) GetSubjectCache(ctx context.Context, subjectID string) (*
 		return nil, err
 	}
 
-	var s model.Subject
+	var s model2.Subject
 	if err := json.Unmarshal([]byte(val), &s); err != nil {
 		return nil, err
 	}
 	return &s, nil
 }
 
-func (c *CommentCache) SetSubjectCache(ctx context.Context, subjectID string, subject *model.Subject, ttl time.Duration) error {
+func (c *CommentCache) SetSubjectCache(ctx context.Context, subjectID string, subject *model2.Subject, ttl time.Duration) error {
 	if c == nil || c.rdb == nil {
 		return fmt.Errorf("comment cache is nil")
 	}

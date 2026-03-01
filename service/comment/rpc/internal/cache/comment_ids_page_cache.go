@@ -4,7 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
-	"sea-try-go/service/comment/internal/model"
+	model2 "sea-try-go/service/comment/rpc/internal/model"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -12,7 +12,7 @@ import (
 
 const defaultReplyIDsPageTTL = 3 * time.Minute
 
-func (c *CommentCache) GetReplyIDsPageCache(ctx context.Context, req model.GetReplyIDsPageReq, conn *model.CommentModel) ([]int64, error) {
+func (c *CommentCache) GetReplyIDsPageCache(ctx context.Context, req model2.GetReplyIDsPageReq, conn *model2.CommentModel) ([]int64, error) {
 	if c == nil || c.rdb == nil {
 		return nil, fmt.Errorf("comment cache is nil")
 	}
@@ -77,8 +77,8 @@ func (c *CommentCache) GetReplyIDsPageCache(ctx context.Context, req model.GetRe
 
 func (c *CommentCache) preloadNextReplyIDsPage(
 	ctx context.Context,
-	req model.GetReplyIDsPageReq,
-	conn *model.CommentModel,
+	req model2.GetReplyIDsPageReq,
+	conn *model2.CommentModel,
 ) {
 	// 基础保护
 	if c == nil || c.rdb == nil || conn == nil {

@@ -4,7 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	kqtypes "sea-try-go/service/comment/common/types"
+	"sea-try-go/service/comment/rpc/common/types"
 	"time"
 
 	"gorm.io/gorm"

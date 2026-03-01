@@ -2,6 +2,7 @@ package logic
 
 import (
 	"context"
+	"fmt"
 	"sea-try-go/service/comment/rpc/internal/model"
 	"sea-try-go/service/comment/rpc/internal/svc"
 	"sea-try-go/service/comment/rpc/pb"
@@ -28,6 +29,7 @@ func (l *GetCommentLogic) GetComment(in *pb.GetCommentReq) (*pb.GetCommentResp, 
 	ctx, cancel := context.WithTimeout(context.Background(), time.Second)
 	defer cancel()
 	conn := l.svcCtx.CommentModel
+	fmt.Println(in.TargetId)
 	subject, err := l.svcCtx.CommentCache.GetSubjectWithCache(ctx, in.TargetId, conn)
 	if err != nil {
 		return nil, err

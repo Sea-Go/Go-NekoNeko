@@ -192,7 +192,7 @@ func (m *CommentModel) GetSubjectByID(ctx context.Context, subjectId string) (Su
 
 	err := m.conn.WithContext(ctx).
 		Model(&Subject{}).
-		Where("id = ?", subjectId).
+		Where("target_id = ?", subjectId).
 		First(&subject).Error
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {

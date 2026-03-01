@@ -1,200 +1,163 @@
 syntax = "v1"
 
 info (
-    title: "comment-api"
-    desc: "HTTP API for CommentService (mapped from proto)"
-    author: "pb->api"
-    version: "1.0"
+	title:   "comment-api"
+	desc:    "HTTP API for CommentService (mapped from proto)"
+	author:  "pb->api"
+	version: "1.0"
 )
 
 type (
-    // =========================
-    // Enums (use int32 in API)
-    // =========================
-    // CommentState:
-    // 0=STATE_NORMAL, 1=STATE_REVIEWING, 2=STATE_DELETED, 3=STATE_BLOCKED
-    //
-    // SubjectState:
-    // 0=SUBJECT_OPEN, 1=SUBJECT_CLOSED, 2=SUBJECT_ONLY
-    //
-    // ReportReason:
-    // 0=REASON_UNKNOWN, 1=REASON_SPAM_ADVERT, 2=REASON_PORN_VULGAR,
-    // 3=REASON_HARASSMENT_ABUSE, 4=REASON_ILLEGAL_COTENT, 5=REASON_FRAUD_SCAM,
-    // 6=REASON_SPOILER, 7=REASON_PRIVACY_LEAK, 8=REASON_MEANINGLESS_SPAM,
-    // 99=REASON_OTHER
-    //
-    // ManageType:
-    // 0=UNKNOWN, 1=MANAGE_PIN, 2=MANAGE_UNPIN, 3=MANAGE_FEATURE, 4=MANAGE_UNFEATURE
-
-    // =========================
-    // Models
-    // =========================
-
-    CommentItem {
-        id int64 `json:"id"`
-        userId int64 `json:"user_id"`
-        content string `json:"content"`
-
-        rootId int64 `json:"root_id"`
-        parentId int64 `json:"parent_id"`
-
-        likeCount int64 `json:"like_count"`
-        dislikeCount int64 `json:"dislike_count"`
-        replyCount int64 `json:"reply_count"`
-
-        attribute int64 `json:"attribute"`
-        state int32 `json:"state"`
-
-        createdAt string `json:"created_at"`
-        meta string `json:"meta"`
-
-        children []CommentItem `json:"children"`
-    }
-
-    SubjectInfo {
-        targetType string `json:"target_type"`
-        targetId string `json:"target_id"`
-
-        totalCount int64 `json:"total_count"`
-        rootCount int64 `json:"root_count"`
-
-        state int32 `json:"state"`
-        attribute int64 `json:"attribute"`
-
-        ownerId int64 `json:"owner_id"`
-    }
-
-        // =========================
-        // Requests / Responses
-        // =========================
-
-    CreateCommentReq {
-        userId int64 `json:"user_id"`
-
-        targetType string `json:"target_type"`
-        targetId string `json:"target_id"`
-
-        rootId int64 `json:"root_id"`
-        parentId int64 `json:"parent_id"`
-
-        content string `json:"content"`
-        meta string `json:"meta"`
-    }
-
-    CreateCommentResp {
-        id int64 `json:"id"`
-        createdAt string `json:"created_at"`
-        subjectCount int64 `json:"subject_count"`
-    }
-
-    GetCommentReq {
-        targetType string `form:"target_type"`
-        targetId string `form:"target_id"`
-
-        sortType int64 `form:"sort_type"`
-        rootId int64 `form:"root_id"`
-
-        page int64 `form:"page"`
-        pageSize int64 `form:"page_size"`
-    }
-
-    GetCommentResp {
-        comment []CommentItem `json:"comment"`
-        subject SubjectInfo `json:"subject"`
-    }
-
-    LikeCommentReq {
-        userId int64 `json:"user_id"`
-
-        targetType string `json:"target_type"`
-        targetId string `json:"target_id"`
-
-        commentId int64 `json:"comment_id"`
-
-        actionType int32 `json:"action_type"`
-    }
-
-    LikeCommentResp {
-        success bool `json:"success"`
-        likeCount int64 `json:"like_count"`
-    }
-
-    DeleteCommentReq {
-        userId int64 `json:"user_id"`
-        commentId int64 `json:"comment_id"`
-
-        targetType string `json:"target_type"`
-        targetId string `json:"target_id"`
-    }
-
-    DeleteCommentResp {
-        success bool `json:"success"`
-        subjectTotalCount int64 `json:"subject_total_count"`
-    }
-
-    ManageCommentReq {
-        userId int64 `json:"user_id"`
-        commentId int64 `json:"comment_id"`
-        targetType string `json:"target_type"`
-        targetId string `json:"target_id"`
-
-        actionType int32 `json:"action_type"`
-    }
-
-    ManageCommentResp {
-        success bool `json:"success"`
-    }
-
-    ReportCommentReq {
-        userId int64 `json:"user_id"`
-        commentId int64 `json:"comment_id"`
-        targetType string `json:"target_type"`
-        targetId string `json:"target_id"`
-
-        reason int32 `json:"reason"`
-        detail string `json:"detail"`
-    }
-
-    ReportCommentResp {
-        success bool `json:"success"`
-    }
-
-    UpdateSubjectStateReq {
-        userId int64 `json:"user_id"`
-        targetType string `json:"target_type"`
-        targetId string `json:"target_id"`
-
-        state int32 `json:"state"`
-    }
-
-    UpdateSubjectStateResp {
-        success bool `json:"success"`
-    }
+	// =========================
+	// Enums (use int32 in API)
+	// =========================
+	// CommentState:
+	// 0=STATE_NORMAL, 1=STATE_REVIEWING, 2=STATE_DELETED, 3=STATE_BLOCKED
+	//
+	// SubjectState:
+	// 0=SUBJECT_OPEN, 1=SUBJECT_CLOSED, 2=SUBJECT_ONLY
+	//
+	// ReportReason:
+	// 0=REASON_UNKNOWN, 1=REASON_SPAM_ADVERT, 2=REASON_PORN_VULGAR,
+	// 3=REASON_HARASSMENT_ABUSE, 4=REASON_ILLEGAL_COTENT, 5=REASON_FRAUD_SCAM,
+	// 6=REASON_SPOILER, 7=REASON_PRIVACY_LEAK, 8=REASON_MEANINGLESS_SPAM,
+	// 99=REASON_OTHER
+	//
+	// ManageType:
+	// 0=UNKNOWN, 1=MANAGE_PIN, 2=MANAGE_UNPIN, 3=MANAGE_FEATURE, 4=MANAGE_UNFEATURE
+	// =========================
+	// Models
+	// =========================
+	CommentItem {
+		id           int64         `json:"id"`
+		userId       int64         `json:"user_id"`
+		content      string        `json:"content"`
+		rootId       int64         `json:"root_id"`
+		parentId     int64         `json:"parent_id"`
+		likeCount    int64         `json:"like_count"`
+		dislikeCount int64         `json:"dislike_count"`
+		replyCount   int64         `json:"reply_count"`
+		attribute    int64         `json:"attribute"`
+		state        int32         `json:"state"`
+		createdAt    string        `json:"created_at"`
+		meta         string        `json:"meta"`
+		children     []CommentItem `json:"children"`
+	}
+	SubjectInfo {
+		targetType string `json:"target_type"`
+		targetId   string `json:"target_id"`
+		totalCount int64  `json:"total_count"`
+		rootCount  int64  `json:"root_count"`
+		state      int32  `json:"state"`
+		attribute  int64  `json:"attribute"`
+		ownerId    int64  `json:"owner_id"`
+	}
+	// =========================
+	// Requests / Responses
+	// =========================
+	CreateCommentReq {
+		userId     int64  `json:"user_id"`
+		targetType string `json:"target_type"`
+		targetId   string `json:"target_id"`
+		rootId     int64  `json:"root_id"`
+		parentId   int64  `json:"parent_id"`
+		content    string `json:"content"`
+		meta       string `json:"meta"`
+	}
+	CreateCommentResp {
+		id           int64  `json:"id"`
+		createdAt    string `json:"created_at"`
+		subjectCount int64  `json:"subject_count"`
+	}
+	GetCommentReq {
+		targetType string `json:"target_type"`
+		targetId   string `json:"target_id"`
+		sortType   int64  `json:"sort_type"`
+		rootId     int64  `json:"root_id"`
+		page       int64  `json:"page"`
+		pageSize   int64  `json:"page_size"`
+	}
+	GetCommentResp {
+		comment []CommentItem `json:"comment"`
+		subject SubjectInfo   `json:"subject"`
+	}
+	LikeCommentReq {
+		userId     int64  `json:"user_id"`
+		targetType string `json:"target_type"`
+		targetId   string `json:"target_id"`
+		commentId  int64  `json:"comment_id"`
+		actionType int32  `json:"action_type"`
+	}
+	LikeCommentResp {
+		success   bool  `json:"success"`
+		likeCount int64 `json:"like_count"`
+	}
+	DeleteCommentReq {
+		userId     int64  `json:"user_id"`
+		commentId  int64  `json:"comment_id"`
+		targetType string `json:"target_type"`
+		targetId   string `json:"target_id"`
+	}
+	DeleteCommentResp {
+		success           bool  `json:"success"`
+		subjectTotalCount int64 `json:"subject_total_count"`
+	}
+	ManageCommentReq {
+		userId     int64  `json:"user_id"`
+		commentId  int64  `json:"comment_id"`
+		targetType string `json:"target_type"`
+		targetId   string `json:"target_id"`
+		actionType int32  `json:"action_type"`
+	}
+	ManageCommentResp {
+		success bool `json:"success"`
+	}
+	ReportCommentReq {
+		userId     int64  `json:"user_id"`
+		commentId  int64  `json:"comment_id"`
+		targetType string `json:"target_type"`
+		targetId   string `json:"target_id"`
+		reason     int32  `json:"reason"`
+		detail     string `json:"detail"`
+	}
+	ReportCommentResp {
+		success bool `json:"success"`
+	}
+	UpdateSubjectStateReq {
+		userId     int64  `json:"user_id"`
+		targetType string `json:"target_type"`
+		targetId   string `json:"target_id"`
+		state      int32  `json:"state"`
+	}
+	UpdateSubjectStateResp {
+		success bool `json:"success"`
+	}
 )
 
 @server (
-    prefix: /api/v1
-    group: comment
+	prefix: /api/v1
+	group:  comment
 )
 service CommentService {
-    @handler CreateComment
-    post /comment/create (CreateCommentReq) returns (CreateCommentResp)
+	@handler CreateComment
+	post /comment/create (CreateCommentReq) returns (CreateCommentResp)
 
-    @handler GetComment
-    get /comment/list (GetCommentReq) returns (GetCommentResp)
+	@handler GetComment
+	post /comment/list (GetCommentReq) returns (GetCommentResp)
 
-    @handler DeleteComment
-    post /comment/delete (DeleteCommentReq) returns (DeleteCommentResp)
+	@handler DeleteComment
+	post /comment/delete (DeleteCommentReq) returns (DeleteCommentResp)
 
-    @handler LikeComment
-    post /comment/like (LikeCommentReq) returns (LikeCommentResp)
+	@handler LikeComment
+	post /comment/like (LikeCommentReq) returns (LikeCommentResp)
 
-    @handler ReportComment
-    post /comment/report (ReportCommentReq) returns (ReportCommentResp)
+	@handler ReportComment
+	post /comment/report (ReportCommentReq) returns (ReportCommentResp)
 
-    @handler ManageComment
-    post /comment/manage (ManageCommentReq) returns (ManageCommentResp)
+	@handler ManageComment
+	post /comment/manage (ManageCommentReq) returns (ManageCommentResp)
 
-    @handler UpdateSubjectState
-    post /subject/state (UpdateSubjectStateReq) returns (UpdateSubjectStateResp)
+	@handler UpdateSubjectState
+	post /subject/state (UpdateSubjectStateReq) returns (UpdateSubjectStateResp)
 }
+

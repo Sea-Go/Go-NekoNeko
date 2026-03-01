@@ -1,0 +1,7 @@
+Name: CommentService
+Host: 0.0.0.0
+Port: 8888
+
+CommentRpc:
+  Target: 127.0.0.1:9001
+  NonBlock: true

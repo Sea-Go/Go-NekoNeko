@@ -20,6 +20,7 @@ KqConsumerConf:
   Topic: comment-audit-topic
   Offset: last
   Consumers: 8
+  Name: ""
 
 BizRedis:
   Host: 127.0.0.1:36379

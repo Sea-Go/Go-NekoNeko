@@ -1,0 +1,71 @@
+Name: like.rpc
+ListenOn: 0.0.0.0:8080
+Etcd:
+  Hosts:
+  - 127.0.0.1:32379
+  Key: like.rpc
+
+Storage:
+  #配置写性能最强的KV数据库RocksDB
+  RocksDB:
+    #Path表示数据文件存在硬盘的位置
+    Path: "./data/like_rocksdb"
+    #WriteBufferSize表示内存缓冲区大小,点赞数据先写到内存里,攒够了64MB再往磁盘里面刷,速度非常快
+    WriteBufferSize: 67108864
+    #MaxWriteBufferNumber表示内存缓冲区个数
+    MaxWriteBufferNumber: 4
+    #TargetFileSizeBase底层数据文件的基础目标大小,每一个放入的SSTable文件,必须是64MB
+    TargetFileSizeBase: 67108864
+    #MaxBackgroundCompactions表示后台开启4个线程,把磁盘上小文件合并成大文件
+    MaxBackgroundCompactions: 4
+  #配置读取性能高的Redis
+  Redis:
+    Host: "127.0.0.1:36379"
+    Type: "node"
+    Pass: ""
+    #普通作品的点赞在Redis中活3600s
+    CacheTTL: 3600
+    #热点作品的点赞在Redis中活1800s,因为热点变化很快,需要更快地过期重建
+    HotspotTTL: 1800
+    #批量查询时的最大查询条数
+    BatchSize: 1000
+  Postgres:
+    DataSource: "postgres://admin:Sea-TryGo@127.0.0.1:35432/first_db?sslmode=disable"
+    #每隔300s,后台会定时把RocksDB中最近产生的10000条数据塞到PG里
+    #"异步冷备"
+    SyncBatchSize: 10000
+    SyncInterval: 300
+
+#配置消息队列Kafka
+KafkaConf:
+  Brokers:
+    - 127.0.0.1:39092
+  Topic: "like_promotion_topic"
+
+HotSpot:
+  Detector:
+    #如果60s内的点赞数超过1000就被识别为热点
+    Threshold: 1000
+    WindowSize: 60
+  #一旦成为热点,所有点赞请求就不能碰数据库，而是进入本地的内存队列
+  AntiAvalanche:
+    #队列长度为10000
+    QueueSize: 10000
+    #最多同时1000个Goroutine来处理消息队列中的请求
+    MaxConcurrent: 1000
+    #在队列中排队超过1000ms还没轮到的话就直接刷掉,此时必须返回"系统繁忙"
+    Timeout: 1000
+
+
+#防刷系统
+AntiBrush:
+  #针对所有人
+  RateLimit:
+    #对于某个IP地址,如果60s内发送了60个赞,则证明是刷赞
+    Window: 60
+    MaxRequests : 60
+  #针对个人账号
+  UserLimit:
+    #一天最多1000赞,每分钟最多60赞,否则判定为刷赞号,直接封
+    DailyMax: 1000
+    PerMinuteMax: 60

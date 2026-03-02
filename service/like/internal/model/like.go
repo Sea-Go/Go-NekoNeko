@@ -6,6 +6,7 @@ type LikeRecordModel interface {
 	GetTotalLikeCount(authorId int64) (int64, error)
 	GetBatchLikeCount(targetType string, targetIds []string) (map[string]map[int32]int64, error)
 	GetUserBatchLikeState(userId int64, targetType string, targetIds []string) (map[string]int32, error)
+	GetUserLikeList(userId int64, targetType string, cursor int64, limit int) ([]UserLikeListResult, error)
 }
 
 type defaultLikeRecordModel struct {
@@ -65,4 +66,24 @@ func (m *defaultLikeRecordModel) GetUserBatchLikeState(userId int64, targetType 
 		resMap[r.TargetID] = r.State
 	}
 	return resMap, nil
+}
+
+type UserLikeListResult struct {
+	Id         int64
+	TargetId   string
+	CreateTime int64
+}
+
+func (m *defaultLikeRecordModel) GetUserLikeList(userId int64, targetType string, cursor int64, limit int) ([]UserLikeListResult, error) {
+	var results []UserLikeListResult
+	//ID越大表示时间越新,只需要 id < cursor ,然后结合Limit就能取出最接近cursor的limit条数据
+	query := m.db.Model(&LikeRecord{}).Where("user_id = ? AND target_type = ? AND state = 1", userId, targetType)
+	if cursor > 0 {
+		query = query.Where("id < ?", cursor)
+	}
+	err := query.Order("id DESC").
+		Limit(limit).
+		Select("id, target_id, create_time").
+		Scan(&results).Error
+	return results, err
 }
